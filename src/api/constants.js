@@ -4,7 +4,7 @@ export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/ap
 export const ENDPOINTS = {
     AUTH: {
         DISCORD: `${API_URL}/auth/discord`,
-        ME: `${API_URL}/auth/me`,
+        ME: `${API_URL}/user/me`,
         LOGOUT: `${API_URL}/auth/logout`,
         REFRESH: `${API_URL}/auth/refresh-token`,
     },

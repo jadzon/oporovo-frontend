@@ -1,46 +1,25 @@
-import { useState, useEffect } from 'react';
+// App.jsx
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getCurrentUser } from './store/thunks/authThunks';
-import { useModal } from './hooks/useModal'; // Import from hooks, not context
 
 // Components
-import Navbar from './components/layout/Navbar';
-import Hero from './components/home/Hero';
-import AboutUs from './components/home/AboutUs';
-import TopTutors from './components/home/TopTutors';
-import Footer from './components/layout/Footer';
-import LoginModal from './components/auth/LoginModal';
+import Layout from './components/layout/Layout';
+import HomePage from './pages/HomePage';
+// import Dashboard from './pages/Dashboard';
 import AuthCallback from './components/auth/AuthCallback';
+import { ROUTES } from './api/constants';
 
-// Home page component with error handling
-const HomePage = () => {
-    // Add error handling for useModal hook
-    const modal = useModal();
+// Protected route component
+const ProtectedRoute = ({ children }) => {
+    const isAuthenticated = useSelector(state => !!state.auth.user);
 
-    // Early return if modal is not available yet
-    if (!modal) {
-        console.log("Modal not available yet");
-        return <div>Loading...</div>;
+    if (!isAuthenticated) {
+        return <Navigate to={ROUTES.HOME} replace />;
     }
 
-    const { isLoginModalOpen, openLoginModal, closeLoginModal } = modal;
-
-    return (
-        <div className="flex flex-col min-h-screen">
-            <Navbar openLoginModal={openLoginModal} />
-
-            <main className="flex-grow">
-                <Hero />
-                <AboutUs />
-                <TopTutors />
-            </main>
-
-            <Footer />
-
-            <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-        </div>
-    );
+    return children;
 };
 
 function App() {
@@ -57,9 +36,26 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="*" element={<Navigate to="/" />} />
+                <Route element={<Layout />}>
+                    {/* Public routes */}
+                    <Route path={ROUTES.HOME} element={<HomePage />} />
+                    <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />
+
+                    {/* Protected routes */}
+                    {/*<Route*/}
+                    {/*    path={ROUTES.DASHBOARD}*/}
+                    {/*    element={*/}
+                    {/*        <ProtectedRoute>*/}
+                    {/*            <Dashboard />*/}
+                    {/*        </ProtectedRoute>*/}
+                    {/*    }*/}
+                    {/*/>*/}
+
+                    {/* Add more protected routes for tutors, calendar, etc. */}
+
+                    {/* Fallback route */}
+                    <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );
