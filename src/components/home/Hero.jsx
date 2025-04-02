@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { FaDiscord, FaSearch } from 'react-icons/fa';
-import { useModal } from '../../context/ModalContext';
-
+import { useModal } from '../../hooks/useModal';
 const Hero = () => {
     const { openLoginModal } = useModal();
 
@@ -17,10 +16,10 @@ const Hero = () => {
                         className="lg:w-1/2 text-center lg:text-left"
                     >
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                            Znajdź idealnego <span className="text-vibely-600">korepetytora</span> na Vibely
+                            Znajdź idealnego <span className="text-vibely-600">korepetytora</span> na Oporovo
                         </h1>
                         <p className="mt-6 text-xl text-gray-600 max-w-lg mx-auto lg:mx-0">
-                            Vibely to platforma, która łączy uczniów z najlepszymi korepetytorami przez Discord.
+                            Oporovo to platforma, która łączy uczniów z najlepszymi korepetytorami przez Discord.
                             Zarezerwuj lekcje online i rozwijaj swoje umiejętności.
                         </p>
                         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -36,6 +35,7 @@ const Hero = () => {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
+                                onClick={() => window.location.href = 'http://localhost:8080/api/user'}
                                 className=" btn btn-outline py-3 px-8 text-lg"
                             >
                                 <FaSearch className="mr-2" />
@@ -52,7 +52,7 @@ const Hero = () => {
                         className="lg:w-1/2 mt-12 lg:mt-0"
                     >
                         <img
-                            src="../../../node_modules/temp_data/classroom.png"
+                            src="../../../public/temp_data/classroom.png"
                             alt="Vibely - dupa"
                             className="w-full h-auto rounded-xl shadow-lg"
                         />

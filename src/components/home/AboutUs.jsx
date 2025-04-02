@@ -35,9 +35,9 @@ const AboutUs = () => {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-3xl font-bold text-gray-900">O Vibely</h2>
+                    <h2 className="text-3xl font-bold text-gray-900">O Oporovo</h2>
                     <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                        Vibely to innowacyjna platforma korepetycji online, która łączy uczniów i studentów
+                        Oporovo to innowacyjna platforma korepetycji online, która łączy uczniów i studentów
                         z doświadczonymi korepetytorami za pośrednictwem Discord. Nasza misja to uczynienie
                         edukacji bardziej dostępną i wygodną dla wszystkich.
                     </p>
@@ -50,7 +50,7 @@ const AboutUs = () => {
                         transition={{ duration: 0.6, delay: 0.2 }}
                     >
                         <img
-                            src="https://via.placeholder.com/600x400"
+                            src="../../../public/temp_data/construction.png"
                             alt="O Vibely"
                             className="w-full h-auto rounded-xl shadow-lg"
                         />
@@ -61,7 +61,7 @@ const AboutUs = () => {
                         transition={{ duration: 0.6, delay: 0.3 }}
                     >
                         <h3 className="text-2xl font-semibold text-gray-900 mb-6">
-                            Dlaczego warto korzystać z Vibely?
+                            Dlaczego warto korzystać z Oporovo?
                         </h3>
 
                         <ul className="space-y-6">

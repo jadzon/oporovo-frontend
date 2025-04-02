@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { FaDiscord, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { authService } from '../../api/services/authService';
 
 const LoginModal = ({ isOpen, onClose }) => {
     const modalRef = useRef();
@@ -35,17 +36,6 @@ const LoginModal = ({ isOpen, onClose }) => {
         };
     }, [isOpen]);
 
-    // Mock login function
-    const handleDiscordLogin = () => {
-        // In production, this would redirect to Discord OAuth
-        console.log('Logging in with Discord...');
-        setTimeout(() => {
-            onClose();
-            // Mock successful login
-            alert('Zalogowano pomyślnie! (symulacja)');
-        }, 1000);
-    };
-
     return (
         <AnimatePresence>
             {isOpen && (
@@ -74,14 +64,14 @@ const LoginModal = ({ isOpen, onClose }) => {
                                 </button>
                                 <div className="text-center">
                                     <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                                        Zaloguj się do Vibely
+                                        Zaloguj się do Oporovo
                                     </h3>
                                     <p className="text-gray-600 mb-8">
                                         Zaloguj się przez Discord aby zarezerwować korepetycje
                                         i korzystać z pełni możliwości platformy.
                                     </p>
                                     <button
-                                        onClick={handleDiscordLogin}
+                                        onClick={() => authService.discordLogin()}
                                         className="w-full flex items-center justify-center btn py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
                                     >
                                         <FaDiscord className="text-xl mr-2" />

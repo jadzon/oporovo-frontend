@@ -26,7 +26,7 @@ const Navbar = ({ openLoginModal }) => {
                     {/* Logo */}
                     <div className="flex items-center">
                         <a href="#" className="font-medium text-gray-700 hover:text-vibely-600 transition-colors">
-                            <span className="text-2xl font-bold text-vibely-700">Vibely</span>
+                            <span className="text-2xl font-bold text-vibely-700">Oporovo</span>
                         </a>
                     </div>
 

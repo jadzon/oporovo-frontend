@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import TutorCard from './TutorCard';
 import { TutorCardSkeleton } from '../ui/Skeleton';
-import { useModal } from '../../context/ModalContext';
+import { useModal } from '../../hooks/useModal';
 
 // Mock tutor data
 const mockTutors = [
