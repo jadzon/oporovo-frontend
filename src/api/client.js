@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_URL } from './constants';
+import {API_URL, ENDPOINTS} from './constants';
 
 const apiClient = axios.create({
     baseURL: API_URL,
@@ -16,14 +16,21 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
+        // Prevent retrying the refresh endpoint itself
+        if (originalRequest.url === ENDPOINTS.AUTH.REFRESH) {
+            return Promise.reject(error);
+        }
+
+        // Check for a 401 error and that we haven't retried this request yet
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-
             try {
-                await apiClient.post('/auth/refresh-token');
+                // Trigger token refresh; the new tokens should be set as cookies by the server.
+                await apiClient.post(ENDPOINTS.AUTH.REFRESH);
+                // Retry the original request; cookies are sent automatically.
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // Handle refresh token failure (e.g., redirect to login)
+                // Handle refresh token failure (for example, redirect to login)
                 return Promise.reject(refreshError);
             }
         }

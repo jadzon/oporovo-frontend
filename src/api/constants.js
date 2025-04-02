@@ -5,8 +5,8 @@ export const ENDPOINTS = {
     AUTH: {
         DISCORD: `${API_URL}/auth/discord`,
         ME: `${API_URL}/user/me`,
-        LOGOUT: `${API_URL}/auth/logout`,
-        REFRESH: `${API_URL}/auth/refresh-token`,
+        LOGOUT: `${API_URL}/user/logout`,
+        REFRESH: `${API_URL}/token/refresh-token`,
     },
 };
 
