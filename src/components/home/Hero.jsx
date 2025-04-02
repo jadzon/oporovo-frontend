@@ -17,7 +17,7 @@ const Hero = () => {
                         className="lg:w-1/2 text-center lg:text-left"
                     >
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                            Znajdź idealnego <span className="text-vibely-600">korepetytora</span> na Discord
+                            Znajdź idealnego <span className="text-vibely-600">korepetytora</span> na Vibely
                         </h1>
                         <p className="mt-6 text-xl text-gray-600 max-w-lg mx-auto lg:mx-0">
                             Vibely to platforma, która łączy uczniów z najlepszymi korepetytorami przez Discord.
@@ -52,8 +52,8 @@ const Hero = () => {
                         className="lg:w-1/2 mt-12 lg:mt-0"
                     >
                         <img
-                            src="https://via.placeholder.com/600x500"
-                            alt="Vibely - platforma korepetycji przez Discord"
+                            src="../../../node_modules/temp_data/classroom.png"
+                            alt="Vibely - dupa"
                             className="w-full h-auto rounded-xl shadow-lg"
                         />
                     </motion.div>

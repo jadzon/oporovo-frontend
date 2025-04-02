@@ -55,7 +55,6 @@ const AboutUs = () => {
                             className="w-full h-auto rounded-xl shadow-lg"
                         />
                     </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
