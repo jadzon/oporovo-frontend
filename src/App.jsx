@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 // import Dashboard from './pages/Dashboard';
 import AuthCallback from './components/auth/AuthCallback';
 import { ROUTES } from './api/constants';
+import CockpitPage from "./pages/CockpitPage.jsx";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -24,6 +25,7 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
     const dispatch = useDispatch();
+    const isAuthenticated = useSelector((state) => !!state.auth.user);
 
     useEffect(() => {
         try {
@@ -38,7 +40,10 @@ function App() {
             <Routes>
                 <Route element={<Layout />}>
                     {/* Public routes */}
-                    <Route path={ROUTES.HOME} element={<HomePage />} />
+                    <Route
+                        path={ROUTES.HOME}
+                        element={isAuthenticated ? <CockpitPage /> : <HomePage />}
+                    />
                     <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />
 
                     {/* Protected routes */}
