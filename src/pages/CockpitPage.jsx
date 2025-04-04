@@ -76,38 +76,38 @@ const CockpitPage = () => {
 
     return (
         <>
-            <section className="pt-24 pb-12 bg-white min-h-screen">
-                <div className="container-custom">
-                    {/* ---------- HERO-LIKE TOP SECTION ---------- */}
+            <section className="pt-20 pb-12 bg-gray-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4">
+                    {/* HERO SECTION */}
                     <div className="flex flex-col lg:flex-row items-center">
-                        {/* LEFT: Big Title + Subtext + 2 Buttons */}
+                        {/* LEFT: Headline, Subtext & Actions */}
                         <motion.div
-                            initial={{ opacity: 0, x: 0 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0,delay: 0 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
                             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
                         >
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                            <h1 className="text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
                                 Nadchodząca <span className="text-purple-600">lekcja</span>
                             </h1>
-                            <p className="mt-6 text-xl text-gray-600 max-w-lg mx-auto lg:mx-0">
-                                Sprawdź szczegóły i zarezerwuj kolejne spotkanie już teraz!
+                            <p className="mt-6 text-xl text-gray-700 max-w-lg mx-auto lg:mx-0">
+                                Rozwijaj swoje umiejętności dzięki starannie zaplanowanym lekcjom.
                             </p>
                             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                 <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                     onClick={handleBookMore}
-                                    className="btn btn-primary py-3 px-8 text-lg"
+                                    className="btn bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded shadow transition"
                                 >
                                     <FaCalendarPlus className="mr-2" />
                                     Zarezerwuj lekcję
                                 </motion.button>
                                 <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
+                                    whileHover={{ scale: 1.01 }}
+                                    whileTap={{ scale: 0.99 }}
                                     onClick={handleSearchTutors}
-                                    className="btn btn-outline py-3 px-8 text-lg"
+                                    className="btn border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white font-semibold py-3 px-8 rounded shadow transition"
                                 >
                                     <FaSearch className="mr-2" />
                                     Szukaj korepetytorów
@@ -117,87 +117,62 @@ const CockpitPage = () => {
 
                         {/* RIGHT: Upcoming Lesson Card */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.1, delay: 0.1 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3, delay: 0.2 }}
                             className="lg:w-1/2 flex justify-center w-full"
                         >
                             {lessonsLoading ? (
-                                <div className="w-full">
-                                    <UpcomingLessonSkeleton />
-                                </div>
+                                <UpcomingLessonSkeleton />
                             ) : nextLesson ? (
-                                <div className="w-full">
-                                    <UpcomingLessonCard lesson={nextLesson} onInfoClick={handleLessonInfo} />
-                                </div>
+                                <UpcomingLessonCard lesson={nextLesson} onInfoClick={handleLessonInfo} />
                             ) : (
-                                <div className="p-4 bg-gray-50 rounded-xl text-center text-gray-500 shadow w-full h-48 flex items-center justify-center">
+                                <div className="p-6 bg-gray-100 rounded-xl text-center text-gray-600 shadow w-full h-48 flex items-center justify-center">
                                     Brak zaplanowanych lekcji
                                 </div>
                             )}
                         </motion.div>
                     </div>
 
-                    {/* ---------- TABS BELOW ---------- */}
+                    {/* TABS SECTION */}
                     <motion.div
-                        initial={{ opacity: 0,y: 50,x: 0 }}
-                        animate={{ opacity: 1,y: 0, x: 0 }}
-                        transition={{ duration: 0.1, delay: 0.1 }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
                         className="mt-12"
                     >
-                        {/* Main Tabs */}
-                        <div className="flex space-x-4 mb-8">
-                            <button
-                                className={`btn px-4 py-2 rounded-md font-semibold transition ${
-                                    activeTab === 'lessons'
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'bg-gray-100 text-gray-700 hover:text-purple-600'
-                                }`}
-                                onClick={() => setActiveTab('lessons')}
-                            >
-                                Lekcje
-                            </button>
-                            <button
-                                className={`btn px-4 py-2 rounded-md font-semibold transition ${
-                                    activeTab === 'calendar'
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'bg-gray-100 text-gray-700 hover:text-purple-600'
-                                }`}
-                                onClick={() => setActiveTab('calendar')}
-                            >
-                                Kalendarz
-                            </button>
-                            <button
-                                className={`btn px-4 py-2 rounded-md font-semibold transition ${
-                                    activeTab === 'progress'
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'bg-gray-100 text-gray-700 hover:text-purple-600'
-                                }`}
-                                onClick={() => setActiveTab('progress')}
-                            >
-                                Postępy
-                            </button>
-                            <button
-                                className={`btn px-4 py-2 rounded-md font-semibold transition ${
-                                    activeTab === 'tutors'
-                                        ? 'bg-purple-100 text-purple-600'
-                                        : 'bg-gray-100 text-gray-700 hover:text-purple-600'
-                                }`}
-                                onClick={() => setActiveTab('tutors')}
-                            >
-                                Korepetytorzy
-                            </button>
+                        <div className="flex space-x-4 mb-8 border-b border-gray-200">
+                            {['lessons', 'calendar', 'progress', 'tutors'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    className={`py-2 px-4 btn font-semibold transition border-b-2 ${
+                                        activeTab === tab
+                                            ? 'border-purple-600 text-purple-600'
+                                            : 'border-transparent text-gray-600 hover:text-purple-600'
+                                    }`}
+                                    onClick={() => setActiveTab(tab)}
+                                >
+                                    {tab === 'lessons'
+                                        ? 'Lekcje'
+                                        : tab === 'calendar'
+                                            ? 'Kalendarz'
+                                            : tab === 'progress'
+                                                ? 'Postępy'
+                                                : 'Korepetytorzy'}
+                                </button>
+                            ))}
                         </div>
 
-                        {/* Tab Content */}
                         <div className="min-h-[500px]">
-                            {/* LESSONS TAB */}
                             {activeTab === 'lessons' && (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                                    {/* Sub-tabs: upcoming / past */}
-                                    <div className="flex space-x-4 mb-8">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <div className="flex space-x-4 mb-6">
                                         <button
-                                            className={`btn px-4 py-2 rounded-md font-medium ${
+                                            className={`py-2 px-4 btn font-medium transition rounded ${
                                                 lessonTab === 'upcoming'
                                                     ? 'bg-purple-50 text-purple-600'
                                                     : 'bg-gray-50 text-gray-600 hover:text-purple-600'
@@ -207,7 +182,7 @@ const CockpitPage = () => {
                                             Nadchodzące lekcje
                                         </button>
                                         <button
-                                            className={`btn px-4 py-2 rounded-md font-medium ${
+                                            className={`py-2 px-4 btn font-medium transition rounded ${
                                                 lessonTab === 'past'
                                                     ? 'bg-purple-50 text-purple-600'
                                                     : 'bg-gray-50 text-gray-600 hover:text-purple-600'
@@ -217,17 +192,16 @@ const CockpitPage = () => {
                                             Minione lekcje
                                         </button>
                                     </div>
-
                                     {lessonTab === 'upcoming' && (
                                         <>
                                             {lessonsLoading ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {Array.from({ length: 4 }).map((_, i) => (
                                                         <LessonCardSkeleton key={i} />
                                                     ))}
                                                 </div>
                                             ) : upcomingLessons.length > 0 ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {upcomingLessons.map((les) => (
                                                         <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                     ))}
@@ -239,17 +213,16 @@ const CockpitPage = () => {
                                             )}
                                         </>
                                     )}
-
                                     {lessonTab === 'past' && (
                                         <>
                                             {lessonsLoading ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {Array.from({ length: 4 }).map((_, i) => (
                                                         <LessonCardSkeleton key={i} />
                                                     ))}
                                                 </div>
                                             ) : pastLessons.length > 0 ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {pastLessons.map((les) => (
                                                         <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                     ))}
@@ -264,35 +237,30 @@ const CockpitPage = () => {
                                 </motion.div>
                             )}
 
-                            {/* CALENDAR TAB */}
                             {activeTab === 'calendar' && (
                                 <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.5 }}
+                                    transition={{ duration: 0.4 }}
                                     className="text-center text-gray-600 mt-8"
                                 >
-                                    <h2 className="text-xl font-semibold">Twój kalendarz</h2>
+                                    <h2 className="text-2xl font-semibold">Twój kalendarz</h2>
                                     <p className="mt-2">Wkrótce dostępne...</p>
                                 </motion.div>
                             )}
 
-                            {/* PROGRESS TAB */}
                             {activeTab === 'progress' && (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                                    <h2 className="text-2xl font-bold mb-4 text-gray-800">
-                                        Twoje postępy
-                                    </h2>
-                                    <div className="p-6 bg-gray-50 rounded-xl shadow mb-6">
-                                        <h3 className="text-lg font-medium text-gray-700 mb-2">
-                                            Ocena jako uczeń
-                                        </h3>
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <h2 className="text-2xl font-bold mb-4 text-gray-900">Twoje postępy</h2>
+                                    <div className="p-6 bg-white rounded-xl shadow border">
+                                        <h3 className="text-lg font-medium text-gray-700 mb-2">Ocena jako uczeń</h3>
                                         <div className="flex items-center">
                                             {Array.from({ length: 5 }).map((_, i) => (
-                                                <FaStar
-                                                    key={i}
-                                                    className={i < Math.round(3) ? 'text-yellow-400' : 'text-gray-300'}
-                                                />
+                                                <FaStar key={i} className={i < Math.round(3) ? 'text-purple-500' : 'text-gray-300'} />
                                             ))}
                                             <span className="ml-2 text-gray-600">(3.0/5)</span>
                                         </div>
@@ -300,24 +268,23 @@ const CockpitPage = () => {
                                 </motion.div>
                             )}
 
-                            {/* TUTORS TAB */}
                             {activeTab === 'tutors' && (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                                    <h2 className="text-2xl font-bold mb-6 text-gray-800">Korepetytorzy</h2>
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Korepetytorzy</h2>
                                     {tutorsLoading ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                             {Array.from({ length: 4 }).map((_, i) => (
                                                 <TutorCardSkeleton key={i} />
                                             ))}
                                         </div>
                                     ) : tutors.length > 0 ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                             {tutors.map((tutor) => (
-                                                <TutorCard
-                                                    key={tutor.id}
-                                                    tutor={tutor}
-                                                    onInfoClick={handleTutorInfo}
-                                                />
+                                                <TutorCard key={tutor.id} tutor={tutor} onInfoClick={handleTutorInfo} />
                                             ))}
                                         </div>
                                     ) : (
@@ -331,15 +298,14 @@ const CockpitPage = () => {
                     </motion.div>
                 </div>
 
-                {/* ------ BOTTOM: ODZNAKI ------ */}
-                <div className="container-custom mt-12">
-                    <h3 className="text-xl font-medium text-gray-700 mb-4">Odznaki</h3>
+                {/* BADGES SECTION */}
+                <div className="max-w-7xl mx-auto px-4 mt-12">
+                    <h3 className="text-xl font-semibold text-gray-700 mb-4">Odznaki</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
                         {/* Badge rendering */}
                     </div>
                 </div>
 
-                {/* Tutor Modal */}
                 <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
             </section>
         </>
