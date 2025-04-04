@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaStar, FaArrowLeft } from 'react-icons/fa';
+import { FaStar, FaArrowLeft, FaGraduationCap, FaBookOpen } from 'react-icons/fa';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-
-// Polish locale for DayPicker
 import { pl } from 'date-fns/locale';
 
 const TutorModal = ({ tutor, onClose }) => {
-    // Steps: 1 = Detailed Profile, 2 = Calendar, 3 = Booking Form
+    // ... (keep existing state and logic)
+// Steps: 1 = Detailed Profile, 2 = Calendar, 3 = Booking Form
     const [step, setStep] = useState(1);
 
     // Booking states
@@ -105,51 +104,48 @@ Dodatkowe informacje: ${lessonDescription}
         setLessonDescription('');
         onClose();
     };
-
     return (
         <AnimatePresence>
             {tutor && (
                 <motion.div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                    initial={{ opacity: 0,backgroundColor: "rgba(0, 0, 0, 0)" }}
-                    animate={{ opacity: 1 ,backgroundColor: "rgba(0, 0, 0, 0.8)"}}
-                    exit={{ opacity: 0,backgroundColor: "rgba(0, 0, 0, 0)" } }
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     onClick={closeAll}
                 >
                     <motion.div
                         layoutId={`tutor-${tutor.id}`}
-                        className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] overflow-hidden flex flex-col"
-                        initial={{ scale: 0.9, y: 50 }}
+                        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 h-[85vh] flex flex-col"
+                        initial={{ scale: 0.95, y: 20 }}
                         animate={{ scale: 1, y: 0 }}
-                        exit={{ scale: 0.9, y: 50 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ scale: 0.95, y: 20 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* HEADER BAR */}
-                        <div className="flex items-center justify-between px-4 py-3 border-b">
+                        {/* HEADER */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                             {step > 1 ? (
                                 <button
                                     onClick={handleBack}
-                                    className="text-gray-600 hover:text-gray-800 text-lg flex items-center space-x-2"
+                                    className="p-2 hover:bg-gray-50 rounded-lg text-gray-600 hover:text-purple-600 transition-colors"
                                 >
-                                    <FaArrowLeft />
-                                    <span className="text-sm">Wróć</span>
+                                    <FaArrowLeft className="text-lg" />
                                 </button>
                             ) : (
                                 <div />
                             )}
                             <button
                                 onClick={closeAll}
-                                className="text-gray-400 hover:text-gray-600 text-2xl font-semibold"
+                                className="p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-gray-600 text-2xl transition-colors"
                             >
                                 &times;
                             </button>
                         </div>
 
-                        {/* PINNED SECTION: Photo on the LEFT, name on the RIGHT */}
-                        <div className="border-b px-4 py-3 flex items-center space-x-4 bg-gray-50">
-                            {/* Perfect circle avatar on left */}
-                            <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
+                        {/* PROFILE HEADER */}
+                        <div className="px-6 py-4 flex items-center gap-5 bg-gradient-to-r from-purple-50 to-indigo-50">
+                            <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden">
                                 {tutor.avatar ? (
                                     <img
                                         src={tutor.avatar}
@@ -157,293 +153,279 @@ Dodatkowe informacje: ${lessonDescription}
                                         className="object-cover w-full h-full"
                                     />
                                 ) : (
-                                    <div className="flex items-center justify-center text-gray-300 h-full">
-                                        Brak zdjęcia
+                                    <div className="flex items-center justify-center h-full bg-gray-100 text-gray-400">
+                                        <FaGraduationCap className="text-3xl" />
                                     </div>
                                 )}
                             </div>
-                            {/* Name, username, rating on the right */}
-                            <div className="flex flex-col">
-                                <h2 className="text-xl font-bold text-gray-800">
+                            <div className="space-y-1.5">
+                                <h2 className="text-2xl font-bold text-gray-900">
                                     {tutor.first_name} {tutor.last_name}
                                 </h2>
-                                <p className="text-sm text-gray-500">{tutor.username || '@nickname'}</p>
-                                <div className="mt-1 flex items-center">
-                                    {Array.from({ length: fullStars }).map((_, i) => (
-                                        <FaStar key={`full-${i}`} className="text-yellow-400 w-4 h-4" />
-                                    ))}
-                                    {halfStar && (
-                                        <FaStar key="half" className="text-yellow-400 w-4 h-4 opacity-50" />
-                                    )}
-                                    {Array.from({
-                                        length: totalStars - fullStars - (halfStar ? 1 : 0),
-                                    }).map((_, i) => (
-                                        <FaStar key={`empty-${i}`} className="text-gray-300 w-4 h-4" />
-                                    ))}
-                                    <span className="ml-2 text-sm text-gray-600">
-                    ({ratingValue.toFixed(1)})
-                  </span>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex items-center">
+                                        {Array.from({ length: 5 }).map((_, i) => (
+                                            <FaStar
+                                                key={i}
+                                                className={`w-4 h-4 ${
+                                                    i < ratingValue
+                                                        ? 'text-amber-400'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-600">
+                                        ({ratingValue.toFixed(1)})
+                                    </span>
                                 </div>
+                                <p className="text-sm text-gray-500">
+                                    {mockLanguages.join(' • ')}
+                                </p>
                             </div>
                         </div>
 
-                        {/* SCROLLABLE CONTENT BELOW */}
-                        <div className="flex-1 overflow-auto p-6 space-y-6">
-                            {/* STEP 1: Detailed Profile */}
+                        {/* CONTENT */}
+                        <div className="flex-1 overflow-auto p-6 space-y-8">
                             {step === 1 && (
-                                <div className="space-y-6">
-                                    {/* INTRO TEXT */}
-                                    <div className="text-sm text-gray-700 leading-relaxed">
-                                        {tutor.description ||
-                                            'Cześć! Jestem pasjonatem nauki i pomogę Ci w osiągnięciu najlepszych wyników.'}
+                                <div className="space-y-8">
+                                    <div className="prose prose-sm max-w-none">
+                                        <p className="text-gray-600 leading-relaxed">
+                                            {tutor.description || '...'}
+                                        </p>
                                     </div>
 
-                                    <hr />
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
+                                                    <FaGraduationCap className="text-purple-600" />
+                                                    Edukacja
+                                                </h3>
+                                                {mockEducation.map((edu, idx) => (
+                                                    <div key={idx} className="mb-4 last:mb-0">
+                                                        <p className="font-medium text-gray-900">
+                                                            {edu.degree}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500">
+                                                            {edu.school} ({edu.year})
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
 
-                                    {/* EDUCATION / EXPERIENCE / APPROACH / LANGUAGES */}
-                                    <div className="space-y-6">
-                                        {/* Education */}
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Edukacja</h3>
-                                            {mockEducation.map((edu, idx) => (
-                                                <div key={idx} className="mb-2">
-                                                    <p className="text-sm font-medium text-gray-700">
-                                                        {edu.degree}, {edu.year}
-                                                    </p>
-                                                    <p className="text-sm text-gray-500">{edu.school}</p>
+                                            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
+                                                    <FaBookOpen className="text-purple-600" />
+                                                    Specjalizacje
+                                                </h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {mockSubjects.map((sub) => (
+                                                        <span
+                                                            key={sub}
+                                                            className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium"
+                                                        >
+                                                            {sub}
+                                                        </span>
+                                                    ))}
                                                 </div>
-                                            ))}
+                                            </div>
                                         </div>
-                                        {/* Experience */}
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                                Doświadczenie
-                                            </h3>
-                                            {mockExperience.map((exp, idx) => (
-                                                <p key={idx} className="text-sm text-gray-700 mb-1">
-                                                    • {exp}
-                                                </p>
-                                            ))}
-                                        </div>
-                                        {/* Approach */}
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                                Mój styl nauczania
-                                            </h3>
-                                            <p className="text-sm text-gray-700">{mockApproach}</p>
-                                        </div>
-                                        {/* Languages */}
-                                        <div>
-                                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Języki</h3>
-                                            <div className="flex flex-wrap gap-2">
-                                                {mockLanguages.map((lang) => (
-                                                    <span
-                                                        key={lang}
-                                                        className="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-xs"
-                                                    >
-                            {lang}
-                          </span>
-                                                ))}
+
+                                        <div className="space-y-4">
+                                            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                                                    Doświadczenie
+                                                </h3>
+                                                <ul className="space-y-3">
+                                                    {mockExperience.map((exp, idx) => (
+                                                        <li
+                                                            key={idx}
+                                                            className="flex items-start before:content-['•'] before:mr-2 before:text-purple-600 before:font-bold"
+                                                        >
+                                                            <span className="text-gray-600">
+                                                                {exp}
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                                                    Poziomy nauczania
+                                                </h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {mockLevels.map((lvl) => (
+                                                        <span
+                                                            key={lvl}
+                                                            className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium"
+                                                        >
+                                                            {lvl}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <hr />
-
-                                    {/* LEVELS & SUBJECTS */}
-                                    <div className="space-y-6">
-                                        <div>
-                                            <h4 className="text-md font-semibold text-gray-800 mb-2">
-                                                Poziomy
-                                            </h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {mockLevels.map((lvl) => (
-                                                    <span
-                                                        key={lvl}
-                                                        className="px-2 py-1 bg-purple-100 text-purple-600 rounded-full text-xs"
-                                                    >
-                            {lvl}
-                          </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-md font-semibold text-gray-800 mb-2">
-                                                Specjalizacje
-                                            </h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {mockSubjects.map((sub) => (
-                                                    <span
-                                                        key={sub}
-                                                        className="px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs"
-                                                    >
-                            {sub}
-                          </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="text-right pt-4">
+                                    <div className="text-center border-t pt-6">
                                         <button
                                             onClick={handleGoCalendar}
-                                            className="px-6 py-2 rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                                            className="px-8 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:shadow-lg transition-all hover:scale-[1.02]"
                                         >
-                                            Zarezerwuj lekcję
+                                            Zarezerwuj lekcję →
                                         </button>
                                     </div>
                                 </div>
                             )}
 
-                            {/* STEP 2: Calendar/Time Selection */}
+                            {/* CALENDAR STEP */}
                             {step === 2 && (
-                                <div className="space-y-6">
-                                    <h2 className="text-lg font-semibold text-gray-800">
-                                        Wybierz datę i godziny
-                                    </h2>
-                                    <p className="text-sm text-gray-600">
-                                        Zaznacz dzień w kalendarzu, a następnie wybierz 45-minutowe bloki.
-                                    </p>
-                                    <div className="w-full overflow-x-auto">
-                                        <DayPicker
-                                            mode="single"
-                                            weekStartsOn={1}
-                                            selected={selectedDay}
-                                            onSelect={setSelectedDay}
-                                            fromDate={new Date()}
-                                            locale={pl}
-                                            modifiersClassNames={{
-                                                selected: 'bg-purple-500 text-white',
-                                                today: 'border border-purple-500',
-                                            }}
-                                            styles={{
-                                                caption: { color: '#4c1d95', fontWeight: 'bold' },
-                                                head_cell: { color: '#4c1d95' },
-                                            }}
-                                        />
+                                <div className="space-y-8">
+                                    <div className="text-center">
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                            Wybierz termin
+                                        </h2>
+                                        <p className="text-gray-600">
+                                            Dostępne terminy w ciągu najbliższych 30 dni
+                                        </p>
                                     </div>
-                                    {selectedDay && (
+
+                                    <div className="flex flex-col lg:flex-row gap-8">
+                                        <div className="lg:w-1/2">
+                                            <DayPicker
+                                                mode="single"
+                                                weekStartsOn={1}
+                                                selected={selectedDay}
+                                                onSelect={setSelectedDay}
+                                                fromDate={new Date()}
+                                                locale={pl}
+                                                modifiersClassNames={{
+                                                    selected: '!bg-purple-600 !text-white',
+                                                    today: 'border border-purple-300',
+                                                }}
+                                                className="[--rdp-cell-size:48px] border rounded-xl p-4"
+                                            />
+                                        </div>
+
+                                        <div className="lg:w-1/2">
+                                            {selectedDay && (
+                                                <div className="space-y-6">
+                                                    <h3 className="text-lg font-semibold text-gray-900">
+                                                        Dostępne godziny
+                                                    </h3>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                        {timeBlocks.map((block) => (
+                                                            <button
+                                                                key={block}
+                                                                onClick={() => toggleBlock(block)}
+                                                                className={`p-3 rounded-lg text-sm font-medium transition-all ${
+                                                                    selectedTimeBlocks.includes(block)
+                                                                        ? 'bg-purple-600 text-white shadow-md'
+                                                                        : 'bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-600'
+                                                                }`}
+                                                            >
+                                                                {block}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                    <button
+                                                        onClick={handleGoForm}
+                                                        disabled={!selectedTimeBlocks.length}
+                                                        className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
+                                                    >
+                                                        Kontynuuj ({selectedTimeBlocks.length} wybrane)
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* FORM STEP */}
+                            {step === 3 && (
+                                <div className="max-w-2xl mx-auto space-y-6">
+                                    <div className="text-center">
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                            Szczegóły lekcji
+                                        </h2>
+                                        <p className="text-gray-600">
+                                            Wypełnij informacje potrzebne do przygotowania się do lekcji
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-5">
                                         <div>
-                                            <h4 className="text-md font-semibold text-gray-800 mb-2">
-                                                Godziny: {selectedDay.toLocaleDateString('pl-PL')}
-                                            </h4>
-                                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                                                {timeBlocks.map((block) => {
-                                                    const isSelected = selectedTimeBlocks.includes(block);
-                                                    return (
-                                                        <button
-                                                            key={block}
-                                                            onClick={() => toggleBlock(block)}
-                                                            className={`px-2 py-1 rounded-md border text-sm transition ${
-                                                                isSelected
-                                                                    ? 'bg-purple-50 border-purple-400 text-purple-700'
-                                                                    : 'hover:bg-gray-50 border-gray-200 text-gray-700'
-                                                            }`}
-                                                        >
-                                                            {block}
-                                                        </button>
-                                                    );
-                                                })}
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Temat lekcji
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                placeholder="Np. Przygotowanie do egzaminu..."
+                                                value={lessonTopic}
+                                                onChange={(e) => setLessonTopic(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-5">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Poziom
+                                                </label>
+                                                <select
+                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                                                    value={lessonLevel}
+                                                    onChange={(e) => setLessonLevel(e.target.value)}
+                                                >
+                                                    <option value="">Wybierz poziom</option>
+                                                    {mockLevels.map((lvl) => (
+                                                        <option key={lvl} value={lvl}>
+                                                            {lvl}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Przedmiot
+                                                </label>
+                                                <select
+                                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                                                    value={lessonSubject}
+                                                    onChange={(e) => setLessonSubject(e.target.value)}
+                                                >
+                                                    <option value="">Wybierz przedmiot</option>
+                                                    {mockSubjects.map((sub) => (
+                                                        <option key={sub} value={sub}>
+                                                            {sub}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
-                                    )}
-                                    <p className="text-xs text-gray-500">
-                                        Możesz zaznaczyć kilka sąsiadujących bloków, żeby wydłużyć lekcję.
-                                    </p>
-                                    <div className="text-right">
-                                        <button
-                                            onClick={handleGoForm}
-                                            disabled={!selectedDay || selectedTimeBlocks.length === 0}
-                                            className={`px-6 py-2 rounded-md text-white ${
-                                                !selectedDay || selectedTimeBlocks.length === 0
-                                                    ? 'bg-gray-300 cursor-not-allowed'
-                                                    : 'bg-purple-600 hover:bg-purple-700'
-                                            }`}
-                                        >
-                                            Kontynuuj
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
 
-                            {/* STEP 3: Booking Form */}
-                            {step === 3 && (
-                                <div className="space-y-6">
-                                    <h2 className="text-lg font-semibold text-gray-800">
-                                        Szczegóły Lekcji
-                                    </h2>
-                                    <p className="text-sm text-gray-600">
-                                        Data: <strong>{selectedDay?.toLocaleDateString('pl-PL')}</strong><br />
-                                        Godziny: <strong>{selectedTimeBlocks.join(', ')}</strong>
-                                    </p>
-                                    {/* Lesson Topic */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Temat lekcji
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400"
-                                            placeholder="Np. Przygotowanie do matury, zadania z fizyki..."
-                                            value={lessonTopic}
-                                            onChange={(e) => setLessonTopic(e.target.value)}
-                                        />
-                                    </div>
-                                    {/* Lesson Level */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Poziom
-                                        </label>
-                                        <select
-                                            className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400"
-                                            value={lessonLevel}
-                                            onChange={(e) => setLessonLevel(e.target.value)}
-                                        >
-                                            <option value="">-- Wybierz --</option>
-                                            {mockLevels.map((lvl) => (
-                                                <option key={lvl} value={lvl}>
-                                                    {lvl}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    {/* Lesson Subject */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Przedmiot
-                                        </label>
-                                        <select
-                                            className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400"
-                                            value={lessonSubject}
-                                            onChange={(e) => setLessonSubject(e.target.value)}
-                                        >
-                                            <option value="">-- Wybierz --</option>
-                                            {mockSubjects.map((sub) => (
-                                                <option key={sub} value={sub}>
-                                                    {sub}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    {/* Additional Info */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Dodatkowe informacje
-                                        </label>
-                                        <textarea
-                                            rows={3}
-                                            className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-purple-400"
-                                            placeholder="Opisz dokładniej co chcesz omówić..."
-                                            value={lessonDescription}
-                                            onChange={(e) => setLessonDescription(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="text-right">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Dodatkowe informacje
+                                            </label>
+                                            <textarea
+                                                rows={4}
+                                                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
+                                                placeholder="Opisz szczegóły lekcji, swoje oczekiwania..."
+                                                value={lessonDescription}
+                                                onChange={(e) => setLessonDescription(e.target.value)}
+                                            />
+                                        </div>
+
                                         <button
                                             onClick={handleConfirmBooking}
-                                            className="px-6 py-2 rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                                            className="w-full py-3.5 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-md"
                                         >
-                                            Zatwierdź
+                                            Potwierdź rezerwację
                                         </button>
                                     </div>
                                 </div>

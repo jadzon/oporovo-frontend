@@ -22,15 +22,17 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
     const tutorUsername = lesson.tutor?.username || '';
 
     return (
-        <motion.div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.15 }}>
+        <motion.div
+            className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row border border-gray-100"
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.2 }}
+        >
             {/* Tutor Avatar */}
-            <div className="flex items-center justify-center lg:justify-start p-6">
-                <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-full overflow-hidden bg-gray-100 relative">
+            <div className="flex items-center justify-center lg:justify-start p-6 bg-purple-50">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-white border-4 border-white shadow-lg relative">
                     {!imageLoaded && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-full h-full bg-gray-300 animate-pulse rounded-full" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse">
+                            <div className="w-full h-full rounded-full" />
                         </div>
                     )}
                     <LazyLoadImage
@@ -44,23 +46,37 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
             </div>
 
             {/* Lesson Details */}
-            <div className="p-6 flex-1 flex flex-col justify-center space-y-3">
-                <h3 className="text-2xl font-bold text-gray-900">{lesson.title}</h3>
-                <div>
-                    <p className="text-lg text-gray-900">{tutorFullName}</p>
-                    {tutorUsername && <p className="text-sm text-gray-500">{tutorUsername}</p>}
+            <div className="p-6 flex-1 flex flex-col justify-center space-y-4">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">{lesson.title}</h3>
+
+                <div className="space-y-1">
+                    <p className="text-lg font-semibold text-gray-900">{tutorFullName}</p>
+                    {tutorUsername && <p className="text-sm text-gray-500">@{tutorUsername}</p>}
                 </div>
-                <p className="text-lg text-gray-700 font-medium">{lesson.description}</p>
-                <p className="text-sm text-gray-600">{formattedDate}</p>
-                <div className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${statusMapping[lesson.status]?.color || 'bg-gray-400'}`}></span>
-                    <span className="text-sm text-gray-700">{statusMapping[lesson.status]?.text || 'Nieznany'}</span>
+
+                {lesson.description && (
+                    <p className="text-gray-600 leading-relaxed">{lesson.description}</p>
+                )}
+
+                <div className="px-4 py-2 bg-purple-50 rounded-lg">
+                    <p className="text-sm font-medium text-purple-700">{formattedDate}</p>
                 </div>
+
+                <div className="flex items-center gap-2">
+                    <span className={`w-3 h-3 rounded-full ${statusMapping[lesson.status]?.color || 'bg-gray-400'}`} />
+                    <span className="text-sm font-medium text-gray-700">
+                        {statusMapping[lesson.status]?.text || 'Nieznany'}
+                    </span>
+                </div>
+
                 <motion.button
-                    className="btn bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded shadow transition"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
+                    className="self-start bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md transition-colors"
                     onClick={() => onInfoClick?.(lesson)}
                 >
-                    Info
+                    Szczegóły
                 </motion.button>
             </div>
         </motion.div>

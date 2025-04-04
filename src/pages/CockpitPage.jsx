@@ -107,7 +107,7 @@ const CockpitPage = () => {
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     onClick={handleSearchTutors}
-                                    className="btn border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white font-semibold py-3 px-8 rounded shadow transition"
+                                    className="btn border border-purple-600 text-purple-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded shadow transition"
                                 >
                                     <FaSearch className="mr-2" />
                                     Szukaj korepetytorów
