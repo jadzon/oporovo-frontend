@@ -82,9 +82,9 @@ const CockpitPage = () => {
                     <div className="flex flex-col lg:flex-row items-center">
                         {/* LEFT: Big Title + Subtext + 2 Buttons */}
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
+                            initial={{ opacity: 0, x: 0 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0,delay: 0 }}
                             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
                         >
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
@@ -119,7 +119,7 @@ const CockpitPage = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
+                            transition={{ duration: 0.1, delay: 0.1 }}
                             className="lg:w-1/2 flex justify-center w-full"
                         >
                             {lessonsLoading ? (
@@ -140,9 +140,9 @@ const CockpitPage = () => {
 
                     {/* ---------- TABS BELOW ---------- */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        initial={{ opacity: 0,y: 50,x: 0 }}
+                        animate={{ opacity: 1,y: 0, x: 0 }}
+                        transition={{ duration: 0.1, delay: 0.1 }}
                         className="mt-12"
                     >
                         {/* Main Tabs */}
