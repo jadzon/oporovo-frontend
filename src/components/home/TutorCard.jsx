@@ -14,6 +14,7 @@ const TutorCard = ({ tutor, onInfoClick }) => {
 
     return (
         <motion.div
+            layoutId={`tutor-${tutor.id}`}
             className="w-64 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.1 }}
@@ -38,14 +39,10 @@ const TutorCard = ({ tutor, onInfoClick }) => {
 
             {/* MIDDLE: Tutor Details */}
             <div className="flex-1 px-4 flex flex-col items-center text-center space-y-1">
-                {/* Tutor Full Name */}
                 <h3 className="text-xl font-semibold text-gray-800">
                     {tutor.first_name} {tutor.last_name}
                 </h3>
-                {/* Tutor Username */}
                 <p className="text-sm text-gray-500">{tutor.username}</p>
-
-                {/* Rating Section */}
                 <div className="mt-2 flex items-center">
                     {Array.from({ length: fullStars }).map((_, i) => (
                         <FaStar key={`full-${i}`} className="w-5 h-5 text-yellow-400" />
@@ -60,8 +57,6 @@ const TutorCard = ({ tutor, onInfoClick }) => {
             ({tutor.rating.toFixed(1)})
           </span>
                 </div>
-
-                {/* Level Badges */}
                 {tutor.levels && tutor.levels.length > 0 && (
                     <div className="mt-2 flex flex-wrap justify-center gap-1">
                         {tutor.levels.map((level, idx) => (
