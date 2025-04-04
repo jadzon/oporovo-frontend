@@ -13,5 +13,5 @@ export const ENDPOINTS = {
 export const ROUTES = {
     HOME: '/',
     AUTH_CALLBACK: '/auth/callback',
-    DASHBOARD: '/dashboard',
+    TUTORS: '/tutors',
 };

@@ -1,33 +1,34 @@
-// src/components/tutorCard/TutorCard.jsx
 import { useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import { motion } from 'framer-motion';
 import { FaStar } from 'react-icons/fa';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const TutorCard = ({ tutor, onInfoClick }) => {
-    // tutor might have:
-    // - tutor.image
-    // - tutor.name
-    // - tutor.discordName
-    // - tutor.rating
-    // - tutor.reviewsCount
-    // - tutor.subjects
-    // - tutor.shortBio
     const [imageLoaded, setImageLoaded] = useState(false);
 
+    // Calculate stars based on tutor.rating
+    const fullStars = Math.floor(tutor.rating);
+    const halfStar = tutor.rating - fullStars >= 0.5;
+    const totalStars = 5;
+
     return (
-        <div className="w-64 h-96 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col">
-            {/* TOP: circular avatar */}
-            <div className="p-4 flex justify-center">
-                <div className="w-24 h-24 rounded-full bg-gray-100 relative overflow-hidden">
+        <motion.div
+            className="w-64 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.1 }}
+        >
+            {/* TOP: Tutor Avatar */}
+            <div className="p-6 flex justify-center">
+                <div className="w-28 h-28 rounded-full bg-gray-100 relative overflow-hidden">
                     {!imageLoaded && (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="skeleton w-full h-full rounded-full" />
                         </div>
                     )}
                     <LazyLoadImage
-                        src={tutor.image}
-                        alt={tutor.name}
+                        src={tutor.avatar}
+                        alt={`${tutor.first_name} ${tutor.last_name}`}
                         effect="blur"
                         className="w-full h-full object-cover"
                         afterLoad={() => setImageLoaded(true)}
@@ -35,56 +36,58 @@ const TutorCard = ({ tutor, onInfoClick }) => {
                 </div>
             </div>
 
-            {/* MIDDLE: name, discord, rating, subjects */}
-            <div className="flex-1 px-4 flex flex-col items-center text-center">
-                <h3 className="text-base font-semibold text-gray-800">
-                    {tutor.name}
+            {/* MIDDLE: Tutor Details */}
+            <div className="flex-1 px-4 flex flex-col items-center text-center space-y-1">
+                {/* Tutor Full Name */}
+                <h3 className="text-xl font-semibold text-gray-800">
+                    {tutor.first_name} {tutor.last_name}
                 </h3>
+                {/* Tutor Username */}
+                <p className="text-sm text-gray-500">{tutor.username}</p>
 
-                {/* Discord name under name */}
-                {tutor.discordName && (
-                    <p className="text-sm text-gray-500 mt-1">
-                        {tutor.discordName}
-                    </p>
-                )}
-
-                {/* Rating stars */}
-                <div className="mt-2 flex items-center justify-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                        <FaStar
-                            key={i}
-                            className={`w-4 h-4 ${
-                                i < Math.round(tutor.rating)
-                                    ? 'text-yellow-400'
-                                    : 'text-gray-300'
-                            }`}
-                        />
+                {/* Rating Section */}
+                <div className="mt-2 flex items-center">
+                    {Array.from({ length: fullStars }).map((_, i) => (
+                        <FaStar key={`full-${i}`} className="w-5 h-5 text-yellow-400" />
                     ))}
-                    {tutor.reviewsCount !== undefined && (
-                        <span className="ml-1 text-sm text-gray-600">
-              ({tutor.reviewsCount})
-            </span>
+                    {halfStar && (
+                        <FaStar key="half" className="w-5 h-5 text-yellow-400 opacity-50" />
                     )}
+                    {Array.from({ length: totalStars - fullStars - (halfStar ? 1 : 0) }).map((_, i) => (
+                        <FaStar key={`empty-${i}`} className="w-5 h-5 text-gray-300" />
+                    ))}
+                    <span className="ml-2 text-sm text-gray-600">
+            ({tutor.rating.toFixed(1)})
+          </span>
                 </div>
 
-                {/* Subjects */}
-                {tutor.subjects?.length > 0 && (
-                    <p className="mt-2 text-sm text-gray-700">
-                        {tutor.subjects.join(', ')}
-                    </p>
+                {/* Level Badges */}
+                {tutor.levels && tutor.levels.length > 0 && (
+                    <div className="mt-2 flex flex-wrap justify-center gap-1">
+                        {tutor.levels.map((level, idx) => (
+                            <span
+                                key={idx}
+                                className="text-xs px-2 py-1 bg-purple-100 text-purple-600 rounded-full"
+                            >
+                {level}
+              </span>
+                        ))}
+                    </div>
                 )}
             </div>
 
-            {/* BOTTOM: "Info" button */}
+            {/* BOTTOM: Info Button */}
             <div className="p-4">
-                <button
-                    className="w-full btn btn-primary"
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.1 }}
+                    className="w-full btn btn-primary rounded-md py-2 px-4 shadow-sm"
                     onClick={() => onInfoClick?.(tutor)}
                 >
                     Info
-                </button>
+                </motion.button>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

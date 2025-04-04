@@ -1,23 +1,40 @@
 // src/components/lessonCard/LessonCard.jsx
 import { useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { motion } from 'framer-motion';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
+// Define a mapping from lesson statuses to Polish text and CSS classes (colors)
+const statusMapping = {
+    scheduled: { text: 'Zaplanowana', color: 'bg-blue-500' },
+    confirmed: { text: 'Potwierdzona', color: 'bg-green-500' },
+    in_progress: { text: 'W trakcie', color: 'bg-orange-500' },
+    done: { text: 'Zakończona', color: 'bg-gray-500' },
+    failed: { text: 'Nieudana', color: 'bg-red-500' },
+    cancelled: { text: 'Anulowana', color: 'bg-black' },
+};
+
 const LessonCard = ({ lesson, onInfoClick }) => {
-    // Lesson fields might include:
-    // - lesson.image
-    // - lesson.fullName
-    // - lesson.discordName
-    // - lesson.mainSubject (e.g. "Matematyka")
-    // - lesson.subTopic (e.g. "Granice i rachunek")
-    // - lesson.date
-    // - lesson.time
-    // etc.
     const [imageLoaded, setImageLoaded] = useState(false);
 
+    // Tutor image and details
+    const tutorAvatar = lesson.tutor?.avatar || '/images/default-avatar.png';
+    // Concatenate first and last name for tutor full name; fall back to username if missing.
+    const tutorFullName = lesson.tutor?.first_name && lesson.tutor?.last_name
+        ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
+        : lesson.tutor?.username || 'Nieznany';
+    const tutorUsername = lesson.tutor?.username || 'Nieznany';
+
+    // Format lesson start time as a localized string
+    const lessonDate = new Date(lesson.start_time).toLocaleString('pl-PL');
+
     return (
-        <div className="w-64 h-96 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col">
-            {/* TOP: circular avatar */}
+        <motion.div
+            className="w-64 h-96 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.1 }}
+        >
+            {/* TOP: Tutor Avatar */}
             <div className="p-4 flex justify-center">
                 <div className="w-24 h-24 rounded-full bg-gray-100 relative overflow-hidden">
                     {!imageLoaded && (
@@ -26,8 +43,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                         </div>
                     )}
                     <LazyLoadImage
-                        src={lesson.image}
-                        alt={lesson.fullName}
+                        src={tutorAvatar}
+                        alt={tutorUsername}
                         effect="blur"
                         className="w-full h-full object-cover"
                         afterLoad={() => setImageLoaded(true)}
@@ -35,44 +52,47 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                 </div>
             </div>
 
-            {/* MIDDLE: name, discord, subject, sub-topic, date/time */}
-            <div className="flex-1 px-4 flex flex-col items-center text-center">
-                <h3 className="text-base font-semibold text-gray-800">
-                    {lesson.fullName}
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">{lesson.discordName}</p>
-
-                <p className="mt-2 text-sm text-gray-700">
-                    {lesson.mainSubject || 'N/A'}
+            {/* MIDDLE: Lesson Details */}
+            <div className="flex-1 px-4 flex flex-col items-center text-center space-y-1">
+                {/* Tutor Full Name */}
+                <p className="text-base font-medium text-gray-800">
+                    {tutorFullName}
                 </p>
-
-                {/* If you have a more specific sub-topic or lesson detail */}
-                {lesson.subTopic && (
-                    <p className="mt-1 text-sm text-gray-600 italic">
-                        {lesson.subTopic}
-                    </p>
-                )}
-
-                {/* Date/time can be combined or separate */}
-                {lesson.date && (
-                    <p className="mt-2 text-sm text-gray-600">
-                        {lesson.date}
-                    </p>
-                )}
+                {/* Tutor Username */}
+                <p className="text-sm text-gray-500">
+                    @{tutorUsername}
+                </p>
+                {/* Lesson Topic */}
+                <h3 className="text-lg font-semibold text-gray-800 mt-2">
+                    {lesson.title}
+                </h3>
+                {/* Lesson Date */}
+                <p className="mt-1 text-sm text-gray-600">
+                    {lessonDate}
+                </p>
             </div>
 
-            {/* BOTTOM: "Info" button */}
-            <div className="p-4">
-                <button
-                    className="w-full btn btn-primary"
+            {/* BOTTOM: Lesson Status and Info Button */}
+            <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center">
+          <span
+              className={`w-4 h-4 rounded-full ${statusMapping[lesson.status]?.color || 'bg-gray-400'}`}
+          ></span>
+                    <span className="ml-2 text-sm text-gray-700">
+            {statusMapping[lesson.status]?.text || 'Nieznany'}
+          </span>
+                </div>
+                <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.1 }}
+                    className="btn btn-primary rounded-md py-2 px-4 shadow-sm"
                     onClick={() => onInfoClick?.(lesson)}
                 >
                     Info
-                </button>
+                </motion.button>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
 export default LessonCard;
-

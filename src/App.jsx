@@ -11,6 +11,7 @@ import HomePage from './pages/HomePage';
 import AuthCallback from './components/auth/AuthCallback';
 import { ROUTES } from './api/constants';
 import CockpitPage from "./pages/CockpitPage.jsx";
+import TutorsPage from "./pages/TutorsPage.jsx";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -45,6 +46,7 @@ function App() {
                         element={isAuthenticated ? <CockpitPage /> : <HomePage />}
                     />
                     <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />
+                    <Route path={ROUTES.TUTORS} element={<TutorsPage />} />
 
                     {/* Protected routes */}
                     {/*<Route*/}

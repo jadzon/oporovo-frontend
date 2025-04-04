@@ -1,12 +1,15 @@
-// src/pages/CockpitPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaStar, FaSearch, FaCalendarPlus } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+
+// Redux thunks for lessons and tutors
+import { fetchUserLessons } from '../store/thunks/lessonThunks';
+import { fetchUserTutors } from '../store/thunks/tutorsThunks';
 
 // Cards
 import LessonCard from '../components/lessonCard/LessonCard';
 import TutorCard from '../components/home/TutorCard';
-// The bigger upcoming lesson card
 import UpcomingLessonCard from '../components/lessonCard/UpcomingLessonCard';
 
 // Skeletons
@@ -16,139 +19,59 @@ import {
     UpcomingLessonSkeleton,
 } from '../components/ui/Skeleton';
 
-const MockUpcomingLessons = [
-    {
-        id: 1,
-        image: '/images/tutors/anna_k.jpg',
-        fullName: 'Anna Kowalska',
-        discordName: 'AnnaK#1234',
-        mainSubject: 'Matematyka',
-        subTopic: 'Granice i rachunek różniczkowy',
-        date: '2025-06-10 15:00',
-    },
-    {
-        id: 2,
-        image: '/images/tutors/piotr_n.jpg',
-        fullName: 'Piotr Nowak',
-        discordName: 'PiotrNowak#6789',
-        mainSubject: 'Angielski',
-        subTopic: 'Konwersacje z native speakerem',
-        date: '2025-06-12 18:00',
-    },
-];
-
-const MockPastLessons = [
-    {
-        id: 3,
-        image: '/images/tutors/tomek_k.jpg',
-        fullName: 'Tomasz Kamiński',
-        discordName: 'TomekDev#2025',
-        mainSubject: 'Programowanie',
-        subTopic: 'Podstawy JS i React',
-        date: '2025-05-02 17:00',
-    },
-    {
-        id: 4,
-        image: '/images/tutors/marta_w.jpg',
-        fullName: 'Marta Wiśniewska',
-        discordName: 'MartaW#4567',
-        mainSubject: 'Chemia',
-        subTopic: 'Chemia organiczna - wstęp',
-        date: '2025-05-05 12:00',
-    },
-];
-
-const MockTutors = [
-    {
-        id: 101,
-        image: '/images/tutors/tomek_k.jpg',
-        name: 'Tomasz Kamiński',
-        discordName: 'TomekDev#2025',
-        rating: 5,
-        reviewsCount: 19,
-        subjects: ['Programowanie'],
-    },
-    {
-        id: 102,
-        image: '/images/tutors/marta_w.jpg',
-        name: 'Marta Wiśniewska',
-        discordName: 'MartaW#4567',
-        rating: 4,
-        reviewsCount: 12,
-        subjects: ['Chemia'],
-    },
-    {
-        id: 103,
-        image: '/images/tutors/anna_k.jpg',
-        name: 'Anna Kowalska',
-        discordName: 'AnnaK#1234',
-        rating: 5,
-        reviewsCount: 30,
-        subjects: ['Matematyka'],
-    },
-    {
-        id: 104,
-        image: '/images/tutors/piotr_n.jpg',
-        name: 'Piotr Nowak',
-        discordName: 'PiotrNowak#6789',
-        rating: 4,
-        reviewsCount: 8,
-        subjects: ['Angielski'],
-    },
-];
-
-const MockBadges = [
-    { id: 1, label: 'First steps', iconSrc: '/path/to/shoes-icon.png' },
-    { id: 2, label: 'Testing waters', iconSrc: '/path/to/beach-icon.png' },
-    { id: 3, label: 'Rockstar', iconSrc: '/path/to/guitar-icon.png' },
-    { id: 4, label: 'Polyglot', iconSrc: '/path/to/language-icon.png' },
-    { id: 5, label: 'Committed', iconSrc: '/path/to/commitment-icon.png' },
-    { id: 6, label: 'Star student', iconSrc: '/path/to/star-icon.png' },
-];
-
-const studentRating = 4.5;
-
 const CockpitPage = () => {
+    const dispatch = useDispatch();
+
+    // Get current user from auth slice
+    const { user } = useSelector((state) => state.auth);
+    const { lessons, loading: lessonsLoading } = useSelector((state) => state.lessons);
+    const { tutors, loading: tutorsLoading } = useSelector((state) => state.tutors);
+
     const [activeTab, setActiveTab] = useState('lessons');
     const [lessonTab, setLessonTab] = useState('upcoming');
 
-    // Loading states
-    const [loadingLessons, setLoadingLessons] = useState(true);
-    const [loadingTutors, setLoadingTutors] = useState(true);
-
-    const [upcoming, setUpcoming] = useState([]);
-    const [past, setPast] = useState([]);
-    const [tutors, setTutors] = useState([]);
-
     useEffect(() => {
-        // Simulate lesson fetch
-        const t1 = setTimeout(() => {
-            setUpcoming(MockUpcomingLessons);
-            setPast(MockPastLessons);
-            setLoadingLessons(false);
-        }, 1200);
+        if (user?.id) {
+            dispatch(fetchUserLessons(user.id));
+            dispatch(fetchUserTutors(user.id));
+        }
+    }, [dispatch, user]);
 
-        // Simulate tutor fetch
-        const t2 = setTimeout(() => {
-            setTutors(MockTutors);
-            setLoadingTutors(false);
-        }, 1500);
+    const now = new Date();
 
-        return () => {
-            clearTimeout(t1);
-            clearTimeout(t2);
-        };
-    }, []);
+    // Memoize filtering for performance
+    const upcomingConfirmed = useMemo(() => {
+        return lessons
+            .filter(
+                (lesson) =>
+                    new Date(lesson.start_time) > now && lesson.status === 'confirmed'
+            )
+            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    }, [lessons, now]);
 
-    const nextLesson = upcoming[0] || null;
+    // Choose the next lesson from the confirmed upcoming ones
+    const nextLesson = upcomingConfirmed[0] || null;
+    console.log("NEXT LESSON:", nextLesson);
+
+    // Split lessons into upcoming and past
+    const upcomingLessons = useMemo(
+        () => lessons.filter(lesson => new Date(lesson.start_time) > now),
+        [lessons, now]
+    );
+    const pastLessons = useMemo(
+        () => lessons.filter(lesson => new Date(lesson.start_time) <= now),
+        [lessons, now]
+    );
 
     // Handlers
     const handleBookMore = () => alert('Zarezerwuj kolejną lekcję...');
     const handleSearchTutors = () => alert('Przekierowanie do wyszukiwania...');
     const handleLessonInfo = (lesson) =>
-        alert(`Info about lesson:\n${lesson.fullName} - ${lesson.mainSubject}`);
+        alert(`Informacje o lekcji:\n${lesson.title} – ${lesson.status}`);
     const handleTutorInfo = (tutor) =>
-        alert(`Info about tutor:\n${tutor.name}, rating ${tutor.rating}`);
+        alert(
+            `Informacje o korepetytorze:\n${tutor.username}\nOcena: ${tutor.rating}\nPoziomy: ${tutor.levels?.join(', ')}`
+        );
 
     return (
         <section className="pt-24 pb-12 bg-white min-h-screen">
@@ -182,7 +105,7 @@ const CockpitPage = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={handleSearchTutors}
-                                className=" btn btn-outline py-3 px-8 text-lg"
+                                className="btn btn-outline py-3 px-8 text-lg"
                             >
                                 <FaSearch className="mr-2" />
                                 Szukaj korepetytorów
@@ -190,24 +113,20 @@ const CockpitPage = () => {
                         </div>
                     </motion.div>
 
-                    {/* RIGHT: BIGGER UpcomingLessonCard or skeleton */}
+                    {/* RIGHT: Upcoming Lesson Card */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="lg:w-1/2 flex justify-center w-full"
                     >
-                        {loadingLessons ? (
-                            // The bigger skeleton
+                        {lessonsLoading ? (
                             <div className="w-full">
                                 <UpcomingLessonSkeleton />
                             </div>
                         ) : nextLesson ? (
                             <div className="w-full">
-                                <UpcomingLessonCard
-                                    lesson={nextLesson}
-                                    onInfoClick={handleLessonInfo}
-                                />
+                                <UpcomingLessonCard lesson={nextLesson} onInfoClick={handleLessonInfo} />
                             </div>
                         ) : (
                             <div className="p-4 bg-gray-50 rounded-xl text-center text-gray-500 shadow w-full h-48 flex items-center justify-center">
@@ -218,44 +137,49 @@ const CockpitPage = () => {
                 </div>
 
                 {/* ---------- TABS BELOW ---------- */}
-                <div className="mt-12">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="mt-12"
+                >
                     {/* Main Tabs */}
                     <div className="flex space-x-4 mb-8">
                         <button
-                            className={`px-4 py-2 rounded-md font-semibold transition ${
+                            className={`btn px-4 py-2 rounded-md font-semibold transition ${
                                 activeTab === 'lessons'
                                     ? 'bg-purple-100 text-purple-600'
-                                    : 'bg-gray-100 text-gray-700'
+                                    : 'bg-gray-100 text-gray-700 hover:text-purple-600'
                             }`}
                             onClick={() => setActiveTab('lessons')}
                         >
                             Lekcje
                         </button>
                         <button
-                            className={`px-4 py-2 rounded-md font-semibold transition ${
+                            className={`btn px-4 py-2 rounded-md font-semibold transition ${
                                 activeTab === 'calendar'
                                     ? 'bg-purple-100 text-purple-600'
-                                    : 'bg-gray-100 text-gray-700'
+                                    : 'bg-gray-100 text-gray-700 hover:text-purple-600'
                             }`}
                             onClick={() => setActiveTab('calendar')}
                         >
                             Kalendarz
                         </button>
                         <button
-                            className={`px-4 py-2 rounded-md font-semibold transition ${
+                            className={`btn px-4 py-2 rounded-md font-semibold transition ${
                                 activeTab === 'progress'
                                     ? 'bg-purple-100 text-purple-600'
-                                    : 'bg-gray-100 text-gray-700'
+                                    : 'bg-gray-100 text-gray-700 hover:text-purple-600'
                             }`}
                             onClick={() => setActiveTab('progress')}
                         >
                             Postępy
                         </button>
                         <button
-                            className={`px-4 py-2 rounded-md font-semibold transition ${
+                            className={`btn px-4 py-2 rounded-md font-semibold transition ${
                                 activeTab === 'tutors'
                                     ? 'bg-purple-100 text-purple-600'
-                                    : 'bg-gray-100 text-gray-700'
+                                    : 'bg-gray-100 text-gray-700 hover:text-purple-600'
                             }`}
                             onClick={() => setActiveTab('tutors')}
                         >
@@ -263,32 +187,28 @@ const CockpitPage = () => {
                         </button>
                     </div>
 
-                    {/* Tab content */}
+                    {/* Tab Content */}
                     <div className="min-h-[500px]">
-                        {/* 1) LESSONS TAB */}
+                        {/* LESSONS TAB */}
                         {activeTab === 'lessons' && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                {/* sub-tabs: upcoming / past */}
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                                {/* Sub-tabs: upcoming / past */}
                                 <div className="flex space-x-4 mb-8">
                                     <button
-                                        className={`px-4 py-2 rounded-md font-medium ${
+                                        className={`btn px-4 py-2 rounded-md font-medium ${
                                             lessonTab === 'upcoming'
                                                 ? 'bg-purple-50 text-purple-600'
-                                                : 'bg-gray-50 text-gray-600'
+                                                : 'bg-gray-50 text-gray-600 hover:text-purple-600'
                                         }`}
                                         onClick={() => setLessonTab('upcoming')}
                                     >
                                         Nadchodzące lekcje
                                     </button>
                                     <button
-                                        className={`px-4 py-2 rounded-md font-medium ${
+                                        className={`btn px-4 py-2 rounded-md font-medium ${
                                             lessonTab === 'past'
                                                 ? 'bg-purple-50 text-purple-600'
-                                                : 'bg-gray-50 text-gray-600'
+                                                : 'bg-gray-50 text-gray-600 hover:text-purple-600'
                                         }`}
                                         onClick={() => setLessonTab('past')}
                                     >
@@ -298,20 +218,16 @@ const CockpitPage = () => {
 
                                 {lessonTab === 'upcoming' && (
                                     <>
-                                        {loadingLessons ? (
+                                        {lessonsLoading ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                                 {Array.from({ length: 4 }).map((_, i) => (
                                                     <LessonCardSkeleton key={i} />
                                                 ))}
                                             </div>
-                                        ) : upcoming.length > 0 ? (
+                                        ) : upcomingLessons.length > 0 ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                                {upcoming.map((les) => (
-                                                    <LessonCard
-                                                        key={les.id}
-                                                        lesson={les}
-                                                        onInfoClick={handleLessonInfo}
-                                                    />
+                                                {upcomingLessons.map((les) => (
+                                                    <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                 ))}
                                             </div>
                                         ) : (
@@ -324,20 +240,16 @@ const CockpitPage = () => {
 
                                 {lessonTab === 'past' && (
                                     <>
-                                        {loadingLessons ? (
+                                        {lessonsLoading ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                                 {Array.from({ length: 4 }).map((_, i) => (
                                                     <LessonCardSkeleton key={i} />
                                                 ))}
                                             </div>
-                                        ) : past.length > 0 ? (
+                                        ) : pastLessons.length > 0 ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                                {past.map((les) => (
-                                                    <LessonCard
-                                                        key={les.id}
-                                                        lesson={les}
-                                                        onInfoClick={handleLessonInfo}
-                                                    />
+                                                {pastLessons.map((les) => (
+                                                    <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                 ))}
                                             </div>
                                         ) : (
@@ -350,7 +262,7 @@ const CockpitPage = () => {
                             </motion.div>
                         )}
 
-                        {/* 2) CALENDAR TAB */}
+                        {/* CALENDAR TAB */}
                         {activeTab === 'calendar' && (
                             <motion.div
                                 initial={{ opacity: 0 }}
@@ -363,13 +275,9 @@ const CockpitPage = () => {
                             </motion.div>
                         )}
 
-                        {/* 3) PROGRESS TAB */}
+                        {/* PROGRESS TAB */}
                         {activeTab === 'progress' && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                            >
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                                 <h2 className="text-2xl font-bold mb-4 text-gray-800">
                                     Twoje postępy
                                 </h2>
@@ -381,32 +289,20 @@ const CockpitPage = () => {
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <FaStar
                                                 key={i}
-                                                className={
-                                                    i < Math.round(studentRating)
-                                                        ? 'text-yellow-400'
-                                                        : 'text-gray-300'
-                                                }
+                                                className={i < Math.round(3) ? 'text-yellow-400' : 'text-gray-300'}
                                             />
                                         ))}
-                                        <span className="ml-2 text-gray-600">
-                      ({studentRating.toFixed(1)}/5)
-                    </span>
+                                        <span className="ml-2 text-gray-600">(3.0/5)</span>
                                     </div>
                                 </div>
                             </motion.div>
                         )}
 
-                        {/* 4) TUTORS TAB */}
+                        {/* TUTORS TAB */}
                         {activeTab === 'tutors' && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                <h2 className="text-2xl font-bold mb-6 text-gray-800">
-                                    Korepetytorzy
-                                </h2>
-                                {loadingTutors ? (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                                <h2 className="text-2xl font-bold mb-6 text-gray-800">Korepetytorzy</h2>
+                                {tutorsLoading ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {Array.from({ length: 4 }).map((_, i) => (
                                             <TutorCardSkeleton key={i} />
@@ -415,11 +311,7 @@ const CockpitPage = () => {
                                 ) : tutors.length > 0 ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         {tutors.map((tutor) => (
-                                            <TutorCard
-                                                key={tutor.id}
-                                                tutor={tutor}
-                                                onInfoClick={handleTutorInfo}
-                                            />
+                                            <TutorCard key={tutor.id} tutor={tutor} onInfoClick={(tutor)=>(console.log(tutor))} />
                                         ))}
                                     </div>
                                 ) : (
@@ -430,33 +322,16 @@ const CockpitPage = () => {
                             </motion.div>
                         )}
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             {/* ------ BOTTOM: ODZNAKI ------ */}
             <div className="container-custom mt-12">
                 <h3 className="text-xl font-medium text-gray-700 mb-4">Odznaki</h3>
-                {MockBadges.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-                        {MockBadges.map((badge) => (
-                            <div
-                                key={badge.id}
-                                className="flex flex-col items-center text-center p-3 bg-white rounded shadow-sm"
-                            >
-                                <img
-                                    src={badge.iconSrc}
-                                    alt={badge.label}
-                                    className="w-12 h-12 mb-2"
-                                />
-                                <p className="text-sm font-medium text-gray-700">
-                                    {badge.label}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-gray-600">Brak odznak</div>
-                )}
+                {/* Replace with actual badges if available */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+                    {/* Badge rendering */}
+                </div>
             </div>
         </section>
     );
