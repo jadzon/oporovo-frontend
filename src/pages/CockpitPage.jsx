@@ -9,7 +9,7 @@ import { fetchUserTutors } from '../store/thunks/tutorsThunks';
 
 // Cards
 import LessonCard from '../components/lessonCard/LessonCard';
-import TutorCard from '../components/home/TutorCard';
+import TutorCard from '../components/tutorCard/TutorCard.jsx';
 import UpcomingLessonCard from '../components/lessonCard/UpcomingLessonCard';
 
 // Skeletons
@@ -88,7 +88,7 @@ const CockpitPage = () => {
                             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
                         >
                             <h1 className="text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-                                Nadchodząca <span className="text-purple-600">lekcja</span>
+                                Nadchodząca <span className="text-purple-700">lekcja</span>
                             </h1>
                             <p className="mt-6 text-xl text-gray-700 max-w-lg mx-auto lg:mx-0">
                                 Rozwijaj swoje umiejętności dzięki starannie zaplanowanym lekcjom.
@@ -98,7 +98,7 @@ const CockpitPage = () => {
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     onClick={handleBookMore}
-                                    className="btn bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded shadow transition"
+                                    className="btn bg-purple-700 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded shadow transition"
                                 >
                                     <FaCalendarPlus className="mr-2" />
                                     Zarezerwuj lekcję
@@ -107,7 +107,7 @@ const CockpitPage = () => {
                                     whileHover={{ scale: 1.01 }}
                                     whileTap={{ scale: 0.99 }}
                                     onClick={handleSearchTutors}
-                                    className="btn border border-purple-600 text-purple-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded shadow transition"
+                                    className="btn border border-purple-700 text-purple-700 hover:bg-gray-100 font-semibold py-3 px-8 rounded shadow transition"
                                 >
                                     <FaSearch className="mr-2" />
                                     Szukaj korepetytorów
@@ -147,8 +147,8 @@ const CockpitPage = () => {
                                     key={tab}
                                     className={`py-2 px-4 btn font-semibold transition border-b-2 ${
                                         activeTab === tab
-                                            ? 'border-purple-600 text-purple-600'
-                                            : 'border-transparent text-gray-600 hover:text-purple-600'
+                                            ? 'border-purple-700 text-purple-700'
+                                            : 'border-transparent text-gray-600 hover:text-purple-700'
                                     }`}
                                     onClick={() => setActiveTab(tab)}
                                 >
@@ -174,8 +174,8 @@ const CockpitPage = () => {
                                         <button
                                             className={`py-2 px-4 btn font-medium transition rounded ${
                                                 lessonTab === 'upcoming'
-                                                    ? 'bg-purple-50 text-purple-600'
-                                                    : 'bg-gray-50 text-gray-600 hover:text-purple-600'
+                                                    ? 'bg-purple-50 text-purple-700'
+                                                    : 'bg-gray-50 text-gray-600 hover:text-purple-700'
                                             }`}
                                             onClick={() => setLessonTab('upcoming')}
                                         >
@@ -184,8 +184,8 @@ const CockpitPage = () => {
                                         <button
                                             className={`py-2 px-4 btn font-medium transition rounded ${
                                                 lessonTab === 'past'
-                                                    ? 'bg-purple-50 text-purple-600'
-                                                    : 'bg-gray-50 text-gray-600 hover:text-purple-600'
+                                                    ? 'bg-purple-50 text-purple-700'
+                                                    : 'bg-gray-50 text-gray-600 hover:text-purple-700'
                                             }`}
                                             onClick={() => setLessonTab('past')}
                                         >

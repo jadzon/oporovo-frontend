@@ -44,46 +44,54 @@ const LoginModal = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="modal-overlay"
+                        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
                     />
-                    <div className="modal">
+
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                         <motion.div
                             ref={modalRef}
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                            className="modal-content"
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                            className="bg-white rounded-2xl shadow-xl w-full max-w-md border border-gray-100"
                         >
-                            <div className="relative p-6">
+                            <div className="relative p-8">
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                                    className="absolute top-5 right-5 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                                 >
-                                    <FaTimes />
+                                    <FaTimes className="w-5 h-5" />
                                 </button>
-                                <div className="text-center">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                                        Zaloguj się do Oporovo
-                                    </h3>
-                                    <p className="text-gray-600 mb-8">
-                                        Zaloguj się przez Discord aby zarezerwować korepetycje
-                                        i korzystać z pełni możliwości platformy.
-                                    </p>
-                                    <button
+
+                                <div className="space-y-6 text-center">
+                                    <div className="space-y-2">
+                                        <h3 className="text-3xl font-bold text-gray-900">
+                                            Zaloguj się do Oporovo
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            Zaloguj się przez Discord aby zarezerwować korepetycje<br />
+                                            i korzystać z pełni możliwości platformy.
+                                        </p>
+                                    </div>
+
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
                                         onClick={() => authService.discordLogin()}
-                                        className="w-full flex items-center justify-center btn py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors"
+                                        className="btn w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md"
                                     >
-                                        <FaDiscord className="text-xl mr-2" />
+                                        <FaDiscord className="text-xl shrink-0" />
                                         Kontynuuj przez Discord
-                                    </button>
-                                    <p className="mt-6 text-sm text-gray-500">
+                                    </motion.button>
+
+                                    <p className="text-sm text-gray-500">
                                         Logując się akceptujesz{' '}
-                                        <a href="#" className="text-vibely-600 hover:underline">
+                                        <a href="#" className="text-purple-600 hover:underline font-medium">
                                             Regulamin
                                         </a>{' '}
                                         oraz{' '}
-                                        <a href="#" className="text-vibely-600 hover:underline">
+                                        <a href="#" className="text-purple-600 hover:underline font-medium">
                                             Politykę Prywatności
                                         </a>
                                     </p>

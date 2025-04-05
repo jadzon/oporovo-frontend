@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import TutorCard from './TutorCard';
+import TutorCard from '../tutorCard/TutorCard.jsx';
 import { TutorCardSkeleton } from '../ui/Skeleton';
 import { useModal } from '../../hooks/useModal';
 

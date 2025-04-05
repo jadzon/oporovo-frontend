@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const statusMapping = {
-    scheduled: { text: 'Zaplanowana', color: 'bg-purple-600' },
+    scheduled: { text: 'Zaplanowana', color: 'bg-purple-700' },
     confirmed: { text: 'Potwierdzona', color: 'bg-green-600' },
     in_progress: { text: 'W trakcie', color: 'bg-purple-500' },
     done: { text: 'Zakończona', color: 'bg-gray-600' },
@@ -73,7 +73,7 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ duration: 0.15 }}
-                    className="self-start bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md transition-colors"
+                    className="self-start bg-purple-700 hover:bg-purple-700 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md transition-colors"
                     onClick={() => onInfoClick?.(lesson)}
                 >
                     Szczegóły
