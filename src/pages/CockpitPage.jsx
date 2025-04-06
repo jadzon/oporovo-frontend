@@ -6,10 +6,12 @@ import { motion } from 'framer-motion';
 // Redux thunks
 import { fetchUserLessons } from '../store/thunks/lessonThunks';
 import { fetchUserTutors } from '../store/thunks/tutorsThunks';
+import { fetchUserCourses } from '../store/thunks/courseThunks';
 
 // Cards
 import LessonCard from '../components/lessonCard/LessonCard';
 import TutorCard from '../components/tutorCard/TutorCard';
+import CourseCard from '../components/courseCard/CourseCard';
 import UpcomingLessonCard from '../components/lessonCard/UpcomingLessonCard';
 
 // Skeletons
@@ -17,6 +19,7 @@ import {
     LessonCardSkeleton,
     TutorCardSkeleton,
     UpcomingLessonSkeleton,
+    // Optionally create a CourseCardSkeleton if needed.
 } from '../components/ui/Skeleton';
 
 // Modals
@@ -28,17 +31,20 @@ const CockpitPage = () => {
     const { user } = useSelector((state) => state.auth);
     const { lessons, loading: lessonsLoading } = useSelector((state) => state.lessons);
     const { tutors, loading: tutorsLoading } = useSelector((state) => state.tutors);
+    const { courses, loading: coursesLoading } = useSelector((state) => state.courses);
 
     const [activeTab, setActiveTab] = useState('lessons');
     const [lessonTab, setLessonTab] = useState('upcoming');
     // Modal states
     const [selectedTutor, setSelectedTutor] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
+    const [selectedCourse, setSelectedCourse] = useState(null);
 
     useEffect(() => {
         if (user?.id) {
             dispatch(fetchUserLessons(user.id));
             dispatch(fetchUserTutors(user.id));
+            dispatch(fetchUserCourses(user.id));
         }
     }, [dispatch, user]);
 
@@ -51,10 +57,7 @@ const CockpitPage = () => {
             .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
     }, [lessons, now]);
 
-    // The next upcoming lesson
     const nextLesson = upcomingConfirmed[0] || null;
-
-    // upcoming vs past
     const upcomingLessons = useMemo(
         () => lessons.filter((lesson) => new Date(lesson.start_time) > now),
         [lessons, now]
@@ -64,13 +67,12 @@ const CockpitPage = () => {
         [lessons, now]
     );
 
-    // Handlers
+    // Handlers for modals
     const handleBookMore = () => alert('Zarezerwuj kolejną lekcję...');
     const handleSearchTutors = () => alert('Przekierowanie do wyszukiwania...');
-    // On Info -> set selected Lesson
     const handleLessonInfo = (lesson) => setSelectedLesson(lesson);
-    // On Info -> set selected Tutor
     const handleTutorInfo = (tutor) => setSelectedTutor(tutor);
+    const handleCourseInfo = (course) => setSelectedCourse(course);
 
     return (
         <>
@@ -78,7 +80,7 @@ const CockpitPage = () => {
                 <div className="max-w-7xl mx-auto px-4">
                     {/* HERO SECTION */}
                     <div className="flex flex-col lg:flex-row items-center">
-                        {/* LEFT: Title & subtext */}
+                        {/* LEFT: Title & Subtext */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -123,10 +125,7 @@ const CockpitPage = () => {
                             {lessonsLoading ? (
                                 <UpcomingLessonSkeleton />
                             ) : nextLesson ? (
-                                <UpcomingLessonCard
-                                    lesson={nextLesson}
-                                    onInfoClick={handleLessonInfo}
-                                />
+                                <UpcomingLessonCard lesson={nextLesson} onInfoClick={handleLessonInfo} />
                             ) : (
                                 <div className="p-6 bg-gray-100 rounded-xl text-center text-gray-600 shadow w-full h-48 flex items-center justify-center">
                                     Brak zaplanowanych lekcji
@@ -143,7 +142,7 @@ const CockpitPage = () => {
                         className="mt-12"
                     >
                         <div className="flex space-x-4 mb-8 border-b border-gray-200">
-                            {['lessons', 'calendar', 'progress', 'tutors'].map((tab) => (
+                            {['lessons', 'courses', 'calendar', 'progress', 'tutors'].map((tab) => (
                                 <button
                                     key={tab}
                                     className={`py-2 px-4 btn font-semibold transition border-b-2 ${
@@ -155,22 +154,20 @@ const CockpitPage = () => {
                                 >
                                     {tab === 'lessons'
                                         ? 'Lekcje'
-                                        : tab === 'calendar'
-                                            ? 'Kalendarz'
-                                            : tab === 'progress'
-                                                ? 'Postępy'
-                                                : 'Korepetytorzy'}
+                                        : tab === 'courses'
+                                            ? 'Kursy'
+                                            : tab === 'calendar'
+                                                ? 'Kalendarz'
+                                                : tab === 'progress'
+                                                    ? 'Postępy'
+                                                    : 'Korepetytorzy'}
                                 </button>
                             ))}
                         </div>
 
                         <div className="min-h-[500px]">
                             {activeTab === 'lessons' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.4 }}
-                                >
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
                                     <div className="flex space-x-4 mb-6">
                                         <button
                                             className={`py-2 px-4 btn font-medium transition rounded ${
@@ -205,11 +202,7 @@ const CockpitPage = () => {
                                             ) : upcomingLessons.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {upcomingLessons.map((les) => (
-                                                        <LessonCard
-                                                            key={les.id}
-                                                            lesson={les}
-                                                            onInfoClick={handleLessonInfo}
-                                                        />
+                                                        <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -219,7 +212,6 @@ const CockpitPage = () => {
                                             )}
                                         </>
                                     )}
-
                                     {lessonTab === 'past' && (
                                         <>
                                             {lessonsLoading ? (
@@ -231,11 +223,7 @@ const CockpitPage = () => {
                                             ) : pastLessons.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {pastLessons.map((les) => (
-                                                        <LessonCard
-                                                            key={les.id}
-                                                            lesson={les}
-                                                            onInfoClick={handleLessonInfo}
-                                                        />
+                                                        <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -244,6 +232,36 @@ const CockpitPage = () => {
                                                 </div>
                                             )}
                                         </>
+                                    )}
+                                </motion.div>
+                            )}
+
+                            {activeTab === 'courses' && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    {coursesLoading ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                            {Array.from({ length: 4 }).map((_, i) => (
+                                                <div key={i} className="bg-gray-200 h-48 rounded-xl animate-pulse" />
+                                            ))}
+                                        </div>
+                                    ) : courses && courses.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                            {courses.map((course) => (
+                                                <CourseCard
+                                                    key={course.id}
+                                                    course={course}
+                                                    onInfoClick={handleCourseInfo}
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-gray-600 mt-8">
+                                            Brak kursów dla Ciebie
+                                        </div>
                                     )}
                                 </motion.div>
                             )}
@@ -270,6 +288,7 @@ const CockpitPage = () => {
                                     <div className="p-6 bg-white rounded-xl shadow border">
                                         <h3 className="text-lg font-medium text-gray-700 mb-2">Ocena jako uczeń</h3>
                                         <div className="flex items-center">
+                                            {/* Replace with dynamic rating if available */}
                                             {Array.from({ length: 5 }).map((_, i) => (
                                                 <FaStar
                                                     key={i}
@@ -313,15 +332,15 @@ const CockpitPage = () => {
                 </div>
             </section>
 
-            {/* The LessonModal with the shared layoutId to show "grow" animation */}
+            {/* Lesson Modal */}
             {selectedLesson && (
                 <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
             )}
-
-            {/* TutorModal as before */}
+            {/* Tutor Modal */}
             {selectedTutor && (
                 <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
             )}
+            {/* Optionally, add a Course Modal if needed */}
         </>
     );
 };
