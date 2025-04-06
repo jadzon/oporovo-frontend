@@ -203,7 +203,7 @@ const LessonModal = ({ lesson, onClose }) => {
                                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 space-y-4">
                                             <div className="flex items-center gap-3 text-purple-600">
                                                 <FaUsers className="text-xl" />
-                                                {console.log(lesson.students)}
+                                                {console.log(lesson)}
                                                 <h3 className="text-lg font-semibold">Uczestnicy ({lesson.students.length})</h3>
                                             </div>
                                             <div className="grid grid-cols-1 gap-3">

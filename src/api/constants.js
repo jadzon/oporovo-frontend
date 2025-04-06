@@ -14,4 +14,6 @@ export const ROUTES = {
     HOME: '/',
     AUTH_CALLBACK: '/auth/callback',
     TUTORS: '/tutors',
+    HELP: '/help',
+    COURSES: '/courses',
 };

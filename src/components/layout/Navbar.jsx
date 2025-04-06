@@ -85,7 +85,8 @@ const Navbar = ({ openLoginModal }) => {
                             <>
                                 <NavItem to="/" exact>Kokpit</NavItem>
                                 <NavItem to="/tutors">Korepetytorzy</NavItem>
-                                <NavItem to="/calendar">Terminarz</NavItem>
+                                <NavItem to="/courses">Kursy Maturalne</NavItem>
+                                <NavItem to="/help">Pomoc</NavItem>
                             </>
                         ) : (
                             <>

@@ -12,6 +12,8 @@ import AuthCallback from './components/auth/AuthCallback';
 import { ROUTES } from './api/constants';
 import CockpitPage from "./pages/CockpitPage.jsx";
 import TutorsPage from "./pages/TutorsPage.jsx";
+import HelpPage from "./pages/HelpPage.jsx";
+import CoursesPage from "./pages/CoursesPage.jsx";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +49,8 @@ function App() {
                     />
                     <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />
                     <Route path={ROUTES.TUTORS} element={<TutorsPage />} />
+                    <Route path={ROUTES.HELP} element={<HelpPage />} />
+                    <Route path={ROUTES.COURSES} element={<CoursesPage />} />
 
                     {/* Protected routes */}
                     {/*<Route*/}

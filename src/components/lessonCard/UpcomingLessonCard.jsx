@@ -28,7 +28,7 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
              * layoutId matches the one used by LessonModal to achieve
              * a smooth shared-element transition (grow from card).
              */
-            layoutId={`lesson-${lesson.id}`}
+            layoutId={`lesson-${lesson.id}1`}
             className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row border border-gray-100"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
