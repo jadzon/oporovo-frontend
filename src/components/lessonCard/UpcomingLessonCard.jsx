@@ -1,5 +1,5 @@
-import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { motion } from 'framer-motion';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
@@ -14,6 +14,7 @@ const statusMapping = {
 
 const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
+
     const formattedDate = new Date(lesson.start_time).toLocaleString('pl-PL');
     const tutorAvatar = lesson.tutor?.avatar || '/images/default-avatar.png';
     const tutorFullName = lesson.tutor
@@ -23,6 +24,11 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
 
     return (
         <motion.div
+            /**
+             * layoutId matches the one used by LessonModal to achieve
+             * a smooth shared-element transition (grow from card).
+             */
+            layoutId={`lesson-${lesson.id}`}
             className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row border border-gray-100"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
@@ -51,10 +57,10 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
 
                 <div className="space-y-1">
                     <p className="text-lg font-semibold text-gray-900">{tutorFullName}</p>
-                    {tutorUsername && <p className="text-sm text-gray-500">@{tutorUsername}</p>}
+                    {!!tutorUsername && <p className="text-sm text-gray-500">@{tutorUsername}</p>}
                 </div>
 
-                {lesson.description && (
+                {!!lesson.description && (
                     <p className="text-gray-600 leading-relaxed">{lesson.description}</p>
                 )}
 
@@ -63,10 +69,14 @@ const UpcomingLessonCard = ({ lesson, onInfoClick }) => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${statusMapping[lesson.status]?.color || 'bg-gray-400'}`} />
+          <span
+              className={`w-3 h-3 rounded-full ${
+                  statusMapping[lesson.status]?.color || 'bg-gray-400'
+              }`}
+          />
                     <span className="text-sm font-medium text-gray-700">
-                        {statusMapping[lesson.status]?.text || 'Nieznany'}
-                    </span>
+            {statusMapping[lesson.status]?.text || 'Nieznany'}
+          </span>
                 </div>
 
                 <motion.button

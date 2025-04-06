@@ -15,14 +15,17 @@ const statusMapping = {
 const LessonCard = ({ lesson, onInfoClick }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const tutorAvatar = lesson.tutor?.avatar || '/images/default-avatar.png';
-    const tutorFullName = lesson.tutor?.first_name && lesson.tutor?.last_name
-        ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
-        : lesson.tutor?.username || 'Nieznany';
+    const tutorFullName =
+        lesson.tutor?.first_name && lesson.tutor?.last_name
+            ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
+            : lesson.tutor?.username || 'Nieznany';
     const tutorUsername = lesson.tutor?.username || 'Nieznany';
     const lessonDate = new Date(lesson.start_time).toLocaleString('pl-PL');
 
     return (
         <motion.div
+            /** The layoutId is critical for the grow-from-card animation. */
+            layoutId={`lesson-${lesson.id}`}
             className="w-72 bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border border-gray-100"
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
@@ -61,10 +64,14 @@ const LessonCard = ({ lesson, onInfoClick }) => {
             {/* Status & Button */}
             <div className="p-4 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${statusMapping[lesson.status]?.color || 'bg-gray-400'}`} />
+          <span
+              className={`w-3 h-3 rounded-full ${
+                  statusMapping[lesson.status]?.color || 'bg-gray-400'
+              }`}
+          />
                     <span className="text-sm font-medium text-gray-700">
-                        {statusMapping[lesson.status]?.text || 'Nieznany'}
-                    </span>
+            {statusMapping[lesson.status]?.text || 'Nieznany'}
+          </span>
                 </div>
                 <motion.button
                     whileHover={{ scale: 1.05 }}

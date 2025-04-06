@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaStar, FaSearch, FaCalendarPlus } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
-// Redux thunks for lessons and tutors
+// Redux thunks
 import { fetchUserLessons } from '../store/thunks/lessonThunks';
 import { fetchUserTutors } from '../store/thunks/tutorsThunks';
 
 // Cards
 import LessonCard from '../components/lessonCard/LessonCard';
-import TutorCard from '../components/tutorCard/TutorCard.jsx';
+import TutorCard from '../components/tutorCard/TutorCard';
 import UpcomingLessonCard from '../components/lessonCard/UpcomingLessonCard';
 
 // Skeletons
@@ -19,20 +19,21 @@ import {
     UpcomingLessonSkeleton,
 } from '../components/ui/Skeleton';
 
-// Modal component for tutor info
+// Modals
 import TutorModal from '../components/tutorModal/TutorModal';
+import LessonModal from '../components/lessonModal/LessonModal';
 
 const CockpitPage = () => {
     const dispatch = useDispatch();
-
-    // Get current user from auth slice
     const { user } = useSelector((state) => state.auth);
     const { lessons, loading: lessonsLoading } = useSelector((state) => state.lessons);
     const { tutors, loading: tutorsLoading } = useSelector((state) => state.tutors);
 
     const [activeTab, setActiveTab] = useState('lessons');
     const [lessonTab, setLessonTab] = useState('upcoming');
+    // Modal states
     const [selectedTutor, setSelectedTutor] = useState(null);
+    const [selectedLesson, setSelectedLesson] = useState(null);
 
     useEffect(() => {
         if (user?.id) {
@@ -43,21 +44,17 @@ const CockpitPage = () => {
 
     const now = new Date();
 
-    // Memoize filtering for performance
+    // Filter upcoming "confirmed" lessons for the hero card
     const upcomingConfirmed = useMemo(() => {
         return lessons
-            .filter(
-                (lesson) =>
-                    new Date(lesson.start_time) > now && lesson.status === 'confirmed'
-            )
+            .filter((lesson) => new Date(lesson.start_time) > now && lesson.status === 'confirmed')
             .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
     }, [lessons, now]);
 
-    // Choose the next lesson from the confirmed upcoming ones
+    // The next upcoming lesson
     const nextLesson = upcomingConfirmed[0] || null;
-    console.log("NEXT LESSON:", nextLesson);
 
-    // Split lessons into upcoming and past
+    // upcoming vs past
     const upcomingLessons = useMemo(
         () => lessons.filter((lesson) => new Date(lesson.start_time) > now),
         [lessons, now]
@@ -70,8 +67,9 @@ const CockpitPage = () => {
     // Handlers
     const handleBookMore = () => alert('Zarezerwuj kolejną lekcję...');
     const handleSearchTutors = () => alert('Przekierowanie do wyszukiwania...');
-    const handleLessonInfo = (lesson) =>
-        alert(`Informacje o lekcji:\n${lesson.title} – ${lesson.status}`);
+    // On Info -> set selected Lesson
+    const handleLessonInfo = (lesson) => setSelectedLesson(lesson);
+    // On Info -> set selected Tutor
     const handleTutorInfo = (tutor) => setSelectedTutor(tutor);
 
     return (
@@ -80,7 +78,7 @@ const CockpitPage = () => {
                 <div className="max-w-7xl mx-auto px-4">
                     {/* HERO SECTION */}
                     <div className="flex flex-col lg:flex-row items-center">
-                        {/* LEFT: Headline, Subtext & Actions */}
+                        {/* LEFT: Title & subtext */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -115,7 +113,7 @@ const CockpitPage = () => {
                             </div>
                         </motion.div>
 
-                        {/* RIGHT: Upcoming Lesson Card */}
+                        {/* RIGHT: Next Lesson Card */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -125,7 +123,10 @@ const CockpitPage = () => {
                             {lessonsLoading ? (
                                 <UpcomingLessonSkeleton />
                             ) : nextLesson ? (
-                                <UpcomingLessonCard lesson={nextLesson} onInfoClick={handleLessonInfo} />
+                                <UpcomingLessonCard
+                                    lesson={nextLesson}
+                                    onInfoClick={handleLessonInfo}
+                                />
                             ) : (
                                 <div className="p-6 bg-gray-100 rounded-xl text-center text-gray-600 shadow w-full h-48 flex items-center justify-center">
                                     Brak zaplanowanych lekcji
@@ -192,6 +193,7 @@ const CockpitPage = () => {
                                             Minione lekcje
                                         </button>
                                     </div>
+
                                     {lessonTab === 'upcoming' && (
                                         <>
                                             {lessonsLoading ? (
@@ -203,7 +205,11 @@ const CockpitPage = () => {
                                             ) : upcomingLessons.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {upcomingLessons.map((les) => (
-                                                        <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
+                                                        <LessonCard
+                                                            key={les.id}
+                                                            lesson={les}
+                                                            onInfoClick={handleLessonInfo}
+                                                        />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -213,6 +219,7 @@ const CockpitPage = () => {
                                             )}
                                         </>
                                     )}
+
                                     {lessonTab === 'past' && (
                                         <>
                                             {lessonsLoading ? (
@@ -224,7 +231,11 @@ const CockpitPage = () => {
                                             ) : pastLessons.length > 0 ? (
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                                     {pastLessons.map((les) => (
-                                                        <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
+                                                        <LessonCard
+                                                            key={les.id}
+                                                            lesson={les}
+                                                            onInfoClick={handleLessonInfo}
+                                                        />
                                                     ))}
                                                 </div>
                                             ) : (
@@ -260,7 +271,10 @@ const CockpitPage = () => {
                                         <h3 className="text-lg font-medium text-gray-700 mb-2">Ocena jako uczeń</h3>
                                         <div className="flex items-center">
                                             {Array.from({ length: 5 }).map((_, i) => (
-                                                <FaStar key={i} className={i < Math.round(3) ? 'text-purple-500' : 'text-gray-300'} />
+                                                <FaStar
+                                                    key={i}
+                                                    className={i < Math.round(3) ? 'text-purple-500' : 'text-gray-300'}
+                                                />
                                             ))}
                                             <span className="ml-2 text-gray-600">(3.0/5)</span>
                                         </div>
@@ -297,17 +311,17 @@ const CockpitPage = () => {
                         </div>
                     </motion.div>
                 </div>
-
-                {/* BADGES SECTION */}
-                <div className="max-w-7xl mx-auto px-4 mt-12">
-                    <h3 className="text-xl font-semibold text-gray-700 mb-4">Odznaki</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
-                        {/* Badge rendering */}
-                    </div>
-                </div>
-
-                <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
             </section>
+
+            {/* The LessonModal with the shared layoutId to show "grow" animation */}
+            {selectedLesson && (
+                <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
+            )}
+
+            {/* TutorModal as before */}
+            {selectedTutor && (
+                <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
+            )}
         </>
     );
 };
