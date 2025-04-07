@@ -272,7 +272,7 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                                     <div className="flex items-center gap-3 text-purple-600 mb-4">
                                         <FaUsers className="text-xl"/>
-                                        <h3 className="text-lg font-semibold">Uczestnicy ({course.students.length})</h3>
+                                        <h3 className="text-lg font-semibold">Uczestnicy ({course.students?.length})</h3>
                                     </div>
                                     <div className="space-y-3 mt-4">
                                         {course.students && course.students.length > 0 ? (
