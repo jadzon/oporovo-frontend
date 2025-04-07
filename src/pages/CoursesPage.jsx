@@ -1,9 +1,11 @@
+// pages/CoursesPage.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import { courseService } from '../api/services/courseService';
 import InfoCourseCard from '../components/courseCard/InfoCourseCard.jsx';
-import CourseModal from '../components/courseModal/CourseModal.jsx';
+// Remove the local CourseModal import
+import { useModal } from '../hooks/useModal';
 
 const CoursesPage = () => {
     // Local state for courses and loading flag
@@ -13,14 +15,14 @@ const CoursesPage = () => {
     // Filter state
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
-    const [priceRange, setPriceRange] = useState([100, 500]);
+    const [priceRange, setPriceRange] = useState([100, 5000]);
     const [showPricePopup, setShowPricePopup] = useState(false);
-
-    // State for opening CourseModal
-    const [selectedCourse, setSelectedCourse] = useState(null);
 
     // Filter options for subjects
     const subjects = ['Matematyka', 'Język Polski', 'Fizyka', 'Chemia', 'Biologia', 'Historia'];
+
+    // Unified modal hook for opening course modal
+    const { openCourseModal } = useModal();
 
     // Fetch courses from API when the component mounts or filters change.
     useEffect(() => {
@@ -68,7 +70,7 @@ const CoursesPage = () => {
     const clearFilters = () => {
         setSearchTerm('');
         setSelectedSubject('');
-        setPriceRange([100, 500]);
+        setPriceRange([100, 5000]);
         setShowPricePopup(false);
     };
 
@@ -221,7 +223,7 @@ const CoursesPage = () => {
                                     <InfoCourseCard
                                         key={course.id}
                                         course={course}
-                                        onInfoClick={() => setSelectedCourse(course)}
+                                        onInfoClick={() => openCourseModal(course)}
                                     />
                                 ))}
                             </motion.div>
@@ -229,7 +231,7 @@ const CoursesPage = () => {
                             <div className="text-center py-12 space-y-4">
                                 <div className="text-6xl">😕</div>
                                 <h3 className="text-xl font-semibold text-gray-900">
-                                    {searchTerm || selectedSubject || priceRange[0] !== 100 || priceRange[1] !== 500
+                                    {searchTerm || selectedSubject || priceRange[0] !== 100 || priceRange[1] !== 5000
                                         ? 'Brak kursów dla wybranych kryteriów'
                                         : 'Nie znaleziono kursów'}
                                 </h3>
@@ -241,11 +243,6 @@ const CoursesPage = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Course Modal */}
-            {selectedCourse && (
-                <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
-            )}
         </>
     );
 };

@@ -14,3 +14,16 @@ export const fetchUserCourses = createAsyncThunk(
         }
     }
 );
+export const enrollCourse = createAsyncThunk(
+    'courses/enrollCourse',
+    async (courseID, { rejectWithValue }) => {
+        try {
+            const response = await courseService.enrollCourse(courseID);
+            return response.data; // Assumes API returns the updated course DTO
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || 'Failed to enroll in course'
+            );
+        }
+    }
+);

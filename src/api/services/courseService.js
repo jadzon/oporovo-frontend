@@ -10,4 +10,6 @@ export const courseService = {
 
     // Optionally, create a new course.
     createCourse: (courseData) => apiClient.post('/courses', courseData),
+
+    enrollCourse: (courseID) => apiClient.post(`/courses/${courseID}/enroll`),
 };

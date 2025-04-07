@@ -14,6 +14,7 @@ import CockpitPage from "./pages/CockpitPage.jsx";
 import TutorsPage from "./pages/TutorsPage.jsx";
 import HelpPage from "./pages/HelpPage.jsx";
 import CoursesPage from "./pages/CoursesPage.jsx";
+import {LayoutGroup} from "framer-motion";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -41,7 +42,11 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route element={<Layout />}>
+                <Route element={
+                    <LayoutGroup>
+                    <Layout />
+                </LayoutGroup>
+                }>
                     {/* Public routes */}
                     <Route
                         path={ROUTES.HOME}

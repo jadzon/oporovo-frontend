@@ -22,9 +22,8 @@ import {
     // Optionally create a CourseCardSkeleton if needed.
 } from '../components/ui/Skeleton';
 
-// Modals
-import TutorModal from '../components/tutorModal/TutorModal';
-import LessonModal from '../components/lessonModal/LessonModal';
+// Import the useModal hook from the new modal system
+import { useModal } from '../hooks/useModal';
 
 const CockpitPage = () => {
     const dispatch = useDispatch();
@@ -35,10 +34,9 @@ const CockpitPage = () => {
 
     const [activeTab, setActiveTab] = useState('lessons');
     const [lessonTab, setLessonTab] = useState('upcoming');
-    // Modal states
-    const [selectedTutor, setSelectedTutor] = useState(null);
-    const [selectedLesson, setSelectedLesson] = useState(null);
-    const [selectedCourse, setSelectedCourse] = useState(null);
+
+    // Use the new modal functions
+    const { openLessonModal, openTutorModal, openCourseModal } = useModal();
 
     useEffect(() => {
         if (user?.id) {
@@ -50,29 +48,40 @@ const CockpitPage = () => {
 
     const now = new Date();
 
+    // Use a fallback for lessons to avoid null errors
+    const lessonsArray = lessons || [];
+
     // Filter upcoming "confirmed" lessons for the hero card
     const upcomingConfirmed = useMemo(() => {
-        return lessons
-            .filter((lesson) => new Date(lesson.start_time) > now && lesson.status === 'confirmed')
-            .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    }, [lessons, now]);
+        return lessonsArray
+            .filter(
+                (lesson) =>
+                    new Date(lesson.start_time) > now &&
+                    lesson.status === 'confirmed'
+            )
+            .sort(
+                (a, b) =>
+                    new Date(a.start_time) - new Date(b.start_time)
+            );
+    }, [lessonsArray, now]);
 
     const nextLesson = upcomingConfirmed[0] || null;
     const upcomingLessons = useMemo(
-        () => lessons.filter((lesson) => new Date(lesson.start_time) > now),
-        [lessons, now]
+        () => lessonsArray.filter((lesson) => new Date(lesson.start_time) > now),
+        [lessonsArray, now]
     );
     const pastLessons = useMemo(
-        () => lessons.filter((lesson) => new Date(lesson.start_time) <= now),
-        [lessons, now]
+        () => lessonsArray.filter((lesson) => new Date(lesson.start_time) <= now),
+        [lessonsArray, now]
     );
 
-    // Handlers for modals
+    // Modal handlers using the new modal system
+    const handleLessonInfo = (lesson) => openLessonModal(lesson);
+    const handleTutorInfo = (tutor) => openTutorModal(tutor);
+    const handleCourseInfo = (course) => openCourseModal(course);
+
     const handleBookMore = () => alert('Zarezerwuj kolejną lekcję...');
     const handleSearchTutors = () => alert('Przekierowanie do wyszukiwania...');
-    const handleLessonInfo = (lesson) => setSelectedLesson(lesson);
-    const handleTutorInfo = (tutor) => setSelectedTutor(tutor);
-    const handleCourseInfo = (course) => setSelectedCourse(course);
 
     return (
         <>
@@ -237,25 +246,17 @@ const CockpitPage = () => {
                             )}
 
                             {activeTab === 'courses' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.4 }}
-                                >
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
                                     {coursesLoading ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                                             {Array.from({ length: 4 }).map((_, i) => (
                                                 <div key={i} className="bg-gray-200 h-48 rounded-xl animate-pulse" />
                                             ))}
                                         </div>
                                     ) : courses && courses.length > 0 ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                                             {courses.map((course) => (
-                                                <CourseCard
-                                                    key={course.id}
-                                                    course={course}
-                                                    onInfoClick={handleCourseInfo}
-                                                />
+                                                <CourseCard key={course.id} course={course} onInfoClick={handleCourseInfo} />
                                             ))}
                                         </div>
                                     ) : (
@@ -267,33 +268,20 @@ const CockpitPage = () => {
                             )}
 
                             {activeTab === 'calendar' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.4 }}
-                                    className="text-center text-gray-600 mt-8"
-                                >
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} className="text-center text-gray-600 mt-8">
                                     <h2 className="text-2xl font-semibold">Twój kalendarz</h2>
                                     <p className="mt-2">Wkrótce dostępne...</p>
                                 </motion.div>
                             )}
 
                             {activeTab === 'progress' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.4 }}
-                                >
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
                                     <h2 className="text-2xl font-bold mb-4 text-gray-900">Twoje postępy</h2>
                                     <div className="p-6 bg-white rounded-xl shadow border">
                                         <h3 className="text-lg font-medium text-gray-700 mb-2">Ocena jako uczeń</h3>
                                         <div className="flex items-center">
-                                            {/* Replace with dynamic rating if available */}
                                             {Array.from({ length: 5 }).map((_, i) => (
-                                                <FaStar
-                                                    key={i}
-                                                    className={i < Math.round(3) ? 'text-purple-500' : 'text-gray-300'}
-                                                />
+                                                <FaStar key={i} className={i < Math.round(3) ? 'text-purple-500' : 'text-gray-300'} />
                                             ))}
                                             <span className="ml-2 text-gray-600">(3.0/5)</span>
                                         </div>
@@ -302,11 +290,7 @@ const CockpitPage = () => {
                             )}
 
                             {activeTab === 'tutors' && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.4 }}
-                                >
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
                                     <h2 className="text-2xl font-bold mb-6 text-gray-900">Korepetytorzy</h2>
                                     {tutorsLoading ? (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -314,7 +298,7 @@ const CockpitPage = () => {
                                                 <TutorCardSkeleton key={i} />
                                             ))}
                                         </div>
-                                    ) : tutors.length > 0 ? (
+                                    ) : tutors && tutors.length > 0 ? (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                             {tutors.map((tutor) => (
                                                 <TutorCard key={tutor.id} tutor={tutor} onInfoClick={handleTutorInfo} />
@@ -331,16 +315,6 @@ const CockpitPage = () => {
                     </motion.div>
                 </div>
             </section>
-
-            {/* Lesson Modal */}
-            {selectedLesson && (
-                <LessonModal lesson={selectedLesson} onClose={() => setSelectedLesson(null)} />
-            )}
-            {/* Tutor Modal */}
-            {selectedTutor && (
-                <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
-            )}
-            {/* Optionally, add a Course Modal if needed */}
         </>
     );
 };

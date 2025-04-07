@@ -1,21 +1,19 @@
-// src/hooks/useModal.js
 import { useSelector, useDispatch } from 'react-redux';
 import {
     openLoginModal,
     closeLoginModal,
-    openTutorModal,
-    closeTutorModal,
-    clearSelectedTutor
+    openContentModal,
+    goBackContentModal,
+    closeContentModal,
+    MODAL_TYPES
 } from '../store/slices/modalSlice';
 
 export const useModal = () => {
     const dispatch = useDispatch();
 
-    // Use try-catch to handle potential errors
+    // Use try-catch to handle potential errors in case Redux store isn't set up yet
     try {
-        // Be more explicit about the selector and add a fallback
         const modalState = useSelector((state) => {
-            // If state.modal is undefined, log an error and return an empty object
             if (!state || !state.modal) {
                 console.error('Modal state is missing in Redux store!', state);
                 return {};
@@ -24,30 +22,53 @@ export const useModal = () => {
         });
 
         return {
+            // Login modal state and actions (separate system)
             isLoginModalOpen: modalState.isLoginModalOpen || false,
             openLoginModal: () => dispatch(openLoginModal()),
             closeLoginModal: () => dispatch(closeLoginModal()),
-            isTutorModalOpen: modalState.isTutorModalOpen || false,
-            selectedTutor: modalState.selectedTutor || null,
-            openTutorModal: (tutor) => dispatch(openTutorModal(tutor)),
-            closeTutorModal: () => {
-                dispatch(closeTutorModal());
-                setTimeout(() => dispatch(clearSelectedTutor()), 300);
-            },
+
+            // Content modal state (unified system)
+            activeModal: modalState.activeModal,
+            modalData: modalState.modalData,
+            isContentModalOpen: modalState.isContentModalOpen || false,
+            hasModalHistory: (modalState.modalHistory?.length > 0) || false,
+
+            // General content modal actions
+            openContentModal: (modalType, data) =>
+                dispatch(openContentModal({ modalType, data })),
+            goBackContentModal: () => dispatch(goBackContentModal()),
+            closeContentModal: () => dispatch(closeContentModal()),
+
+            // Convenience methods for specific modal types
+            openTutorModal: (tutor) =>
+                dispatch(openContentModal({ modalType: MODAL_TYPES.TUTOR, data: tutor })),
+
+            openLessonModal: (lesson) =>
+                dispatch(openContentModal({ modalType: MODAL_TYPES.LESSON, data: lesson })),
+
+            openCourseModal: (course) =>
+                dispatch(openContentModal({ modalType: MODAL_TYPES.COURSE, data: course })),
         };
     } catch (error) {
-        // Log the error but return default values so the app doesn't crash
         console.error('Error in useModal hook:', error);
 
-        // Return a non-functional but non-breaking implementation
+        // Return non-functional but non-breaking implementation
         return {
             isLoginModalOpen: false,
             openLoginModal: () => console.warn('Modal functionality unavailable'),
             closeLoginModal: () => {},
-            isTutorModalOpen: false,
-            selectedTutor: null,
+            activeModal: null,
+            modalData: null,
+            isContentModalOpen: false,
+            hasModalHistory: false,
+            openContentModal: () => {},
+            goBackContentModal: () => {},
+            closeContentModal: () => {},
             openTutorModal: () => {},
-            closeTutorModal: () => {},
+            openLessonModal: () => {},
+            openCourseModal: () => {},
         };
     }
 };
+
+export default useModal;

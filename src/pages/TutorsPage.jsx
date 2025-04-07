@@ -1,10 +1,12 @@
+// pages/TutorsPage.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import { tutorService } from '../api/services/tutorService';
 import InfoTutorCard from '../components/tutorCard/InfoTutorCard.jsx';
 import InfoTutorCardSkeleton from '../components/tutorCard/InfoTutorCardSkeleton.jsx';
-import TutorModal from '../components/tutorModal/TutorModal';
+// Instead of using a local modal component, we now use the unified modal hook.
+import { useModal } from '../hooks/useModal';
 
 const TutorsPage = () => {
     // Tutors and pagination state
@@ -21,9 +23,6 @@ const TutorsPage = () => {
     const [priceRange, setPriceRange] = useState([50, 200]);
     const [showPricePopup, setShowPricePopup] = useState(false);
 
-    // Modal state for tutor details
-    const [selectedTutor, setSelectedTutor] = useState(null);
-
     // Filter options arrays
     const subjects = [
         'Matematyka',
@@ -37,6 +36,9 @@ const TutorsPage = () => {
         'Informatyka',
     ];
     const levels = ['Szkoła Podstawowa', 'Liceum', 'Studia', 'Matura'];
+
+    // Unified modal hook for opening the tutor modal
+    const { openTutorModal } = useModal();
 
     // Fetch tutors from API based on filters and page.
     const fetchTutors = async (pageNumber = 1, reset = false) => {
@@ -105,8 +107,8 @@ const TutorsPage = () => {
     const filtersActive =
         searchTerm || selectedSubject || selectedLevel || priceRange[0] !== 50 || priceRange[1] !== 200;
 
-    // Handler to open tutor modal
-    const handleTutorInfo = (tutor) => setSelectedTutor(tutor);
+    // Handler to open tutor modal using the new modal hook
+    const handleTutorInfo = (tutor) => openTutorModal(tutor);
 
     return (
         <section className="pt-24 pb-16 bg-gray-50 min-h-screen">
@@ -123,8 +125,8 @@ const TutorsPage = () => {
                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                             Znajdź swojego{' '}
                             <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                                korepetytora
-                            </span>
+                korepetytora
+              </span>
                         </h1>
                         <p className="mt-4 text-lg text-gray-600 max-w-xl lg:pr-8">
                             Odkryj pasjonujących nauczycieli, którzy pomogą Ci osiągnąć sukces w nauce.
@@ -221,8 +223,8 @@ const TutorsPage = () => {
                                                                 className="w-full accent-purple-600"
                                                             />
                                                             <span className="text-sm font-medium text-purple-600 w-12">
-                                                                {priceRange[0]}
-                                                            </span>
+                                {priceRange[0]}
+                              </span>
                                                         </div>
                                                         <div className="flex items-center gap-3">
                                                             <input
@@ -235,8 +237,8 @@ const TutorsPage = () => {
                                                                 className="w-full accent-purple-600"
                                                             />
                                                             <span className="text-sm font-medium text-purple-600 w-12">
-                                                                {priceRange[1]}
-                                                            </span>
+                                {priceRange[1]}
+                              </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -314,9 +316,6 @@ const TutorsPage = () => {
                     )}
                 </div>
             </div>
-            {selectedTutor && (
-                <TutorModal tutor={selectedTutor} onClose={() => setSelectedTutor(null)} />
-            )}
         </section>
     );
 };

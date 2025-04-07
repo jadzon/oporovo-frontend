@@ -72,7 +72,7 @@ const CourseCard = ({ course, onInfoClick }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => onInfoClick?.(course)}
-                    className="bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md transition-colors"
+                    className="btn bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
                     Szczegóły
                 </motion.button>
