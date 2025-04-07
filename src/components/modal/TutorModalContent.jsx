@@ -1,34 +1,66 @@
 // components/modal/TutorModalContent.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaStar, FaArrowLeft, FaGraduationCap, FaBookOpen, FaTimes } from 'react-icons/fa';
+import { FaStar, FaArrowLeft, FaGraduationCap, FaBookOpen, FaTimes, FaCalendarCheck, FaCheck } from 'react-icons/fa';
+import { BiLoaderAlt } from 'react-icons/bi';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { pl } from 'date-fns/locale';
 import { useModal } from '../../hooks/useModal';
+import { useSelector } from 'react-redux';
+import { lessonService } from '../../api/services/lessonService';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
-    const { openLessonModal } = useModal();
+    const { openLessonModal, openLessonCreatedConfirmation } = useModal();
+    const currentUser = useSelector(state => state.auth.user);
 
-    // Steps: 1 = Detailed Profile, 2 = Calendar, 3 = Booking Form
+    // Steps:
+    // 1 = Detailed Profile
+    // 2 = Schedule Lesson Form
+    // 3 = Confirmation Screen
+    // 4 = Processing (temporary during API call)
     const [step, setStep] = useState(1);
 
-    // Booking states
+    // Form state for creating a lesson
     const [selectedDay, setSelectedDay] = useState(null);
     const [selectedTimeBlocks, setSelectedTimeBlocks] = useState([]);
-    const [lessonTopic, setLessonTopic] = useState('');
-    const [lessonLevel, setLessonLevel] = useState('');
-    const [lessonSubject, setLessonSubject] = useState('');
-    const [lessonDescription, setLessonDescription] = useState('');
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [subject, setSubject] = useState('');
+    const [level, setLevel] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [lessonData, setLessonData] = useState(null);
 
     // Basic rating logic
     const ratingValue = tutor?.rating ?? 4.8;
     const fullStars = Math.floor(ratingValue);
     const halfStar = ratingValue - fullStars >= 0.5;
 
-    // Some mock data – replace as needed
+    // Subject options based on tutor's specializations
+    const subjectOptions = tutor?.subjects?.length
+        ? tutor.subjects
+        : ['Matematyka', 'Fizyka', 'Informatyka'];
+
+    // Level options based on tutor's teaching levels
+    const levelOptions = tutor?.levels?.length
+        ? tutor.levels
+        : ['Podstawówka', 'Liceum', 'Studia'];
+
+    // Set default subject and level if tutor has them
+    useEffect(() => {
+        if (subjectOptions.length > 0 && !subject) {
+            setSubject(subjectOptions[0]);
+        }
+
+        if (levelOptions.length > 0 && !level) {
+            setLevel(levelOptions[0]);
+        }
+    }, [subjectOptions, levelOptions, subject, level]);
+
+    // Mock data for display
     const mockEducation = [
         { school: 'Uniwersytet ABC', degree: 'Magister Informatyki', year: '2019' },
         { school: 'Liceum XYZ', degree: 'Profil mat-fiz', year: '2015' },
@@ -38,12 +70,6 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         'Prowadzenie szkoleń z JS (3 lata)',
     ];
     const mockLanguages = ['Polski (Natywny)', 'Angielski (C1)'];
-    const mockLevels = tutor?.levels?.length
-        ? tutor.levels
-        : ['Podstawówka', 'Liceum', 'Studia'];
-    const mockSubjects = tutor?.subjects?.length
-        ? tutor.subjects
-        : ['Matematyka', 'Fizyka', 'Informatyka'];
 
     // Example 45-min blocks
     const timeBlocks = [
@@ -60,42 +86,145 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         );
     };
 
-    // Step transitions
-    const handleGoCalendar = () => setStep(2);
-    const handleBack = () => setStep((prev) => prev - 1);
-    const handleGoForm = () => {
-        if (selectedDay && selectedTimeBlocks.length > 0) {
+    // Proceed to confirmation step
+    const handleProceedToConfirmation = (e) => {
+        if (e) e.preventDefault();
+
+        if (!selectedDay || selectedTimeBlocks.length === 0 || !title || !subject || !level) {
+            setError('Wypełnij wszystkie wymagane pola');
+            return;
+        }
+
+        if (!currentUser || !currentUser.id) {
+            setError('Musisz być zalogowany, aby utworzyć lekcję');
+            return;
+        }
+
+        // Calculate start and end times
+        const startDate = new Date(selectedDay);
+        const [startHour, startMinute] = selectedTimeBlocks[0].split(':');
+        startDate.setHours(parseInt(startHour, 10), parseInt(startMinute, 10), 0, 0);
+
+        const endDate = new Date(selectedDay);
+        const [endHour, endMinute] = selectedTimeBlocks[selectedTimeBlocks.length - 1].split(':');
+        endDate.setHours(parseInt(endHour, 10), parseInt(endMinute, 10) + 45, 0, 0);
+
+        // Prepare lesson data
+        const lessonDetails = {
+            tutor_id: tutor.id,
+            student_ids: [currentUser.id],
+            title,
+            description,
+            subject,
+            level,
+            start_time: startDate.toISOString(),
+            end_time: endDate.toISOString(),
+            // Additional display-only fields
+            tutor_name: `${tutor.first_name} ${tutor.last_name}`,
+            formatted_start: startDate.toLocaleString('pl-PL'),
+            formatted_end: endDate.toLocaleString('pl-PL'),
+            duration: selectedTimeBlocks.length * 45
+        };
+
+        // Save lesson data for confirmation step
+        setLessonData(lessonDetails);
+
+        // Go to confirmation step
+        setStep(3);
+    };
+
+    // Handle creating a lesson (after confirmation)
+    const handleCreateLesson = async () => {
+        if (!lessonData) {
+            setError('Brak danych lekcji');
+            return;
+        }
+
+        // Show processing state
+        setLoading(true);
+        setError(null);
+        setStep(4);
+
+        try {
+            // Call the API to create the lesson
+            const response = await lessonService.createLesson(lessonData);
+
+            // Show success confirmation
+            openLessonCreatedConfirmation({
+                ...response.data,
+                lessonObject: response.data // Store the full lesson object for navigation
+            });
+
+            // Reset form and close modal
+            resetForm();
+
+            // Open the lesson modal to view the created lesson
+            setTimeout(() => {
+                openLessonModal(response.data);
+            }, 500);
+
+        } catch (err) {
+            console.error('Error creating lesson:', err);
+            setError(err.response?.data?.error || 'Wystąpił błąd podczas tworzenia lekcji');
+            // Go back to confirmation step
             setStep(3);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleConfirmBooking = () => {
-        // Create a new lesson object based on the form data
-        const newLesson = {
-            id: Math.random().toString(36).substring(2, 9),
-            title: lessonTopic,
-            tutor: tutor,
-            subject: lessonSubject,
-            level: lessonLevel,
-            description: lessonDescription,
-            start_time: new Date(selectedDay).setHours(
-                parseInt(selectedTimeBlocks[0].split(':')[0]),
-                parseInt(selectedTimeBlocks[0].split(':')[1])
-            ),
-            end_time: new Date(selectedDay).setHours(
-                parseInt(selectedTimeBlocks[selectedTimeBlocks.length - 1].split(':')[0]),
-                parseInt(selectedTimeBlocks[selectedTimeBlocks.length - 1].split(':')[1]) + 45
-            ),
-            status: 'scheduled'
-        };
+    // Cancel lesson creation
+    const handleCancelConfirmation = () => {
+        // Go back to form step
+        setStep(2);
+    };
 
-        // Navigate to the lesson modal
-        openLessonModal(newLesson);
+    // Reset form fields
+    const resetForm = () => {
+        setSelectedDay(null);
+        setSelectedTimeBlocks([]);
+        setTitle('');
+        setDescription('');
+        setLessonData(null);
+        setError(null);
+        // Keep the default subject and level
     };
 
     // Handle navigation to lesson
     const handleViewLesson = (lesson) => {
         openLessonModal(lesson);
+    };
+
+    // Handle back button for different steps
+    const handleBackNavigation = () => {
+        if (step > 1) {
+            // If we're in confirmation, go back to form
+            if (step === 3) {
+                setStep(2);
+            } else {
+                // Otherwise reset form and go to profile
+                resetForm();
+                setStep(1);
+            }
+        } else if (goBack) {
+            goBack();
+        }
+    };
+
+    // Get header title based on current step
+    const getHeaderTitle = () => {
+        switch (step) {
+            case 1:
+                return `${tutor?.first_name || ''} ${tutor?.last_name || ''}`;
+            case 2:
+                return 'Zaplanuj lekcję';
+            case 3:
+                return 'Potwierdź szczegóły lekcji';
+            case 4:
+                return 'Tworzenie lekcji...';
+            default:
+                return 'Nauczyciel';
+        }
     };
 
     return (
@@ -104,8 +233,9 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                 {hasHistory || step > 1 ? (
                     <button
-                        onClick={step > 1 ? handleBack : goBack}
+                        onClick={handleBackNavigation}
                         className="p-2 hover:bg-gray-50 rounded-lg text-gray-600 hover:text-purple-600 transition-colors"
+                        disabled={loading}
                     >
                         <FaArrowLeft className="text-lg" />
                     </button>
@@ -113,18 +243,18 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                     <div></div>
                 )}
                 <h2 className="text-lg font-semibold text-gray-700">
-                    {step === 1 ? `${tutor?.first_name || ''} ${tutor?.last_name || ''}` :
-                        step === 2 ? 'Wybierz termin' : 'Szczegóły lekcji'}
+                    {getHeaderTitle()}
                 </h2>
                 <button
                     onClick={onClose}
                     className="p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-gray-600 text-2xl transition-colors"
+                    disabled={loading}
                 >
                     <FaTimes className="text-xl" />
                 </button>
             </div>
 
-            {/* PROFILE HEADER */}
+            {/* PROFILE HEADER - Show in all steps for context */}
             <div className="px-6 py-4 flex items-center gap-5 bg-gradient-to-r from-purple-50 to-indigo-50">
                 <div className="w-24 h-24 rounded-full border-4 border-white shadow-lg overflow-hidden">
                     {tutor?.avatar ? (
@@ -158,8 +288,8 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                             ))}
                         </div>
                         <span className="text-sm font-medium text-gray-600">
-              ({ratingValue.toFixed(1)})
-            </span>
+                            ({ratingValue.toFixed(1)})
+                        </span>
                     </div>
                     <p className="text-sm text-gray-500">
                         {mockLanguages.join(' • ')}
@@ -169,6 +299,7 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
 
             {/* CONTENT */}
             <div className="flex-1 overflow-auto p-6 space-y-8">
+                {/* STEP 1: Tutor Profile */}
                 {step === 1 && (
                     <div className="space-y-8">
                         <div className="prose prose-sm max-w-none">
@@ -202,13 +333,13 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                         Specjalizacje
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
-                                        {mockSubjects.map((sub) => (
+                                        {subjectOptions.map((sub) => (
                                             <span
                                                 key={sub}
                                                 className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm font-medium"
                                             >
-                        {sub}
-                      </span>
+                                                {sub}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
@@ -225,9 +356,9 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                                 key={idx}
                                                 className="flex items-start before:content-['•'] before:mr-2 before:text-purple-600 before:font-bold"
                                             >
-                        <span className="text-gray-600">
-                          {exp}
-                        </span>
+                                                <span className="text-gray-600">
+                                                    {exp}
+                                                </span>
                                             </li>
                                         ))}
                                     </ul>
@@ -238,13 +369,13 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                         Poziomy nauczania
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
-                                        {mockLevels.map((lvl) => (
+                                        {levelOptions.map((lvl) => (
                                             <span
                                                 key={lvl}
                                                 className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-sm font-medium"
                                             >
-                        {lvl}
-                      </span>
+                                                {lvl}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
@@ -274,164 +405,306 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
 
                         <div className="text-center border-t pt-6">
                             <button
-                                onClick={handleGoCalendar}
+                                onClick={() => setStep(2)}
                                 className="px-8 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:shadow-lg transition-all hover:scale-[1.02]"
                             >
-                                Zarezerwuj lekcję →
+                                Zaplanuj lekcję →
                             </button>
                         </div>
                     </div>
                 )}
 
-                {/* CALENDAR STEP */}
+                {/* STEP 2: Lesson Form */}
                 {step === 2 && (
                     <div className="space-y-8">
                         <div className="text-center">
                             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                Wybierz termin
+                                Zaplanuj lekcję z {tutor?.first_name}
                             </h2>
                             <p className="text-gray-600">
-                                Dostępne terminy w ciągu najbliższych 30 dni
+                                Wybierz termin i podaj szczegóły lekcji
                             </p>
                         </div>
 
-                        <div className="flex flex-col lg:flex-row gap-8">
-                            <div className="lg:w-1/2">
-                                <DayPicker
-                                    mode="single"
-                                    weekStartsOn={1}
-                                    selected={selectedDay}
-                                    onSelect={setSelectedDay}
-                                    fromDate={new Date()}
-                                    locale={pl}
-                                    modifiersClassNames={{
-                                        selected: '!bg-purple-600 !text-white',
-                                        today: 'border border-purple-300',
-                                    }}
-                                    className="[--rdp-cell-size:48px] border rounded-xl p-4"
-                                />
+                        {error && (
+                            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                                {error}
                             </div>
+                        )}
 
-                            <div className="lg:w-1/2">
-                                {selectedDay && (
-                                    <div className="space-y-6">
-                                        <h3 className="text-lg font-semibold text-gray-900">
-                                            Dostępne godziny
+                        <form onSubmit={handleProceedToConfirmation} className="space-y-8">
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {/* Left column - Calendar */}
+                                <div className="space-y-6">
+                                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+                                            <FaCalendarCheck className="text-purple-600" />
+                                            Wybierz termin
                                         </h3>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                            {timeBlocks.map((block) => (
-                                                <button
-                                                    key={block}
-                                                    onClick={() => toggleBlock(block)}
-                                                    className={`p-3 rounded-lg text-sm font-medium transition-all ${
-                                                        selectedTimeBlocks.includes(block)
-                                                            ? 'bg-purple-600 text-white shadow-md'
-                                                            : 'bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-600'
-                                                    }`}
-                                                >
-                                                    {block}
-                                                </button>
-                                            ))}
+
+                                        <DayPicker
+                                            mode="single"
+                                            weekStartsOn={1}
+                                            selected={selectedDay}
+                                            onSelect={setSelectedDay}
+                                            locale={pl}
+                                            disabled={{ before: new Date() }}
+                                            modifiers={{
+                                                disabled: (date) => date < new Date().setHours(0, 0, 0, 0),
+                                            }}
+                                            modifiersClassNames={{
+                                                selected: '!bg-purple-600 !text-white',
+                                                today: 'border border-purple-300',
+                                                disabled: 'text-gray-300 cursor-not-allowed',
+                                            }}
+                                            className="mx-auto [--rdp-cell-size:40px]"
+                                        />
+                                    </div>
+
+                                    {selectedDay && (
+                                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                                Wybierz godziny
+                                            </h3>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {timeBlocks.map((block) => (
+                                                    <button
+                                                        key={block}
+                                                        type="button"
+                                                        onClick={() => toggleBlock(block)}
+                                                        className={`p-2 rounded-lg text-sm font-medium transition-all ${
+                                                            selectedTimeBlocks.includes(block)
+                                                                ? 'bg-purple-600 text-white shadow-md'
+                                                                : 'bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-600'
+                                                        }`}
+                                                    >
+                                                        {block}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {selectedTimeBlocks.length > 0 && (
+                                                <div className="mt-4 text-sm text-gray-600">
+                                                    Zaplanowana lekcja: {selectedTimeBlocks.length * 45} minut
+                                                </div>
+                                            )}
                                         </div>
-                                        <button
-                                            onClick={handleGoForm}
-                                            disabled={!selectedTimeBlocks.length}
-                                            className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition-colors"
-                                        >
-                                            Kontynuuj ({selectedTimeBlocks.length} wybrane)
-                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Right column - Form Details */}
+                                <div className="space-y-6">
+                                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                            Szczegóły lekcji
+                                        </h3>
+
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Tytuł lekcji*
+                                                </label>
+                                                <input
+                                                    id="title"
+                                                    type="text"
+                                                    value={title}
+                                                    onChange={(e) => setTitle(e.target.value)}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    placeholder="Wprowadź tytuł lekcji"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Przedmiot*
+                                                    </label>
+                                                    <select
+                                                        id="subject"
+                                                        value={subject}
+                                                        onChange={(e) => setSubject(e.target.value)}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                                        required
+                                                    >
+                                                        <option value="">Wybierz przedmiot</option>
+                                                        {subjectOptions.map((sub) => (
+                                                            <option key={sub} value={sub}>
+                                                                {sub}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+                                                        Poziom*
+                                                    </label>
+                                                    <select
+                                                        id="level"
+                                                        value={level}
+                                                        onChange={(e) => setLevel(e.target.value)}
+                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                                        required
+                                                    >
+                                                        <option value="">Wybierz poziom</option>
+                                                        {levelOptions.map((lvl) => (
+                                                            <option key={lvl} value={lvl}>
+                                                                {lvl}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Opis lekcji
+                                                </label>
+                                                <textarea
+                                                    id="description"
+                                                    value={description}
+                                                    onChange={(e) => setDescription(e.target.value)}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    placeholder="Opisz czego dotyczy lekcja, cele, pytania..."
+                                                    rows={4}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={!selectedDay || selectedTimeBlocks.length === 0 || !title || !subject || !level}
+                                        className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Dalej
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                )}
+
+                {/* STEP 3: Confirmation */}
+                {step === 3 && lessonData && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="max-w-2xl mx-auto space-y-6"
+                    >
+                        <div className="text-center">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                Potwierdź szczegóły lekcji
+                            </h2>
+                            <p className="text-gray-600">
+                                Sprawdź, czy wszystko się zgadza przed utworzeniem lekcji
+                            </p>
+                        </div>
+
+                        {error && (
+                            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-6">Szczegóły lekcji</h3>
+
+                            <div className="divide-y divide-gray-100">
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Tytuł</span>
+                                    <span className="col-span-2 font-medium">{lessonData.title}</span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Nauczyciel</span>
+                                    <span className="col-span-2 font-medium">{lessonData.tutor_name}</span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Przedmiot</span>
+                                    <span className="col-span-2 font-medium">{lessonData.subject}</span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Poziom</span>
+                                    <span className="col-span-2 font-medium">{lessonData.level}</span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Data</span>
+                                    <span className="col-span-2 font-medium">
+                                        {new Date(lessonData.start_time).toLocaleDateString('pl-PL')}
+                                    </span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Czas rozpoczęcia</span>
+                                    <span className="col-span-2 font-medium">
+                                        {new Date(lessonData.start_time).toLocaleTimeString('pl-PL', {
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Czas zakończenia</span>
+                                    <span className="col-span-2 font-medium">
+                                        {new Date(lessonData.end_time).toLocaleTimeString('pl-PL', {
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </span>
+                                </div>
+
+                                <div className="py-3 grid grid-cols-3">
+                                    <span className="text-gray-500">Czas trwania</span>
+                                    <span className="col-span-2 font-medium">{lessonData.duration} minut</span>
+                                </div>
+
+                                {lessonData.description && (
+                                    <div className="py-3 grid grid-cols-3">
+                                        <span className="text-gray-500">Opis</span>
+                                        <span className="col-span-2">{lessonData.description}</span>
                                     </div>
                                 )}
                             </div>
                         </div>
-                    </div>
-                )}
 
-                {/* FORM STEP */}
-                {step === 3 && (
-                    <div className="max-w-2xl mx-auto space-y-6">
-                        <div className="text-center">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                Szczegóły lekcji
-                            </h2>
-                            <p className="text-gray-600">
-                                Wypełnij informacje potrzebne do przygotowania się do lekcji
-                            </p>
-                        </div>
-
-                        <div className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Temat lekcji
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    placeholder="Np. Przygotowanie do egzaminu..."
-                                    value={lessonTopic}
-                                    onChange={(e) => setLessonTopic(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="grid md:grid-cols-2 gap-5">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Poziom
-                                    </label>
-                                    <select
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
-                                        value={lessonLevel}
-                                        onChange={(e) => setLessonLevel(e.target.value)}
-                                    >
-                                        <option value="">Wybierz poziom</option>
-                                        {mockLevels.map((lvl) => (
-                                            <option key={lvl} value={lvl}>
-                                                {lvl}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Przedmiot
-                                    </label>
-                                    <select
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
-                                        value={lessonSubject}
-                                        onChange={(e) => setLessonSubject(e.target.value)}
-                                    >
-                                        <option value="">Wybierz przedmiot</option>
-                                        {mockSubjects.map((sub) => (
-                                            <option key={sub} value={sub}>
-                                                {sub}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Dodatkowe informacje
-                                </label>
-                                <textarea
-                                    rows={4}
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500"
-                                    placeholder="Opisz szczegóły lekcji, swoje oczekiwania..."
-                                    value={lessonDescription}
-                                    onChange={(e) => setLessonDescription(e.target.value)}
-                                />
-                            </div>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                            <button
+                                onClick={handleCancelConfirmation}
+                                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+                            >
+                                Wróć do edycji
+                            </button>
 
                             <button
-                                onClick={handleConfirmBooking}
-                                className="w-full py-3.5 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-md"
+                                onClick={handleCreateLesson}
+                                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
                             >
-                                Potwierdź rezerwację
+                                Utwórz lekcję
                             </button>
                         </div>
-                    </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 4: Processing */}
+                {step === 4 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-center justify-center h-full py-12"
+                    >
+                        <div className="text-center">
+                            <div className="flex justify-center">
+                                <BiLoaderAlt className="animate-spin text-6xl text-purple-600 mb-4" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900">Trwa tworzenie lekcji</h3>
+                            <p className="text-gray-600 mt-2">Proszę czekać, przetwarzamy Twoje zgłoszenie...</p>
+                        </div>
+                    </motion.div>
                 )}
             </div>
         </>

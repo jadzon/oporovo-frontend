@@ -1,41 +1,36 @@
 // store/slices/modalSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
-// Modal types for content modals
 export const MODAL_TYPES = {
-    TUTOR: 'tutor',
-    LESSON: 'lesson',
-    COURSE: 'course',
+    TUTOR: 'TUTOR',
+    LESSON: 'LESSON',
+    COURSE: 'COURSE',
+    CONFIRMATION: 'CONFIRMATION' // Add the confirmation modal type
 };
 
 const initialState = {
-    // Login modal (separate system)
-    isLoginModalOpen: false,
+    isContentModalOpen: false,
+    activeModal: null,
+    modalData: null,
+    modalHistory: [], // For back navigation in modals
 
-    // Content modals (unified system)
-    activeModal: null,       // Current active modal type (tutor, lesson, course)
-    modalData: null,         // Data for the current modal
-    modalHistory: [],        // History stack for modal navigation
-    isContentModalOpen: false, // Whether any content modal is open
+    // Confirmation modal specific state
+    isConfirmationModalOpen: false,
+    confirmationData: {
+        title: '',
+        message: '',
+        type: 'success',
+        data: null,
+        showViewDetailsButton: false
+    }
 };
 
 const modalSlice = createSlice({
     name: 'modal',
     initialState,
     reducers: {
-        // Login modal actions (separate)
-        openLoginModal: (state) => {
-            state.isLoginModalOpen = true;
-        },
-        closeLoginModal: (state) => {
-            state.isLoginModalOpen = false;
-        },
-
-        // Content modal actions (unified)
         openContentModal: (state, action) => {
-            const { modalType, data } = action.payload;
-
-            // If a content modal is already open, push it to history
+            // If there's already an active modal, add it to history
             if (state.activeModal) {
                 state.modalHistory.push({
                     type: state.activeModal,
@@ -43,41 +38,56 @@ const modalSlice = createSlice({
                 });
             }
 
-            state.activeModal = modalType;
-            state.modalData = data;
             state.isContentModalOpen = true;
+            state.activeModal = action.payload.type;
+            state.modalData = action.payload.data;
         },
 
-        // Go back to previous modal in history
+        closeContentModal: (state) => {
+            state.isContentModalOpen = false;
+            state.activeModal = null;
+            state.modalData = null;
+            state.modalHistory = []; // Clear history when fully closing
+        },
+
         goBackContentModal: (state) => {
             if (state.modalHistory.length > 0) {
-                const previousModal = state.modalHistory.pop();
-                state.activeModal = previousModal.type;
-                state.modalData = previousModal.data;
+                const prevModal = state.modalHistory.pop();
+                state.activeModal = prevModal.type;
+                state.modalData = prevModal.data;
             } else {
-                // If no history, close the modal
+                // If no history, just close
+                state.isContentModalOpen = false;
                 state.activeModal = null;
                 state.modalData = null;
-                state.isContentModalOpen = false;
             }
         },
 
-        // Close all content modals and clear history
-        closeContentModal: (state) => {
-            state.activeModal = null;
-            state.modalData = null;
-            state.modalHistory = [];
-            state.isContentModalOpen = false;
+        // Confirmation modal actions
+        openConfirmationModal: (state, action) => {
+            state.isConfirmationModalOpen = true;
+            state.confirmationData = {
+                title: action.payload.title || 'Potwierdzenie',
+                message: action.payload.message || 'Operacja zakończona pomyślnie',
+                type: action.payload.type || 'success',
+                data: action.payload.data || null,
+                showViewDetailsButton: action.payload.showViewDetailsButton || false
+            };
+        },
+
+        closeConfirmationModal: (state) => {
+            state.isConfirmationModalOpen = false;
+            state.confirmationData = initialState.confirmationData;
         }
-    },
+    }
 });
 
 export const {
-    openLoginModal,
-    closeLoginModal,
     openContentModal,
+    closeContentModal,
     goBackContentModal,
-    closeContentModal
+    openConfirmationModal,
+    closeConfirmationModal
 } = modalSlice.actions;
 
 export default modalSlice.reducer;

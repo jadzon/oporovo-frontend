@@ -1,6 +1,6 @@
 // components/modal/ContentModalContainer.jsx
 import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useModal } from '../../hooks/useModal';
 import { MODAL_TYPES } from '../../store/slices/modalSlice';
 
@@ -8,6 +8,7 @@ import { MODAL_TYPES } from '../../store/slices/modalSlice';
 import TutorModalContent from './TutorModalContent';
 import LessonModalContent from './LessonModalContent';
 import CourseModalContent from './CourseModalContent';
+import ConfirmationModal from './ConfirmationModal';
 
 const ContentModalContainer = () => {
     const {
@@ -16,18 +17,28 @@ const ContentModalContainer = () => {
         isContentModalOpen,
         hasModalHistory,
         closeContentModal,
-        goBackContentModal
+        goBackContentModal,
+
+        // Confirmation modal state
+        isConfirmationModalOpen,
+        confirmationData,
+        closeConfirmationModal,
+        openLessonModal
     } = useModal();
 
     // Listen for escape key to close modal
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape') {
-                closeContentModal();
+                if (isContentModalOpen) {
+                    closeContentModal();
+                } else if (isConfirmationModalOpen) {
+                    closeConfirmationModal();
+                }
             }
         };
 
-        if (isContentModalOpen) {
+        if (isContentModalOpen || isConfirmationModalOpen) {
             document.addEventListener('keydown', handleKeyDown);
             // Prevent body scrolling when modal is open
             document.body.style.overflow = 'hidden';
@@ -37,7 +48,7 @@ const ContentModalContainer = () => {
             document.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = 'unset';
         };
-    }, [isContentModalOpen, closeContentModal]);
+    }, [isContentModalOpen, isConfirmationModalOpen, closeContentModal, closeConfirmationModal]);
 
     // Helper to get correct content based on modal type
     const getModalContent = () => {
@@ -74,38 +85,58 @@ const ContentModalContainer = () => {
         }
     };
 
-    return (
-        <AnimatePresence>
-            {isContentModalOpen && (
-                <>
-                    {/* Backdrop */}
-                    <motion.div
-                        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50"
-                        initial={{opacity: 0}}
-                        animate={{opacity: 1}}
-                        exit={{opacity: 0}}
-                        onClick={closeContentModal}
-                    />
+    // Handle viewing details of a created lesson
+    const handleViewLessonDetails = () => {
+        if (confirmationData) {
+            // Close confirmation modal first
+            closeConfirmationModal();
 
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div
-                            className="bg-white rounded-lg shadow-lg w-full max-w-4xl border border-gray-200 max-h-[90vh] flex flex-col"
-                            initial={{scale: 0.95, opacity: 0, y: 20}}
-                            animate={{scale: 1, opacity: 1, y: 0}}
-                            exit={{scale: 0.95, opacity: 0, y: 20}}
-                            transition={{
-                                type: 'spring',
-                                stiffness: 200,
-                                damping: 25
-                            }} // Adjusted for smoother transition
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {getModalContent()}
-                        </motion.div>
-                    </div>
-                </>
-            )}
-        </AnimatePresence>
+            // If we have the full lesson object in the data, use that
+            if (confirmationData.lessonObject) {
+                // Small delay to allow confirmation modal to close smoothly
+                setTimeout(() => {
+                    openLessonModal(confirmationData.lessonObject);
+                }, 100);
+            }
+        }
+    };
+
+    return (
+        <>
+            {/* Content Modal */}
+            <AnimatePresence mode="wait">
+                {isContentModalOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50" onClick={closeContentModal} />
+
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div
+                                className="bg-white rounded-lg shadow-lg w-full max-w-4xl border border-gray-200 max-h-[90vh] flex flex-col"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {getModalContent()}
+                            </div>
+                        </div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Confirmation Modal */}
+            <AnimatePresence mode="wait">
+                {isConfirmationModalOpen && (
+                    <ConfirmationModal
+                        onClose={closeConfirmationModal}
+                        title={confirmationData.title}
+                        message={confirmationData.message}
+                        type={confirmationData.type}
+                        data={confirmationData.data}
+                        showViewDetailsButton={confirmationData.showViewDetailsButton}
+                        onViewDetails={handleViewLessonDetails}
+                    />
+                )}
+            </AnimatePresence>
+        </>
     );
 };
 
