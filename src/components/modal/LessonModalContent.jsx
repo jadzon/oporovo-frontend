@@ -264,7 +264,7 @@ const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                         href={lesson?.discord_link || '#'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-lg transition-all hover:shadow-xl"
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md shadow-lg transition-all hover:shadow-xl"
                     >
                         <FaDiscord className="text-xl" />
                         <span>Dołącz do rozmowy na Discord</span>

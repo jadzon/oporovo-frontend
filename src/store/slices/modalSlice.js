@@ -22,7 +22,10 @@ const initialState = {
         type: 'success',
         data: null,
         showViewDetailsButton: false
-    }
+    },
+
+    // Dodajemy stan dla modala logowania
+    isLoginModalOpen: false,
 };
 
 const modalSlice = createSlice({
@@ -78,6 +81,15 @@ const modalSlice = createSlice({
         closeConfirmationModal: (state) => {
             state.isConfirmationModalOpen = false;
             state.confirmationData = initialState.confirmationData;
+        },
+
+        // Akcje dla modala logowania
+        openLoginModal: (state) => {
+            state.isLoginModalOpen = true;
+        },
+
+        closeLoginModal: (state) => {
+            state.isLoginModalOpen = false;
         }
     }
 });
@@ -87,7 +99,9 @@ export const {
     closeContentModal,
     goBackContentModal,
     openConfirmationModal,
-    closeConfirmationModal
+    closeConfirmationModal,
+    openLoginModal,
+    closeLoginModal
 } = modalSlice.actions;
 
 export default modalSlice.reducer;

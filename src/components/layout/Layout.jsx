@@ -7,11 +7,11 @@ import ContentModalContainer from '../modal/ContentModalContainer';  // Our new 
 import { useModal } from '../../hooks/useModal';
 
 const Layout = () => {
-    const { isLoginModalOpen, closeLoginModal } = useModal();
+    const { isLoginModalOpen, closeLoginModal, openLoginModal } = useModal();
 
     return (
         <div className="flex flex-col min-h-screen">
-            <Navbar />
+            <Navbar openLoginModal={openLoginModal}/>
 
             <main className="flex-grow">
                 <Outlet /> {/* This is where page content will be rendered */}

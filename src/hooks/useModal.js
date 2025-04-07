@@ -6,6 +6,8 @@ import {
     goBackContentModal,
     openConfirmationModal,
     closeConfirmationModal,
+    openLoginModal,      // dodajemy akcję otwierania modala logowania
+    closeLoginModal,     // dodajemy akcję zamykania modala logowania
     MODAL_TYPES
 } from '../store/slices/modalSlice';
 
@@ -17,7 +19,8 @@ export const useModal = () => {
         modalData,
         modalHistory,
         isConfirmationModalOpen,
-        confirmationData
+        confirmationData,
+        isLoginModalOpen     // pobieramy stan modala logowania
     } = useSelector(state => state.modal);
 
     // Content modal functions
@@ -66,7 +69,6 @@ export const useModal = () => {
         }));
     };
 
-    // Generic error confirmation
     const openErrorConfirmation = ({
                                        title = 'Błąd',
                                        message = 'Wystąpił błąd podczas wykonywania operacji',
@@ -79,6 +81,10 @@ export const useModal = () => {
             data
         }));
     };
+
+    // Login modal functions
+    const triggerOpenLoginModal = () => dispatch(openLoginModal());
+    const triggerCloseLoginModal = () => dispatch(closeLoginModal());
 
     return {
         // Content modal state and functions
@@ -98,6 +104,11 @@ export const useModal = () => {
         openSuccessConfirmation,
         openLessonCreatedConfirmation,
         openErrorConfirmation,
-        closeConfirmationModal: () => dispatch(closeConfirmationModal())
+        closeConfirmationModal: () => dispatch(closeConfirmationModal()),
+
+        // Login modal state and functions
+        isLoginModalOpen,
+        openLoginModal: triggerOpenLoginModal,
+        closeLoginModal: triggerCloseLoginModal
     };
 };

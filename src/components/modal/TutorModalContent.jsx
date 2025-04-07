@@ -1,7 +1,17 @@
 // components/modal/TutorModalContent.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaStar, FaArrowLeft, FaGraduationCap, FaBookOpen, FaTimes, FaCalendarCheck, FaCheck } from 'react-icons/fa';
+import {
+    FaStar,
+    FaArrowLeft,
+    FaGraduationCap,
+    FaBookOpen,
+    FaTimes,
+    FaCalendarCheck,
+    FaCheck,
+    FaClock,
+    FaMoneyBillWave
+} from 'react-icons/fa';
 import { BiLoaderAlt } from 'react-icons/bi';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -12,6 +22,7 @@ import { lessonService } from '../../api/services/lessonService';
 import { tutorAvailabilityService } from '../../api/services/tutorAvailabilityService';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import {FaMagnifyingGlass} from "react-icons/fa6";
 
 const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
     const { openLessonModal, openLessonCreatedConfirmation } = useModal();
@@ -42,6 +53,12 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
     const [loadingAvailability, setLoadingAvailability] = useState(false);
     const [availabilityError, setAvailabilityError] = useState(null);
     const [allMonthlySlots, setAllMonthlySlots] = useState([]);
+    const [dailyAvailableMinutes, setDailyAvailableMinutes] = useState(0);
+
+    // Price calculation state
+    const [lessonDuration, setLessonDuration] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
+
 
     // Basic rating logic
     const ratingValue = tutor?.rating ?? 4.8;
@@ -76,7 +93,29 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         }
     }, [tutor?.id, step]);
 
-    // Fetch availability for the selected day
+    // Calculate price when start time or end time changes
+    useEffect(() => {
+        if (startTime && endTime) {
+            // Calculate duration in minutes
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+            const startInMinutes = startHour * 60 + startMinute;
+            const endInMinutes = endHour * 60 + endMinute;
+            const durationInMinutes = endInMinutes - startInMinutes;
+
+            setLessonDuration(durationInMinutes);
+
+            // Calculate price (hourly rate * duration in hours)
+            const hourlyRate = tutor?.price || 0;
+            const durationInHours = durationInMinutes / 60;
+            const calculatedPrice = hourlyRate * durationInHours;
+
+            setTotalPrice(calculatedPrice);
+        } else {
+            setLessonDuration(0);
+            setTotalPrice(0);
+        }
+    }, [startTime, endTime, tutor?.price]);
 
     // Function to fetch availability for the entire month
     const fetchMonthAvailability = async () => {
@@ -170,6 +209,14 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
 
                 return slotFormatted === formattedDate;
             });
+            const totalAvailableMinutes = filteredSlots.reduce((sum, slot) => {
+                const [sh, sm] = slot.start_time.split(':').map(Number);
+                const [eh, em] = slot.end_time.split(':').map(Number);
+                return sum + (eh * 60 + em - sh * 60 - sm);
+            }, 0);
+
+            setAvailableSlots(filteredSlots);
+            setDailyAvailableMinutes(totalAvailableMinutes); // nowy state
 
             console.log(`Found ${filteredSlots.length} slots for ${formattedDate}`);
             setAvailableSlots(filteredSlots);
@@ -212,7 +259,7 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         if (availableSlots.length > 0) {
             return (
                 <div className="mt-2 text-sm text-green-600">
-                    Dostępne terminy: {availableSlots.length}
+                    Dostępność: {dailyAvailableMinutes / 60} godziny
                 </div>
             );
         }
@@ -348,6 +395,11 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         return options;
     }
 
+    // Format price to display with 2 decimal places and PLN
+    const formatPrice = (price) => {
+        return `${price.toFixed(2)} zł`;
+    };
+
     // Proceed to confirmation step
     const handleProceedToConfirmation = (e) => {
         if (e) e.preventDefault();
@@ -391,7 +443,9 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
             tutor_name: `${tutor.first_name} ${tutor.last_name}`,
             formatted_start: startDate.toLocaleString('pl-PL'),
             formatted_end: endDate.toLocaleString('pl-PL'),
-            duration
+            duration,
+            hourly_rate: tutor.price || 0,
+            total_price: totalPrice
         };
 
         setLessonData(lessonDetails);
@@ -453,6 +507,8 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
         setDescription('');
         setLessonData(null);
         setError(null);
+        setLessonDuration(0);
+        setTotalPrice(0);
         // Keep the default subject and level
     };
 
@@ -560,6 +616,12 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                     <p className="text-sm text-gray-500">
                         {mockLanguages.join(' • ')}
                     </p>
+                    {tutor?.price && (
+                        <p className="text-sm font-medium text-green-600 flex items-center">
+                            <FaMoneyBillWave className="mr-1" />
+                            {formatPrice(tutor.price)} / godzina
+                        </p>
+                    )}
                 </div>
             </div>
 
@@ -609,6 +671,22 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Price card for tutor profile */}
+                                {tutor?.price && (
+                                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                                        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-3">
+                                            <FaMoneyBillWave className="text-green-600" />
+                                            Cennik
+                                        </h3>
+                                        <div className="space-y-2">
+                                            <p className="text-gray-700">Stawka godzinowa: <span className="font-bold text-green-600">{formatPrice(tutor.price)}</span></p>
+                                            <p className="text-sm text-gray-500">Minimalna długość lekcji: 45 minut</p>
+                                            <p className="text-sm text-gray-500">Cena za 45 minut: {formatPrice(tutor.price * 0.75)}</p>
+                                            <p className="text-sm text-gray-500">Cena za 90 minut: {formatPrice(tutor.price * 1.5)}</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-4">
@@ -672,9 +750,9 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                         <div className="text-center border-t pt-6">
                             <button
                                 onClick={() => setStep(2)}
-                                className="px-8 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:shadow-lg transition-all hover:scale-[1.02]"
+                                className="btn px-8 py-3 rounded-md bg-purple-600 text-white font-semibold hover:shadow-lg transition-all hover:bg-purple-700"
                             >
-                                Zaplanuj lekcję →
+                                Zaplanuj lekcję
                             </button>
                         </div>
                     </div>
@@ -690,6 +768,7 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                             <p className="text-gray-600">
                                 Wybierz termin i podaj szczegóły lekcji
                             </p>
+
                         </div>
 
                         {error && (
@@ -754,7 +833,8 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
 
                                     {selectedDay && (
                                         <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+                                                <FaClock className="text-purple-600"/>
                                                 Wybierz godziny
                                             </h3>
 
@@ -796,12 +876,16 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                                 </div>
                                             </div>
                                             {startTime && endTime && (
-                                                <div className="mt-4 text-sm text-gray-600">
-                                                    Zaplanowana lekcja: {(() => {
-                                                    const [sh, sm] = startTime.split(":").map(Number);
-                                                    const [eh, em] = endTime.split(":").map(Number);
-                                                    return (eh * 60 + em - sh * 60 - sm);
-                                                })()} minut
+                                                <div className="mt-4 space-y-2">
+                                                    <div className="text-sm text-gray-600">
+                                                        Zaplanowana lekcja: {lessonDuration} minut
+                                                    </div>
+                                                    {tutor?.price && (
+                                                        <div className="flex items-center text-sm font-medium text-green-600">
+                                                            <FaMoneyBillWave className="mr-1" />
+                                                            Cena lekcji: {formatPrice(totalPrice)} ({formatPrice(tutor.price)} / godzina)
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -811,13 +895,15 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                 {/* Right column - Form Details */}
                                 <div className="space-y-6">
                                     <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                        <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
+                                            <FaMagnifyingGlass className="text-purple-600"/>
                                             Szczegóły lekcji
                                         </h3>
 
                                         <div className="space-y-4">
                                             <div>
-                                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                                                <label htmlFor="title"
+                                                       className="block text-sm font-medium text-gray-700 mb-1">
                                                     Tytuł lekcji*
                                                 </label>
                                                 <input
@@ -979,6 +1065,20 @@ const TutorModalContent = ({ tutor, onClose, hasHistory, goBack }) => {
                                     <span className="text-gray-500">Czas trwania</span>
                                     <span className="col-span-2 font-medium">{lessonData.duration} minut</span>
                                 </div>
+
+                                {lessonData.hourly_rate > 0 && (
+                                    <>
+                                        <div className="py-3 grid grid-cols-3">
+                                            <span className="text-gray-500">Stawka za godzinę</span>
+                                            <span className="col-span-2 font-medium">{formatPrice(lessonData.hourly_rate)}</span>
+                                        </div>
+
+                                        <div className="py-3 grid grid-cols-3">
+                                            <span className="text-gray-500">Cena lekcji</span>
+                                            <span className="col-span-2 font-medium text-green-600">{formatPrice(lessonData.total_price)}</span>
+                                        </div>
+                                    </>
+                                )}
 
                                 {lessonData.description && (
                                     <div className="py-3 grid grid-cols-3">
