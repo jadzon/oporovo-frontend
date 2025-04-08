@@ -113,20 +113,37 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                 // Store all monthly slots for filtering later
                 setAllMonthlySlots(response.data.available_slots);
 
-                // Extract unique dates that have availability and are not in the past
-                const datesWithAvailability = response.data.available_slots
-                    .filter(slot => {
-                        // Extract just the date part from the slot date
-                        const slotDate = new Date(slot.date.split('T')[0]);
-                        // Keep only dates that are today or in the future
-                        return slotDate >= todayDate;
-                    })
-                    .map(slot => slot.date.split('T')[0]);
+                // First, group slots by date
+                const slotsByDate = {};
+                response.data.available_slots.forEach(slot => {
+                    const dateStr = slot.date.split('T')[0];
+                    if (!slotsByDate[dateStr]) {
+                        slotsByDate[dateStr] = [];
+                    }
+                    slotsByDate[dateStr].push(slot);
+                });
 
-                const uniqueDates = [...new Set(datesWithAvailability)];
+                // Only include dates that have sufficient availability (at least 45 minutes)
+                const datesWithSufficientAvailability = Object.entries(slotsByDate)
+                    .filter(([dateStr, slots]) => {
+                        // Skip past dates
+                        const slotDate = new Date(dateStr);
+                        if (slotDate < todayDate) return false;
+
+                        // Calculate total available minutes for this day
+                        const totalMinutes = slots.reduce((sum, slot) => {
+                            const [startHour, startMin] = slot.start_time.split(':').map(Number);
+                            const [endHour, endMin] = slot.end_time.split(':').map(Number);
+                            return sum + (endHour * 60 + endMin - startHour * 60 - startMin);
+                        }, 0);
+
+                        // Require at least 45 minutes (minimum lesson duration)
+                        return totalMinutes >= 45;
+                    })
+                    .map(([dateStr]) => dateStr);
 
                 // Convert to Date objects for DayPicker
-                setAvailableDates(uniqueDates.map(dateStr => new Date(dateStr)));
+                setAvailableDates(datesWithSufficientAvailability.map(dateStr => new Date(dateStr)));
             } else {
                 setAllMonthlySlots([]);
                 setAvailableDates([]);
@@ -177,6 +194,13 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
 
             setAvailableSlots(filteredSlots);
             setDailyAvailableMinutes(totalAvailableMinutes);
+
+// Show error if not enough time available
+            if (totalAvailableMinutes < 45) {
+                setAvailabilityError('Brak wystarczającej dostępności dla minimalnego czasu lekcji (45 minut)');
+            } else {
+                setAvailabilityError(null);
+            }
         } catch (err) {
             console.error('Error filtering slots:', err);
             setAvailabilityError('Wystąpił błąd podczas przetwarzania dostępności');
@@ -214,9 +238,17 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         }
 
         if (availableSlots.length > 0) {
+            const hours = Math.floor(dailyAvailableMinutes / 60);
+            const minutes = dailyAvailableMinutes % 60;
+
             return (
                 <div className="mt-2 text-sm text-green-600">
-                    Dostępność: {dailyAvailableMinutes / 60} godziny
+                    Dostępność: {hours > 0 ? `${hours} godz. ` : ''}{minutes > 0 ? `${minutes} min.` : ''}
+                    {dailyAvailableMinutes < 45 && (
+                        <span className="block text-amber-600 mt-1">
+                        Uwaga: Dostępny czas jest krótszy niż wymagane 45 minut.
+                    </span>
+                    )}
                 </div>
             );
         }
@@ -224,6 +256,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         return null;
     };
 
+    // Generate start time options based on available slots
     // Generate start time options based on available slots
     const generateTimeOptions = () => {
         if (!selectedDay) return [];
@@ -266,21 +299,29 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
             const effectiveStartMins = isToday ?
                 Math.max(slotStartMins, nextAvailableMinute) : slotStartMins;
 
-            // Generate 15-minute intervals
-            for (let mins = effectiveStartMins; mins <= slotEndMins - 15; mins += 15) {
-                // Round to nearest 15-minute interval
-                const roundedMins = Math.ceil(mins / 15) * 15;
+            // Generate options at 15-minute intervals
+            // The latest possible start time is 45 minutes before the slot end
+            const latestStartMins = slotEndMins - 45;
 
-                if (roundedMins >= slotEndMins) continue;
+            // Only generate times if we have at least 45 minutes in the slot
+            if (effectiveStartMins <= latestStartMins) {
+                // Generate 15-minute intervals
+                for (let mins = effectiveStartMins; mins <= latestStartMins; mins += 15) {
+                    // Round to nearest 15-minute interval
+                    const roundedMins = Math.floor(mins / 15) * 15;
 
-                const h = String(Math.floor(roundedMins / 60)).padStart(2, '0');
-                const m = String(roundedMins % 60).padStart(2, '0');
+                    // Skip if rounded time would exceed the latest possible start time
+                    if (roundedMins > latestStartMins) continue;
 
-                options.push(
-                    <option key={`${h}:${m}`} value={`${h}:${m}`}>
-                        {h}:{m}
-                    </option>
-                );
+                    const h = String(Math.floor(roundedMins / 60)).padStart(2, '0');
+                    const m = String(roundedMins % 60).padStart(2, '0');
+
+                    options.push(
+                        <option key={`${h}:${m}`} value={`${h}:${m}`}>
+                            {h}:{m}
+                        </option>
+                    );
+                }
             }
         });
 
@@ -298,6 +339,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         return uniqueOptions.sort((a, b) => a.props.value.localeCompare(b.props.value));
     };
 
+    // Generate end time options based on selected start time
     // Generate end time options based on selected start time
     const generateEndTimeOptions = () => {
         if (!selectedDay || !startTime) return [];
@@ -319,13 +361,21 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
 
         if (!matchingSlot) return [];
 
-        // Generate options from start time + 15 min to end of slot
+        // Generate options from start time + 45 min to end of slot
         const options = [];
         const [endHour, endMin] = matchingSlot.end_time.split(':').map(Number);
         const slotEndMinutes = endHour * 60 + endMin;
 
-        // Start at current start time + 15 minutes minimum
-        for (let mins = startMinutes + 15; mins <= slotEndMinutes; mins += 15) {
+        // Minimum lesson duration is 45 minutes
+        const minEndMinutes = startMinutes + 45;
+
+        // If the slot doesn't have at least 45 minutes, return no options
+        if (minEndMinutes > slotEndMinutes) {
+            return [<option key="none" value="">Zbyt krótki czas na lekcję</option>];
+        }
+
+        // Start at current start time + 45 minutes minimum (not 15 as before)
+        for (let mins = minEndMinutes; mins <= slotEndMinutes; mins += 15) {
             const h = String(Math.floor(mins / 60)).padStart(2, '0');
             const m = String(mins % 60).padStart(2, '0');
 
@@ -412,18 +462,54 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Left column - Calendar */}
                     <div className="space-y-6">
-                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-                                <FaCalendarCheck className="text-purple-600" />
+                        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-5">
+                                <FaCalendarCheck className="text-purple-600"/>
                                 Wybierz termin
                             </h3>
 
                             {loadingAvailability && !selectedDay && (
-                                <div className="flex justify-center items-center py-2">
-                                    <BiLoaderAlt className="animate-spin text-purple-600 mr-2" />
+                                <div className="flex justify-center items-center py-3">
+                                    <BiLoaderAlt className="animate-spin text-purple-600 mr-2"/>
                                     <span className="text-sm text-gray-600">Ładowanie dostępności...</span>
                                 </div>
                             )}
+
+                            {/* Custom CSS for properly styled calendar days */}
+                            <style jsx>{`
+                                /* Base day styling */
+                                .rdp-day {
+                                    position: relative;
+                                    border-radius: 6px;
+                                }
+
+                                /* Available day styling - grey background with spacing */
+                                .rdp-day.rdp-day_available:not(.rdp-day_selected)::before {
+                                    content: "";
+                                    position: absolute;
+                                    top: 3px;
+                                    left: 3px;
+                                    right: 3px;
+                                    bottom: 3px;
+                                    background-color: #f3f4f6;
+                                    border-radius: 6px;
+                                    z-index: -1;
+                                }
+
+                                /* Selected day styling - ONLY purple background */
+                                .rdp-day.rdp-day_selected {
+                                    background-color: #9333ea;
+                                    color: white;
+                                    border: none;
+                                    border-radius: 6px;
+                                }
+
+                                /* Today styling - purple rounded border */
+                                .rdp-day.rdp-day_today:not(.rdp-day_selected) {
+                                    border: 2px solid #d8b4fe;
+                                    border-radius: 6px;
+                                }
+                            `}</style>
 
                             <DayPicker
                                 mode="single"
@@ -433,7 +519,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                 locale={pl}
                                 disabled={[
                                     // Disable dates before today
-                                    { before: new Date() },
+                                    {before: new Date()},
                                     // Disable dates without availability
                                     (date) => {
                                         // Skip this check for dates already disabled (before today)
@@ -451,10 +537,10 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                     available: availableDates,
                                 }}
                                 modifiersClassNames={{
-                                    selected: '!bg-purple-600 !text-white',
-                                    today: 'border border-purple-300',
-                                    disabled: 'text-gray-300 cursor-not-allowed bg-gray-50',
-                                    available: 'bg-green-50 font-bold text-green-800',
+                                    selected: 'rdp-day_selected',
+                                    today: 'rdp-day_today',
+                                    disabled: 'text-gray-400 cursor-not-allowed',
+                                    available: 'rdp-day_available font-medium text-gray-800',
                                 }}
                                 className="mx-auto [--rdp-cell-size:40px]"
                             />
