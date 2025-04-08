@@ -1,20 +1,25 @@
-// components/modal/CourseModalContent.jsx
-import { useState } from 'react';
+// components/modal/course/CourseModalContent.jsx
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import {FaArrowLeft, FaStar, FaTimes, FaUsers, FaGraduationCap} from 'react-icons/fa';
-import { useModal } from '../../hooks/useModal';
+import { FaArrowLeft, FaStar, FaTimes, FaUsers, FaGraduationCap } from 'react-icons/fa';
+import { useModal } from '../../../hooks/useModal';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { enrollCourse } from '../../store/thunks/courseThunks.js';
+import { enrollCourse } from '../../../store/thunks/courseThunks.js';
+import { formatUtils } from '../utils';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
+/**
+ * Component for displaying course details
+ */
 const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
     const { openTutorModal, openLessonModal } = useModal();
     const dispatch = useDispatch();
 
-    // Get current user from redux store.
+    // Get current user from redux store
     const user = useSelector((state) => state.auth.user);
-    // Compute enrollment status by checking if the current user's ID is in course.students.
+
+    // Compute enrollment status by checking if the current user's ID is in course.students
     const isEnrolled =
         course.students && user
             ? course.students.some((student) => student.id === user.id)
@@ -29,20 +34,21 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
     const [prevStep, setPrevStep] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState(null);
 
+    // Handle enrolling in a course
     const handleEnroll = () => {
         dispatch(enrollCourse(course.id))
             .unwrap()
             .then((updatedCourse) => {
                 console.log("Enrolled successfully:", updatedCourse);
-                // Optionally, you can update local UI state or show a success message here.
+                // Optionally show success feedback
             })
             .catch((error) => {
                 console.error("Enrollment failed:", error);
-                // Optionally, display an error message to the user.
+                // Optionally display an error message
             });
     };
 
-    // Directly navigate to full lesson details
+    // Open a lesson modal with details
     const handleLessonClick = (lesson) => {
         const enhancedLesson = {
             ...lesson,
@@ -52,13 +58,14 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
         openLessonModal(enhancedLesson);
     };
 
-    // Directly open the full tutor profile
+    // Open the tutor profile modal
     const handleTutorClick = () => {
         if (course?.tutor) {
             openTutorModal(course.tutor);
         }
     };
 
+    // View student details
     const handleStudentClick = (student) => {
         setSelectedStudent(student);
         setPrevStep(step === 5 ? 5 : 1);
@@ -158,13 +165,13 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                     </p>
                                     <p className="text-sm text-gray-500 mt-1">
                                         {lesson.start_time
-                                            ? new Date(lesson.start_time).toLocaleDateString('pl-PL')
+                                            ? formatUtils.formatDate(lesson.start_time)
                                             : 'Termin nie ustalony'}
                                     </p>
                                 </div>
                                 <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                  →
-                </span>
+                                    →
+                                </span>
                             </div>
                         </motion.div>
                     ))
@@ -253,9 +260,9 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                 {/* Pricing Card */}
                                 <div className="bg-purple-50 p-5 rounded-xl border border-purple-100">
                                     <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-purple-600">
-                      {course?.price ? `${course.price}zł` : 'Darmowy'}
-                    </span>
+                                        <span className="text-3xl font-bold text-purple-600">
+                                            {course?.price ? formatUtils.formatPrice(course.price) : 'Darmowy'}
+                                        </span>
                                         <span className="text-gray-500">/ pełny kurs</span>
                                     </div>
                                     <p className="mt-2 text-sm text-purple-700">
@@ -263,7 +270,7 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                     </p>
                                     {course?.price && course?.lessons && course.lessons.length > 0 && (
                                         <p className="mt-1 text-sm text-purple-700">
-                                            Cena za lekcję: {(course.price / course.lessons.length).toFixed(2)} zł
+                                            Cena za lekcję: {formatUtils.formatPrice(course.price / course.lessons.length)}
                                         </p>
                                     )}
                                 </div>
@@ -272,7 +279,7 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                 <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                                     <div className="flex items-center gap-3 text-purple-600 mb-4">
                                         <FaUsers className="text-xl"/>
-                                        <h3 className="text-lg font-semibold">Uczestnicy ({course.students?.length})</h3>
+                                        <h3 className="text-lg font-semibold">Uczestnicy ({course.students?.length || 0})</h3>
                                     </div>
                                     <div className="space-y-3 mt-4">
                                         {course.students && course.students.length > 0 ? (
@@ -347,9 +354,9 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                                 @{course?.tutor?.username}
                                             </p>
                                             <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-purple-600">
-                          {course?.tutor?.subjects?.join(', ')}
-                        </span>
+                                                <span className="text-sm text-purple-600">
+                                                    {course?.tutor?.subjects?.join(', ')}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -376,13 +383,13 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                                             </p>
                                                             <p className="text-sm text-gray-500 mt-1">
                                                                 {lesson.start_time
-                                                                    ? new Date(lesson.start_time).toLocaleDateString('pl-PL')
+                                                                    ? formatUtils.formatDate(lesson.start_time)
                                                                     : 'Termin nie ustalony'}
                                                             </p>
                                                         </div>
                                                         <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                              →
-                            </span>
+                                                            →
+                                                        </span>
                                                     </div>
                                                 </motion.div>
                                             ))}
@@ -393,7 +400,7 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                                     {course.lessons && course.lessons.length > 3 && (
                                         <div className="mt-4 flex justify-center">
                                             <button
-                                                className="btn px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
                                                 onClick={() => setStep(5)}
                                             >
                                                 Zobacz wszystkie

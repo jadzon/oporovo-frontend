@@ -1,15 +1,17 @@
-// components/modal/ContentModalContainer.jsx
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useModal } from '../../hooks/useModal';
 import { MODAL_TYPES } from '../../store/slices/modalSlice';
 
-// Import all content modal components
-import TutorModalContent from './TutorModalContent';
-import LessonModalContent from './LessonModalContent';
-import CourseModalContent from './CourseModalContent';
-import ConfirmationModal from './ConfirmationModal';
+// Import modal components
+import { TutorModalContent } from './tutor';
+import { LessonModalContent } from './lesson';
+import { CourseModalContent } from './course';
+import { ConfirmationModal } from './confirmation';
 
+/**
+ * Main container component that manages all modal types
+ */
 const ContentModalContainer = () => {
     const {
         activeModal,

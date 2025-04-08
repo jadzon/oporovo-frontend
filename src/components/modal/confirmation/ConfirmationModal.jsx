@@ -1,7 +1,12 @@
-// components/modal/ConfirmationModal.jsx
+// components/modal/confirmation/ConfirmationModal.jsx
+import React from 'react';
 import { motion } from 'framer-motion';
 import { FaTimes, FaCheck, FaCalendarCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { statusUtils, formatUtils } from '../utils';
 
+/**
+ * Reusable confirmation modal component for different states
+ */
 const ConfirmationModal = ({
                                onClose,
                                title = 'Potwierdzenie',
@@ -51,19 +56,6 @@ const ConfirmationModal = ({
     };
 
     const styles = getTypeStyles();
-
-    // Get the appropriate status badge color
-    const getStatusBadgeColor = (status) => {
-        switch(status) {
-            case 'scheduled': return 'bg-blue-100 text-blue-800';
-            case 'confirmed': return 'bg-green-100 text-green-800';
-            case 'in_progress': return 'bg-purple-100 text-purple-800';
-            case 'done': return 'bg-teal-100 text-teal-800';
-            case 'failed': return 'bg-red-100 text-red-800';
-            case 'cancelled': return 'bg-gray-100 text-gray-800';
-            default: return 'bg-blue-100 text-blue-800';
-        }
-    };
 
     return (
         <>
@@ -122,13 +114,8 @@ const ConfirmationModal = ({
                                             {data.status && (
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm text-gray-600">Status:</span>
-                                                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(data.status)}`}>
-                                                        {data.status === 'scheduled' ? 'Zaplanowana' :
-                                                            data.status === 'confirmed' ? 'Potwierdzona' :
-                                                                data.status === 'in_progress' ? 'W trakcie' :
-                                                                    data.status === 'done' ? 'Zakończona' :
-                                                                        data.status === 'failed' ? 'Nieudana' :
-                                                                            data.status === 'cancelled' ? 'Anulowana' : data.status}
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${statusUtils.getStatusBadgeColor(data.status)}`}>
+                                                        {statusUtils.getStatusText(data.status)}
                                                     </span>
                                                 </div>
                                             )}
@@ -137,7 +124,7 @@ const ConfirmationModal = ({
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm text-gray-600">Data rozpoczęcia:</span>
                                                     <span className="text-sm font-medium text-gray-900">
-                                                        {new Date(data.startTime).toLocaleString('pl-PL')}
+                                                        {formatUtils.formatDateTime(data.startTime)}
                                                     </span>
                                                 </div>
                                             )}
