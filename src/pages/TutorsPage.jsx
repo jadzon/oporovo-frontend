@@ -136,7 +136,10 @@ const TutorsPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* LEFT SIDEBAR - FILTERS (Desktop) */}
                     <div className="hidden lg:block lg:col-span-1">
-                        <div
+                        <motion.div
+                            initial={{opacity: 0, x: -20}}
+                            animate={{opacity: 1, x: 0}}
+                            transition={{duration: 0.5}}
                             className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden sticky top-24">
                             <div className="px-6 py-4 border-b border-gray-200">
                                 <h2 className="text-lg font-medium text-gray-900">Filtry wyszukiwania</h2>
@@ -248,7 +251,7 @@ const TutorsPage = () => {
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
 
                     {/* Mobile search and filters */}
@@ -435,7 +438,11 @@ const TutorsPage = () => {
                             </div>
                         )}
 
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <motion.div
+                            initial={{opacity: 0, x: 20}}
+                            animate={{opacity: 1, x: 0}}
+                            transition={{duration: 0.5}}
+                            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-200">
                                 <h2 className="text-lg font-medium text-gray-900">Dostępni korepetytorzy</h2>
                             </div>
@@ -519,7 +526,7 @@ const TutorsPage = () => {
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>

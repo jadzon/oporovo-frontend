@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import { motion } from 'framer-motion';
+import { FaGraduationCap, FaBook, FaUsers } from 'react-icons/fa';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const InfoCourseCard = ({ course, onInfoClick }) => {
@@ -14,99 +14,108 @@ const InfoCourseCard = ({ course, onInfoClick }) => {
             : course.tutor?.username || 'Nieznany';
     const tutorUsername = course.tutor?.username || 'nieznany';
 
+    // Calculate lessons count or set a fallback value
+    const lessonsCount = course.lessons?.length || 8;
+    const studentsCount = course.students?.length || 24;
+
     return (
-        <motion.div
-            layoutId={`course-${course.id}`}
-            className="w-80 bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 flex flex-col"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-        >
-            {/* Course Banner */}
-            {course.banner ? (
-                <div className="w-full h-32 overflow-hidden">
-                    <LazyLoadImage
-                        src={course.banner}
-                        alt="Course Banner"
-                        effect="blur"
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-            ) : (
-                <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Brak bannera</span>
-                </div>
-            )}
-
-            {/* Course Details */}
-            <div className="p-4 flex-1">
-                <h3 className="text-xl font-bold text-gray-900">{course.name}</h3>
-                <p className="mt-1 text-sm text-gray-700">{course.description}</p>
-                <p className="mt-2 text-lg font-bold text-purple-700">
-                    {course.price ? `${course.price} zł` : 'Cena niedostępna'}
-                </p>
-                <div className="mt-3 flex gap-2">
-          <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
-            {course.subject}
-          </span>
-                    <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-full text-xs">
-            {course.level}
-          </span>
-                </div>
-            </div>
-
-            {/* Tutor Info & Action Button */}
-            <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    {course.banner ? (
-                        <div className="relative w-12 h-12">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 transition-colors duration-200">
+            <div className="flex flex-col md:flex-row">
+                {/* Left column - Square Banner */}
+                <div className="md:w-44 flex-shrink-0">
+                    <div className="aspect-square w-full relative">
+                        {course.banner ? (
                             <LazyLoadImage
                                 src={course.banner}
-                                alt="Banner"
-                                effect="blur"
-                                className="w-12 h-12 rounded-full object-cover"
-                            />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full bg-white border-2 border-white shadow">
-                                    {!avatarLoaded && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 animate-pulse rounded-full" />
-                                    )}
-                                    <LazyLoadImage
-                                        src={tutorAvatar}
-                                        alt={tutorUsername}
-                                        effect="blur"
-                                        className="w-full h-full object-cover rounded-full"
-                                        afterLoad={() => setAvatarLoaded(true)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="w-12 h-12 rounded-full overflow-hidden">
-                            <LazyLoadImage
-                                src={tutorAvatar}
-                                alt={tutorUsername}
+                                alt={course.name || "Kurs"}
                                 effect="blur"
                                 className="w-full h-full object-cover"
-                                afterLoad={() => setAvatarLoaded(true)}
                             />
-                        </div>
-                    )}
-                    <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-gray-900">{tutorFullName}</span>
-                        <span className="text-xs text-gray-500">@{tutorUsername}</span>
+                        ) : (
+                            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                <FaBook className="text-gray-300 text-4xl" />
+                            </div>
+                        )}
                     </div>
                 </div>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.15 }}
-                    onClick={() => onInfoClick?.(course)}
-                    className="bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md transition-colors"
-                >
-                    Szczegóły
-                </motion.button>
+
+                {/* Middle section - Course Info with Author at bottom */}
+                <div className="flex-grow p-4 flex flex-col">
+                    <div className="flex-grow">
+                        <div className="flex flex-wrap justify-between items-start mb-2">
+                            <h3 className="text-xl font-medium text-gray-900">{course.name || "Tytuł kursu"}</h3>
+                        </div>
+
+                        {/* Subject and Level badges */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {course.subject && (
+                                <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                                    {course.subject}
+                                </span>
+                            )}
+                            {course.level && (
+                                <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium">
+                                    {course.level}
+                                </span>
+                            )}
+                        </div>
+
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{course.description || "Opis kursu"}</p>
+
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                            <div className="flex items-center">
+                                <FaGraduationCap className="text-blue-900 mr-2" />
+                                <span>{lessonsCount} lekcji</span>
+                            </div>
+
+                            <div className="flex items-center">
+                                <FaUsers className="text-blue-900 mr-2" />
+                                <span>{studentsCount} uczniów</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Author section - at the bottom of middle column */}
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex items-center">
+                            <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                                <img
+                                    src={tutorAvatar}
+                                    alt={tutorUsername}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.target.src = '/images/default-avatar.png';
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-gray-900">{tutorFullName}</p>
+                                <p className="text-xs text-gray-600">@{tutorUsername}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right section - Price and actions */}
+                <div className="md:w-48 p-4 md:border-l border-gray-200 flex md:flex-col justify-between items-center md:items-end">
+                    {/* Price */}
+                    <div className="text-center md:text-right mb-0 md:mb-6">
+                        <p className="text-gray-600 text-sm">Cena</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                            {course.price ? `${course.price} zł` : 'Brak ceny'}
+                        </p>
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                        onClick={() => onInfoClick?.(course)}
+                        className="min-w-24 px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white text-sm font-medium rounded-md shadow-sm transition-colors"
+                    >
+                        Szczegóły
+                    </button>
+                </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 

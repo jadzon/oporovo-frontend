@@ -204,7 +204,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                     setSelectedBlock(null);
                                     setSelectedAdjacentBlock(null);
                                 }}
-                                className="text-sm text-indigo-600 hover:underline transition-colors"
+                                className="btn text-sm text-indigo-600 hover:underline transition-colors"
                             >
                                 Zmień wybór
                             </button>
