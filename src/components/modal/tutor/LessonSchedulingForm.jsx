@@ -33,6 +33,8 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
     const [availabilityError, setAvailabilityError] = useState(null);
     const [allMonthlySlots, setAllMonthlySlots] = useState([]);
     const [dailyAvailableMinutes, setDailyAvailableMinutes] = useState(0);
+    const [selectedBlock, setSelectedBlock] = useState(null); // Blok początkowy (45 min)
+    const [selectedAdjacentBlock, setSelectedAdjacentBlock] = useState(null); // Dodatkowy blok, jeżeli możliwy
 
     // Subject options based on tutor's specializations
     const subjectOptions = tutor?.subjects?.length
@@ -45,6 +47,20 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         : ['Podstawówka', 'Liceum', 'Studia'];
 
     // Set default subject and level if tutor has them
+    useEffect(() => {
+        if (selectedBlock) {
+            // Jeżeli dodatkowy blok został wybrany, lekcja trwa od początku pierwszego do końca drugiego bloku
+            const startMins = selectedBlock.startMins;
+            const endMins = selectedAdjacentBlock ? selectedAdjacentBlock.endMins : selectedBlock.endMins;
+            const durationInMinutes = endMins - startMins;
+            setLessonDuration(durationInMinutes);
+            const calculatedPrice = tutor.price * (durationInMinutes / 60);
+            setTotalPrice(calculatedPrice);
+        } else {
+            setLessonDuration(0);
+            setTotalPrice(0);
+        }
+    }, [selectedBlock, selectedAdjacentBlock, tutor.price]);
     useEffect(() => {
         if (subjectOptions.length > 0 && !subject) {
             setSubject(subjectOptions[0]);
@@ -79,6 +95,161 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
             setTotalPrice(0);
         }
     }, [startTime, endTime, tutor?.price]);
+    const getInitialBlockOptions = () => {
+        if (!selectedDay || availableSlots.length === 0) return [];
+        const options = [];
+        availableSlots.forEach(slot => {
+            if (!slot.start_time || !slot.end_time) return;
+            const [slotStartHour, slotStartMin] = slot.start_time.split(':').map(Number);
+            const [slotEndHour, slotEndMin] = slot.end_time.split(':').map(Number);
+            const slotStart = slotStartHour * 60 + slotStartMin;
+            const slotEnd = slotEndHour * 60 + slotEndMin;
+            // Generujemy bloki startowe co 30 minut, ale tylko jeśli cały 45-minutowy blok mieści się w slotcie
+            for (let time = slotStart; time + 45 <= slotEnd; time += 30) {
+                const hStart = String(Math.floor(time / 60)).padStart(2, '0');
+                const mStart = String(time % 60).padStart(2, '0');
+                const hEnd = String(Math.floor((time + 45) / 60)).padStart(2, '0');
+                const mEnd = String((time + 45) % 60).padStart(2, '0');
+                options.push({
+                    start: `${hStart}:${mStart}`, // tylko start
+                    // nadal przechowujemy end, startMins i endMins do obliczeń,
+                    // ale w UI wykorzystamy wyłącznie start
+                    end: `${hEnd}:${mEnd}`,
+                    startMins: time,
+                    endMins: time + 45
+                });
+            }
+        });
+        // Usuwamy ewentualne duplikaty i sortujemy
+        const uniqueOptions = options.filter((opt, index, self) =>
+            index === self.findIndex(o => o.start === opt.start && o.end === opt.end)
+        );
+        return uniqueOptions.sort((a, b) => a.startMins - b.startMins);
+    };
+    const getAdjacentBlockOption = () => {
+        if (!selectedBlock) return null;
+        const adjacentStartMins = selectedBlock.endMins;
+        const adjacentEndMins = adjacentStartMins + 45;
+        let isValid = false;
+        availableSlots.forEach(slot => {
+            if (!slot.start_time || !slot.end_time) return;
+            const [sHour, sMin] = slot.start_time.split(':').map(Number);
+            const [eHour, eMin] = slot.end_time.split(':').map(Number);
+            const slotStart = sHour * 60 + sMin;
+            const slotEnd = eHour * 60 + eMin;
+            // Sprawdzamy, czy dodatkowy blok mieści się w jednym z dostępnych przedziałów
+            if (selectedBlock.startMins >= slotStart && adjacentEndMins <= slotEnd) {
+                isValid = true;
+            }
+        });
+        if (!isValid) return null;
+        const h = String(Math.floor(adjacentStartMins / 60)).padStart(2, '0');
+        const m = String(adjacentStartMins % 60).padStart(2, '0');
+        const hEnd = String(Math.floor(adjacentEndMins / 60)).padStart(2, '0');
+        const mEnd = String(adjacentEndMins % 60).padStart(2, '0');
+        return {
+            start: `${h}:${m}`, // tylko start
+            end: `${hEnd}:${mEnd}`,
+            startMins: adjacentStartMins,
+            endMins: adjacentEndMins
+        };
+    };
+
+    const renderBlockSelection = () => {
+        // Informacja, że bloki są 45-minutowe (możesz tę informację umieścić również w nagłówku sekcji)
+        const blockInfo = (
+            <p className="text-sm text-gray-500 mb-2">Każdy blok trwa 45 minut</p>
+        );
+
+        // Jeśli żaden blok nie został jeszcze wybrany, renderujemy wszystkie dostępne opcje
+        if (!selectedBlock) {
+            const options = getInitialBlockOptions();
+            if (options.length === 0) {
+                return (
+                    <div className="text-sm text-amber-600 mt-4">
+                        Brak dostępnych bloków na ten dzień.
+                    </div>
+                );
+            }
+            return (
+                <div className="mt-4">
+                    {blockInfo}
+                    <div className="flex flex-wrap gap-4">
+                        {options.map((block, index) => (
+                            <button
+                                key={index}
+                                onClick={() => {
+                                    setSelectedBlock(block);
+                                    setSelectedAdjacentBlock(null); // reset przy nowym wyborze
+                                }}
+                                className="btn px-8 py-2 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-800 hover:bg-indigo-50 transition-colors"
+                            >
+                                {block.start}
+
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        } else {
+            // Gdy już wybrano główny blok, prezentujemy podsumowanie w eleganckiej karcie
+            return (
+                <div className="mt-6">
+                    {blockInfo}
+                    <div className="bg-white rounded-lg shadow-lg border border-gray-300 p-6">
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-800">Wybrany blok</h4>
+                            <button
+                                onClick={() => {
+                                    setSelectedBlock(null);
+                                    setSelectedAdjacentBlock(null);
+                                }}
+                                className="text-sm text-indigo-600 hover:underline transition-colors"
+                            >
+                                Zmień wybór
+                            </button>
+                        </div>
+                        <div className="mt-2">
+                            <p className="text-gray-700">
+                                <span className="font-medium">Blok podstawowy:</span> {selectedBlock.start} - {selectedBlock.end}
+                            </p>
+                        </div>
+                        {getAdjacentBlockOption() ? (
+                            <div className="mt-4">
+                                {selectedAdjacentBlock ? (
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-gray-700">
+                                            <span className="font-medium">Dodatkowy blok:</span> {selectedAdjacentBlock.start} - {selectedAdjacentBlock.end}
+                                        </p>
+                                        <button
+                                            onClick={() => setSelectedAdjacentBlock(null)}
+                                            className="btn text-sm text-red-600 hover:text-red-700 transition-colors"
+                                        >
+                                            Usuń
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => {
+                                            const adjacent = getAdjacentBlockOption();
+                                            if (adjacent) setSelectedAdjacentBlock(adjacent);
+                                        }}
+                                        className="btn w-full mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded transition-colors"
+                                    >
+                                        Dodaj dodatkowy blok ({getAdjacentBlockOption().start})
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="mt-4 text-sm text-gray-600">
+                                Nie można przedłużyć lekcji – dostępny czas nie pozwala.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+    };
 
     // Function to fetch availability for the entire month
     const fetchMonthAvailability = async () => {
@@ -399,36 +570,33 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
 
     // Submit form handler
     const handleSubmit = (e) => {
-        if (e) e.preventDefault();
-
-        if (!selectedDay || !startTime || !endTime || !title || !subject || !level) {
+        e.preventDefault();
+        if (!selectedDay || !selectedBlock || !title || !subject || !level) {
             setError('Wypełnij wszystkie wymagane pola');
             return;
         }
-
         if (!currentUser || !currentUser.id) {
             setError('Musisz być zalogowany, aby utworzyć lekcję');
             return;
         }
-
-        // Calculate start and end times
-        const [startHour, startMinute] = startTime.split(':').map(Number);
-        const [endHour, endMinute] = endTime.split(':').map(Number);
+        // Początek to start wybranego bloku, koniec to:
+        // - jeśli użytkownik dodał dodatkowy blok – koniec tego bloku,
+        // - inaczej koniec wybranego bloku
+        const startTimeStr = selectedBlock.start;
+        const endTimeStr = selectedAdjacentBlock ? selectedAdjacentBlock.end : selectedBlock.end;
+        const [startHour, startMinute] = startTimeStr.split(':').map(Number);
+        const [endHour, endMinute] = endTimeStr.split(':').map(Number);
         const start = startHour * 60 + startMinute;
         const end = endHour * 60 + endMinute;
         const duration = end - start;
-
-        if (duration < 45 || duration % 15 !== 0) {
-            setError('Czas trwania lekcji musi wynosić co najmniej 45 minut i być wielokrotnością 15 minut');
+        if (duration < 45) {
+            setError('Czas trwania lekcji musi wynosić co najmniej 45 minut');
             return;
         }
-
-        // Prepare lesson data
         const startDate = new Date(selectedDay);
         startDate.setHours(startHour, startMinute, 0, 0);
         const endDate = new Date(selectedDay);
         endDate.setHours(endHour, endMinute, 0, 0);
-
         const lessonDetails = {
             tutor_id: tutor.id,
             student_ids: [currentUser.id],
@@ -445,7 +613,6 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
             hourly_rate: tutor.price || 0,
             total_price: totalPrice
         };
-
         onFormSubmit(lessonDetails);
     };
 
@@ -568,44 +735,23 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                     Wybierz godziny
                                 </h3>
 
-                                {renderAvailabilityInfo()}
-
-                                <div className="grid grid-cols-2 gap-4 mt-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Godzina rozpoczecia*
-                                        </label>
-                                        <select
-                                            value={startTime}
-                                            onChange={(e) => {
-                                                setStartTime(e.target.value);
-                                                setEndTime(""); // Reset end time when start time changes
-                                            }}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                            required
-                                            disabled={availableSlots.length === 0 || loadingAvailability}
-                                        >
-                                            <option value="">--</option>
-                                            {generateTimeOptions()}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Godzina zakończenia*
-                                        </label>
-                                        <select
-                                            value={endTime}
-                                            onChange={(e) => setEndTime(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                            required
-                                            disabled={!startTime || availableSlots.length === 0 || loadingAvailability}
-                                        >
-                                            <option value="">--</option>
-                                            {generateEndTimeOptions()}
-                                        </select>
-                                    </div>
-                                </div>
+                                {renderBlockSelection()}
                                 {startTime && endTime && (
+                                    <div className="mt-4 space-y-2">
+                                        <div className="text-sm text-gray-600">
+                                            Zaplanowana lekcja: {lessonDuration} minut
+                                        </div>
+                                        {tutor?.price && (
+                                            <div className="flex items-center text-sm font-medium text-indigo-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Cena lekcji: {formatUtils.formatPrice(totalPrice)} ({formatUtils.formatPrice(tutor.price)} / godzina)
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {selectedBlock && (
                                     <div className="mt-4 space-y-2">
                                         <div className="text-sm text-gray-600">
                                             Zaplanowana lekcja: {lessonDuration} minut
@@ -711,7 +857,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
 
                         <button
                             type="submit"
-                            disabled={!selectedDay || !startTime || !endTime || !title || !subject || !level}
+                            disabled={!selectedDay || !selectedBlock || !title || !subject || !level}
                             className="btn inline-flex items-center justify-center w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Dalej

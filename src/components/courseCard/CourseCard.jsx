@@ -140,7 +140,7 @@ const CourseCard = ({ course, onInfoClick }) => {
 
                 {/* Action link */}
                 <button
-                    className="text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
+                    className="btn text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
                     onClick={() => onInfoClick?.(course)}
                 >
                     Szczegóły
