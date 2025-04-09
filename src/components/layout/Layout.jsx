@@ -13,7 +13,7 @@ const Layout = () => {
         <div className="flex flex-col min-h-screen">
             <Navbar openLoginModal={openLoginModal}/>
 
-            <main className="flex-grow">
+            <main className="flex-grow pt-20">
                 <Outlet /> {/* This is where page content will be rendered */}
             </main>
 

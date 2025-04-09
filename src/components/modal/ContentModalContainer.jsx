@@ -114,7 +114,7 @@ const ContentModalContainer = () => {
 
                         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                             <div
-                                className="bg-white rounded-lg shadow-lg w-full max-w-4xl border border-gray-200 max-h-[90vh] flex flex-col"
+                                className="bg-white rounded-lg shadow-lg w-full max-w-4xl border border-gray-200 max-h-[80vh] overflow-y-auto"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {getModalContent()}

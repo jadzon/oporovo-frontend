@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaDiscord, FaUser, FaSignOutAlt } from 'react-icons/fa';
-import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, Link } from 'react-router-dom';
 import { logout } from '../../store/thunks/authThunks';
@@ -38,44 +36,16 @@ const Navbar = ({ openLoginModal }) => {
         setIsDropdownOpen(false);
     };
 
-    // Nav item component with animated underline
-    const NavItem = ({ to, exact, children }) => (
-        <NavLink
-            to={to}
-            end={exact}
-            className={({ isActive }) =>
-                `relative font-medium transition-colors ${
-                    isActive ? 'text-purple-700' : 'text-gray-700 hover:text-purple-500'
-                }`
-            }
-        >
-            {({ isActive }) => (
-                <div className="relative inline-block">
-                    <span>{children}</span>
-                    <motion.div
-                        className="absolute left-0 -bottom-1 w-full h-0.5 bg-purple-600"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: isActive ? 1 : 0 }}
-                        whileHover={{ scaleX: 1 }}
-                        transition={{ duration: 0.3 }}
-                        style={{ originX: 0 }}
-                    />
-                </div>
-            )}
-        </NavLink>
-    );
-
     return (
-        <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : 'navbar-transparent'}`}>
-            <div className="container-custom py-4">
-                <div className="flex items-center justify-between">
+        <nav className={`fixed w-full top-0 left-0 z-40 transition-all duration-300 ${
+            isScrolled ? 'bg-white shadow-sm' : 'bg-white bg-opacity-95'
+        }`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <div className="flex items-center">
-                        <Link
-                            to="/"
-                            className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
-                        >
-                            <span className="text-2xl font-bold text-purple-700">Oporovo</span>
+                        <Link to="/" className="flex items-center">
+                            <span className="text-xl font-semibold text-blue-900">Oporovo</span>
                         </Link>
                     </div>
 
@@ -83,186 +53,409 @@ const Navbar = ({ openLoginModal }) => {
                     <div className="hidden md:flex items-center space-x-8">
                         {isAuthenticated ? (
                             <>
-                                <NavItem to="/" exact>Kokpit</NavItem>
-                                <NavItem to="/tutors">Korepetytorzy</NavItem>
-                                <NavItem to="/courses">Kursy Maturalne</NavItem>
-                                <NavItem to="/help">Pomoc</NavItem>
+                                <NavLink
+                                    to="/"
+                                    end
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Kokpit
+                                </NavLink>
+                                <NavLink
+                                    to="/tutors"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Korepetytorzy
+                                </NavLink>
+                                <NavLink
+                                    to="/courses"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Kursy Maturalne
+                                </NavLink>
+                                <NavLink
+                                    to="/help"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Pomoc
+                                </NavLink>
                             </>
                         ) : (
                             <>
-                                <NavItem to="/about">O nas</NavItem>
-                                <NavItem to="/tutors">Korepetytorzy</NavItem>
-                                <NavItem to="/contact">Kontakt</NavItem>
+                                <NavLink
+                                    to="/about"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    O nas
+                                </NavLink>
+                                <NavLink
+                                    to="/tutors"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Korepetytorzy
+                                </NavLink>
+                                <NavLink
+                                    to="/contact"
+                                    className={({ isActive }) =>
+                                        `text-sm font-medium transition-colors border-b-2 py-5 ${
+                                            isActive
+                                                ? 'text-blue-900 border-blue-900'
+                                                : 'text-gray-700 border-transparent hover:text-blue-800 hover:border-blue-800'
+                                        }`
+                                    }
+                                >
+                                    Kontakt
+                                </NavLink>
                             </>
                         )}
                     </div>
 
                     {/* Login Button or User Avatar */}
-                    {isAuthenticated ? (
-                        <div className="relative" ref={dropdownRef}>
-                            <motion.div
-                                className="flex items-center cursor-pointer"
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white mr-2 overflow-hidden">
-                                    {user.avatar ? (
-                                        <img
-                                            src={user.avatar}
-                                            alt={user.username}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <FaUser className="text-lg" />
-                                    )}
-                                </div>
-                                <span className="font-medium text-gray-700">{user.username}</span>
-                            </motion.div>
-
-                            {/* User Dropdown */}
-                            {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                                    <NavItem to="/profile">Profil</NavItem>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    <div className="flex items-center">
+                        {isAuthenticated ? (
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    className="btn flex items-center gap-2"
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                >
+                                    <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                                        {user.avatar ? (
+                                            <img
+                                                src={user.avatar}
+                                                alt={user.username}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = '/images/default-avatar.png';
+                                                }}
+                                            />
+                                        ) : (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-5 w-5 m-auto text-gray-500"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                />
+                                            </svg>
+                                        )}
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">{user.username}</span>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className={`h-4 w-4 text-gray-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
                                     >
-                                        <div className="flex items-center">
-                                            <FaSignOutAlt className="mr-2" />
-                                            Wyloguj się
-                                        </div>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={openLoginModal}
-                            className="btn btn-primary py-3 px-8"
-                        >
-                            <FaDiscord className="mr-2" />
-                            Zaloguj się
-                        </motion.button>
-                    )}
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19 9l-7 7-7-7"
+                                        />
+                                    </svg>
+                                </button>
+
+                                {/* User Dropdown */}
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md border border-gray-200 py-1 z-10">
+                                        <Link
+                                            to="/profile"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            Profil
+                                        </Link>
+                                        <Link
+                                            to="/settings"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            Ustawienia
+                                        </Link>
+                                        <div className="border-t border-gray-100 my-1"></div>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                        >
+                                            <div className="flex items-center">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-4 w-4 mr-2 text-gray-500"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                                    />
+                                                </svg>
+                                                Wyloguj się
+                                            </div>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button
+                                onClick={openLoginModal}
+                                className="inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800 transition-colors"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 mr-2"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                    />
+                                </svg>
+                                Zaloguj się
+                            </button>
+                        )}
+                    </div>
 
                     {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden p-2 rounded-md text-gray-700 hover:text-purple-500 focus:outline-none"
-                    >
-                        <svg
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                    <div className="md:hidden flex">
+                        <button
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="p-2 rounded-md text-gray-700 hover:text-blue-900 focus:outline-none"
                         >
-                            {isMobileMenuOpen ? (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            ) : (
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            )}
-                        </svg>
-                    </button>
+                            <svg
+                                className="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                ) : (
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 6h16M4 12h16M4 18h16"
+                                    />
+                                )}
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden mt-4 pb-4">
-                        <div className="flex flex-col space-y-4">
+                    <div className="md:hidden py-2 border-t border-gray-200">
+                        <div className="flex flex-col">
                             {isAuthenticated ? (
                                 <>
                                     <NavLink
                                         to="/"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        end
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Kokpit
                                     </NavLink>
                                     <NavLink
                                         to="/tutors"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Korepetytorzy
                                     </NavLink>
                                     <NavLink
-                                        to="/calendar"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        to="/courses"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        Terminarz
+                                        Kursy Maturalne
+                                    </NavLink>
+                                    <NavLink
+                                        to="/help"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        Pomoc
                                     </NavLink>
                                     <NavLink
                                         to="/profile"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Profil
                                     </NavLink>
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="btn-primary w-full flex items-center justify-center"
-                                    >
-                                        <FaSignOutAlt className="mr-2" />
-                                        Wyloguj się
-                                    </button>
+                                    <div className="px-4 py-3">
+                                        <button
+                                            onClick={() => {
+                                                handleLogout();
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="w-full flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800 transition-colors"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-4 w-4 mr-2"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                                />
+                                            </svg>
+                                            Wyloguj się
+                                        </button>
+                                    </div>
                                 </>
                             ) : (
                                 <>
                                     <NavLink
                                         to="/"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        end
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Strona główna
                                     </NavLink>
                                     <NavLink
                                         to="/about"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         O nas
                                     </NavLink>
                                     <NavLink
                                         to="/tutors"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Korepetytorzy
                                     </NavLink>
                                     <NavLink
                                         to="/contact"
-                                        className="font-medium text-gray-700 hover:text-purple-500 transition-colors"
+                                        className={({ isActive }) =>
+                                            `px-4 py-3 text-sm font-medium ${
+                                                isActive ? 'text-blue-900 bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
+                                            }`
+                                        }
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         Kontakt
                                     </NavLink>
-                                    <button
-                                        onClick={() => {
-                                            openLoginModal();
-                                            setIsMobileMenuOpen(false);
-                                        }}
-                                        className="btn-primary w-full flex items-center justify-center"
-                                    >
-                                        <FaDiscord className="mr-2" />
-                                        Zaloguj się
-                                    </button>
+                                    <div className="px-4 py-3">
+                                        <button
+                                            onClick={() => {
+                                                openLoginModal();
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className="w-full flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800 transition-colors"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-4 w-4 mr-2"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                                                />
+                                            </svg>
+                                            Zaloguj się
+                                        </button>
+                                    </div>
                                 </>
                             )}
                         </div>

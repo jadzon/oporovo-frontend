@@ -1,14 +1,11 @@
 // components/modal/tutor/LessonSchedulingForm.jsx
 import React, { useState, useEffect } from 'react';
-import { BiLoaderAlt } from 'react-icons/bi';
-import {FaCalendarCheck, FaClock, FaMoneyBillWave} from 'react-icons/fa';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { pl } from 'date-fns/locale';
 import { useSelector } from 'react-redux';
 import { tutorAvailabilityService } from '../../../api/services/tutorAvailabilityService';
 import { timeUtils, formatUtils } from '../utils';
-import {FaMagnifyingGlass} from "react-icons/fa6";
 
 /**
  * Component for scheduling a lesson with a tutor
@@ -195,7 +192,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
             setAvailableSlots(filteredSlots);
             setDailyAvailableMinutes(totalAvailableMinutes);
 
-// Show error if not enough time available
+            // Show error if not enough time available
             if (totalAvailableMinutes < 45) {
                 setAvailabilityError('Brak wystarczającej dostępności dla minimalnego czasu lekcji (45 minut)');
             } else {
@@ -215,7 +212,10 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         if (loadingAvailability) {
             return (
                 <div className="mt-2 text-sm text-gray-600 flex items-center">
-                    <BiLoaderAlt className="animate-spin mr-2" />
+                    <svg className="animate-spin h-4 w-4 mr-2 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
                     Ładowanie dostępności...
                 </div>
             );
@@ -246,8 +246,8 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                     Dostępność: {hours > 0 ? `${hours} godz. ` : ''}{minutes > 0 ? `${minutes} min.` : ''}
                     {dailyAvailableMinutes < 45 && (
                         <span className="block text-amber-600 mt-1">
-                        Uwaga: Dostępny czas jest krótszy niż wymagane 45 minut.
-                    </span>
+                            Uwaga: Dostępny czas jest krótszy niż wymagane 45 minut.
+                        </span>
                     )}
                 </div>
             );
@@ -256,7 +256,6 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         return null;
     };
 
-    // Generate start time options based on available slots
     // Generate start time options based on available slots
     const generateTimeOptions = () => {
         if (!selectedDay) return [];
@@ -340,7 +339,6 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
     };
 
     // Generate end time options based on selected start time
-    // Generate end time options based on selected start time
     const generateEndTimeOptions = () => {
         if (!selectedDay || !startTime) return [];
 
@@ -374,7 +372,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
             return [<option key="none" value="">Zbyt krótki czas na lekcję</option>];
         }
 
-        // Start at current start time + 45 minutes minimum (not 15 as before)
+        // Start at current start time + 45 minutes minimum
         for (let mins = minEndMinutes; mins <= slotEndMinutes; mins += 15) {
             const h = String(Math.floor(mins / 60)).padStart(2, '0');
             const m = String(mins % 60).padStart(2, '0');
@@ -387,6 +385,16 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
         }
 
         return options;
+    };
+
+    // Handler for day selection that also resets time fields
+    const handleDaySelect = (day) => {
+        // Reset time selections when day changes
+        setStartTime('');
+        setEndTime('');
+
+        // Update selected day
+        setSelectedDay(day);
     };
 
     // Submit form handler
@@ -442,9 +450,9 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">
                     Zaplanuj lekcję z {tutor?.first_name}
                 </h2>
                 <p className="text-gray-600">
@@ -458,19 +466,24 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
                     {/* Left column - Calendar */}
                     <div className="space-y-6">
-                        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
-                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-5">
-                                <FaCalendarCheck className="text-purple-600"/>
+                        <div className="border border-gray-200 rounded-lg p-4">
+                            <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                                 Wybierz termin
                             </h3>
 
                             {loadingAvailability && !selectedDay && (
                                 <div className="flex justify-center items-center py-3">
-                                    <BiLoaderAlt className="animate-spin text-purple-600 mr-2"/>
+                                    <svg className="animate-spin h-5 w-5 text-indigo-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
                                     <span className="text-sm text-gray-600">Ładowanie dostępności...</span>
                                 </div>
                             )}
@@ -496,17 +509,17 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                     z-index: -1;
                                 }
 
-                                /* Selected day styling - ONLY purple background */
+                                /* Selected day styling - ONLY indigo background */
                                 .rdp-day.rdp-day_selected {
-                                    background-color: #9333ea;
+                                    background-color: #4f46e5;
                                     color: white;
                                     border: none;
                                     border-radius: 6px;
                                 }
 
-                                /* Today styling - purple rounded border */
+                                /* Today styling - indigo rounded border */
                                 .rdp-day.rdp-day_today:not(.rdp-day_selected) {
-                                    border: 2px solid #d8b4fe;
+                                    border: 2px solid #c7d2fe;
                                     border-radius: 6px;
                                 }
                             `}</style>
@@ -515,7 +528,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                 mode="single"
                                 weekStartsOn={1}
                                 selected={selectedDay}
-                                onSelect={setSelectedDay}
+                                onSelect={handleDaySelect}
                                 locale={pl}
                                 disabled={[
                                     // Disable dates before today
@@ -547,9 +560,11 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                         </div>
 
                         {selectedDay && (
-                            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-                                    <FaClock className="text-purple-600"/>
+                            <div className="border border-gray-200 rounded-lg p-4">
+                                <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
                                     Wybierz godziny
                                 </h3>
 
@@ -566,7 +581,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                                 setStartTime(e.target.value);
                                                 setEndTime(""); // Reset end time when start time changes
                                             }}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                             required
                                             disabled={availableSlots.length === 0 || loadingAvailability}
                                         >
@@ -581,7 +596,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                         <select
                                             value={endTime}
                                             onChange={(e) => setEndTime(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                             required
                                             disabled={!startTime || availableSlots.length === 0 || loadingAvailability}
                                         >
@@ -596,8 +611,10 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                             Zaplanowana lekcja: {lessonDuration} minut
                                         </div>
                                         {tutor?.price && (
-                                            <div className="flex items-center text-sm font-medium text-green-600">
-                                                <FaMoneyBillWave className="mr-1" />
+                                            <div className="flex items-center text-sm font-medium text-indigo-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
                                                 Cena lekcji: {formatUtils.formatPrice(totalPrice)} ({formatUtils.formatPrice(tutor.price)} / godzina)
                                             </div>
                                         )}
@@ -609,9 +626,11 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
 
                     {/* Right column - Form Details */}
                     <div className="space-y-6">
-                        <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-                                <FaMagnifyingGlass className="text-purple-600"/>
+                        <div className="border border-gray-200 rounded-lg p-4">
+                            <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
                                 Szczegóły lekcji
                             </h3>
 
@@ -626,7 +645,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                         type="text"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         placeholder="Wprowadź tytuł lekcji"
                                         required
                                     />
@@ -641,7 +660,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                             id="subject"
                                             value={subject}
                                             onChange={(e) => setSubject(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                             required
                                         >
                                             <option value="">Wybierz przedmiot</option>
@@ -661,7 +680,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                             id="level"
                                             value={level}
                                             onChange={(e) => setLevel(e.target.value)}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                                             required
                                         >
                                             <option value="">Wybierz poziom</option>
@@ -682,7 +701,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                                         id="description"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                                         placeholder="Opisz czego dotyczy lekcja, cele, pytania..."
                                         rows={4}
                                     />
@@ -693,7 +712,7 @@ const LessonSchedulingForm = ({ tutor, error, setError, onFormSubmit }) => {
                         <button
                             type="submit"
                             disabled={!selectedDay || !startTime || !endTime || !title || !subject || !level}
-                            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn inline-flex items-center justify-center w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Dalej
                         </button>

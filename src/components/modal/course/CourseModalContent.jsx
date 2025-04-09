@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaStar, FaTimes, FaUsers, FaGraduationCap } from 'react-icons/fa';
 import { useModal } from '../../../hooks/useModal';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { enrollCourse } from '../../../store/thunks/courseThunks.js';
@@ -84,37 +83,39 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
 
     // Render full students list view (step 4)
     const renderFullStudents = () => (
-        <div className="p-6 space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Wszyscy Studenci</h3>
-            <div className="space-y-3">
+        <div className="p-6 space-y-4">
+            <h3 className="text-xl font-medium text-gray-900 mb-4">Wszyscy Studenci</h3>
+            <div className="space-y-2">
                 {course.students && course.students.length > 0 ? (
                     course.students.map((student) => (
-                        <motion.div
+                        <div
                             key={student.id}
-                            whileHover={{ x: 5 }}
-                            className="group cursor-pointer flex items-center gap-4 p-3 rounded-lg hover:bg-purple-50 transition-colors"
+                            className="cursor-pointer flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
                             onClick={() => handleStudentClick(student)}
                         >
-                            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
                                 <LazyLoadImage
                                     src={student.avatar}
                                     alt={student.username}
                                     effect="blur"
                                     className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.target.src = '/images/default-avatar.png';
+                                    }}
                                 />
                             </div>
                             <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900">
                                     {student.first_name} {student.last_name}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-600">
                                     @{student.username}
                                 </p>
                             </div>
-                        </motion.div>
+                        </div>
                     ))
                 ) : (
-                    <p className="text-gray-500">Brak zapisanych studentów</p>
+                    <p className="text-gray-500 text-sm">Brak zapisanych studentów</p>
                 )}
             </div>
         </div>
@@ -122,61 +123,88 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
 
     // Render student details (step 6)
     const renderStudentDetails = (student) => (
-        <div className="p-6 space-y-6">
-            <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg">
+        <div className="p-6 space-y-4">
+            <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
                     <LazyLoadImage
                         src={student.avatar}
                         alt={student.username}
                         effect="blur"
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.target.src = '/images/default-avatar.png';
+                        }}
                     />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-xl font-medium text-gray-900">
                         {student.first_name} {student.last_name}
                     </h2>
-                    <p className="text-sm text-gray-500">
-                        Nickname: @{student.username}
+                    <p className="text-sm text-gray-600">
+                        @{student.username}
                     </p>
                 </div>
             </div>
-            {/* Additional student details can be added here if needed */}
+
+            {/* Additional student details can be added here */}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Dane kontaktowe</h3>
+                <p className="text-sm text-gray-600">
+                    {student.email || 'Brak danych kontaktowych'}
+                </p>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Status w kursie</h3>
+                <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                    {student.status || 'Aktywny'}
+                </span>
+            </div>
         </div>
     );
 
     // Render full lessons list view (step 5)
     const renderFullLessons = () => (
-        <div className="p-6 space-y-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Wszystkie Lekcje</h3>
-            <div className="space-y-3">
+        <div className="p-6 space-y-4">
+            <h3 className="text-xl font-medium text-gray-900 mb-4">Wszystkie Lekcje</h3>
+            <div className="space-y-2">
                 {course.lessons && course.lessons.length > 0 ? (
                     course.lessons.map((lesson) => (
-                        <motion.div
+                        <div
                             key={lesson.id}
-                            whileHover={{ x: 5 }}
-                            className="group cursor-pointer p-3 rounded-lg hover:bg-purple-50 transition-colors"
+                            className="cursor-pointer p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
                             onClick={() => handleLessonClick(lesson)}
                         >
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-medium text-gray-900">
+                                    <p className="text-sm font-medium text-gray-900">
                                         {lesson.title}
                                     </p>
-                                    <p className="text-sm text-gray-500 mt-1">
+                                    <p className="text-sm text-gray-600 mt-1">
                                         {lesson.start_time
                                             ? formatUtils.formatDate(lesson.start_time)
                                             : 'Termin nie ustalony'}
                                     </p>
                                 </div>
-                                <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    →
-                                </span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5 text-blue-900"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 5l7 7-7 7"
+                                    />
+                                </svg>
                             </div>
-                        </motion.div>
+                        </div>
                     ))
                 ) : (
-                    <p className="text-gray-500">Brak dostępnych lekcji</p>
+                    <p className="text-gray-500 text-sm">Brak dostępnych lekcji</p>
                 )}
             </div>
         </div>
@@ -199,28 +227,54 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
     };
 
     return (
-        <>
+        <div className="bg-white flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                {(hasHistory || step > 1) ? (
-                    <button
-                        onClick={step > 1 ? handleBack : goBack}
-                        className="flex items-center text-purple-600 hover:text-purple-700"
-                    >
-                        <FaArrowLeft className="mr-2" />
-                        {step > 1 ? 'Powrót' : 'Wstecz'}
-                    </button>
-                ) : (
-                    <div></div>
-                )}
-                <h2 className="text-lg font-semibold text-gray-700">
-                    {getHeaderTitle()}
-                </h2>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white sticky top-0 z-10">
+                <div className="flex items-center gap-3">
+                    {(hasHistory || step > 1) && (
+                        <button
+                            onClick={step > 1 ? handleBack : goBack}
+                            className="text-sm text-blue-900 font-medium flex items-center gap-1"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
+                            Powrót
+                        </button>
+                    )}
+                </div>
+
+                <h2 className="text-lg font-semibold text-gray-800">{getHeaderTitle()}</h2>
+
                 <button
                     onClick={onClose}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full transition-colors"
                 >
-                    <FaTimes className="text-xl" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
                 </button>
             </div>
 
@@ -231,197 +285,222 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="p-6 space-y-6"
+                        transition={{ duration: 0.3 }}
                     >
+                        {/* Course Banner */}
+                        {course.banner && (
+                            <div className="w-full h-40 overflow-hidden border-b border-gray-200">
+                                <LazyLoadImage
+                                    src={course.banner}
+                                    alt={course.name}
+                                    effect="blur"
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+
                         {/* Course Overview */}
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Left Column */}
-                            <div className="space-y-4">
-                                {/* Course Description */}
-                                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                        Opis kursu
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        {course?.description || 'Brak opisu kursu'}
-                                    </p>
+                        <div className="p-6">
+                            {/* Basic Information */}
+                            <div className="mb-6">
+                                {/* Subject and level tags */}
+                                <div className="flex flex-wrap items-center gap-3 mb-4">
+                                    {course.subject && (
+                                        <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                                            {course.subject}
+                                        </span>
+                                    )}
+                                    {course.level && (
+                                        <span className="text-sm px-3 py-1 bg-amber-50 text-amber-700 rounded-full">
+                                            {course.level}
+                                        </span>
+                                    )}
                                 </div>
 
-                                {/* Course Level */}
-                                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-4">
-                                        Poziom kursu
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        {course.level || 'Brak informacji o poziomie'}
-                                    </p>
-                                </div>
+                                <p className="text-gray-600">
+                                    {course?.description || 'Brak opisu kursu'}
+                                </p>
+                            </div>
 
-                                {/* Pricing Card */}
-                                <div className="bg-purple-50 p-5 rounded-xl border border-purple-100">
+                            {/* Course Information Cards */}
+                            <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                {/* Price Info */}
+                                <div className="bg-gray-50 border border-gray-200 rounded-lg p-5">
+                                    <h3 className="text-sm font-medium text-gray-900 mb-3">Cena</h3>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-3xl font-bold text-purple-600">
+                                        <span className="text-2xl font-medium text-gray-900">
                                             {course?.price ? formatUtils.formatPrice(course.price) : 'Darmowy'}
                                         </span>
-                                        <span className="text-gray-500">/ pełny kurs</span>
+                                        {course?.price && <span className="text-gray-500 text-sm">/ pełny kurs</span>}
                                     </div>
-                                    <p className="mt-2 text-sm text-purple-700">
+                                    <p className="mt-2 text-sm text-gray-600">
                                         Obejmuje {course?.lessons?.length || 0} lekcji
                                     </p>
                                     {course?.price && course?.lessons && course.lessons.length > 0 && (
-                                        <p className="mt-1 text-sm text-purple-700">
+                                        <p className="mt-1 text-sm text-gray-600">
                                             Cena za lekcję: {formatUtils.formatPrice(course.price / course.lessons.length)}
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Students Preview */}
-                                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                    <div className="flex items-center gap-3 text-purple-600 mb-4">
-                                        <FaUsers className="text-xl"/>
-                                        <h3 className="text-lg font-semibold">Uczestnicy ({course.students?.length || 0})</h3>
-                                    </div>
-                                    <div className="space-y-3 mt-4">
-                                        {course.students && course.students.length > 0 ? (
-                                            course.students.slice(0, 3).map((student) => (
-                                                <motion.div
-                                                    key={student.id}
-                                                    whileHover={{x: 5}}
-                                                    className="group cursor-pointer flex items-center gap-4 p-3 rounded-lg hover:bg-purple-50 transition-colors"
-                                                    onClick={() => handleStudentClick(student)}
-                                                >
-                                                    <div
-                                                        className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-lg">
-                                                        <LazyLoadImage
-                                                            src={student.avatar}
-                                                            alt={student.username}
-                                                            effect="blur"
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-medium text-gray-900">
-                                                            {student.first_name} {student.last_name}
-                                                        </p>
-                                                        <p className="text-sm text-gray-500">
-                                                            @{student.username}
-                                                        </p>
-                                                    </div>
-                                                </motion.div>
-                                            ))
-                                        ) : (
-                                            <p className="text-gray-500">Brak zapisanych studentów</p>
-                                        )}
-                                    </div>
-                                    {course.students && course.students.length > 3 && (
-                                        <div className="mt-4 flex justify-center">
-                                            <button
-                                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
-                                                onClick={() => setStep(4)}
-                                            >
-                                                Zobacz wszystkich
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Right Column */}
-                            <div className="space-y-6">
-                                {/* Tutor Card - Direct redirect to full profile */}
-                                <div
-                                    className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors"
-                                    onClick={handleTutorClick}
-                                >
-                                    <div className="flex items-center gap-3 text-purple-600 mb-4">
-                                        <FaGraduationCap className="text-xl"/>
-                                        <h3 className="text-lg font-semibold">Prowadzący kurs</h3>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                                {/* Tutor Info */}
+                                <div className="border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-sm">
+                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Prowadzący</h3>
+                                    <div className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 transition-colors">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 shadow-sm border border-gray-200">
                                             <LazyLoadImage
-                                                src={course?.tutor?.avatar}
-                                                alt={course?.tutor?.username}
+                                                src={course?.tutor?.avatar || '/images/default-avatar.png'}
+                                                alt={`${course?.tutor?.first_name || ''} ${course?.tutor?.last_name || ''}`}
                                                 effect="blur"
                                                 className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = '/images/default-avatar.png';
+                                                }}
                                             />
                                         </div>
                                         <div>
-                                            <h4 className="text-lg font-semibold text-gray-900">
+                                            <h4 className="text-sm font-medium text-gray-900">
                                                 {course?.tutor?.first_name} {course?.tutor?.last_name}
                                             </h4>
-                                            <p className="text-sm text-gray-500">
-                                                @{course?.tutor?.username}
-                                            </p>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-sm text-purple-600">
-                                                    {course?.tutor?.subjects?.join(', ')}
-                                                </span>
+                                            {course?.tutor?.username && (
+                                                <p className="text-xs text-gray-600">@{course?.tutor?.username}</p>
+                                            )}
+                                            <div
+                                                className="text-xs text-blue-900 font-medium mt-1 hover:text-blue-700 hover:underline cursor-pointer transition-colors"
+                                                onClick={handleTutorClick}
+                                            >
+                                                Zobacz profil
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Lessons Preview - Direct navigate to full lesson details */}
-                                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                        Program kursu ({course?.lessons?.length || 0})
+                            {/* Program kursu (Lessons) */}
+                            <div className="mb-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                        Program kursu
                                     </h3>
-                                    {course?.lessons && course.lessons.length > 0 ? (
-                                        <div className="space-y-3">
-                                            {course.lessons.slice(0, 3).map((lesson) => (
-                                                <motion.div
-                                                    key={lesson.id}
-                                                    whileHover={{ x: 5 }}
-                                                    className="group cursor-pointer p-3 rounded-lg hover:bg-purple-50 transition-colors"
-                                                    onClick={() => handleLessonClick(lesson)}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div>
-                                                            <p className="font-medium text-gray-900">
-                                                                {lesson.title}
-                                                            </p>
-                                                            <p className="text-sm text-gray-500 mt-1">
-                                                                {lesson.start_time
-                                                                    ? formatUtils.formatDate(lesson.start_time)
-                                                                    : 'Termin nie ustalony'}
-                                                            </p>
-                                                        </div>
-                                                        <span className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            →
-                                                        </span>
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-gray-500">Brak dostępnych lekcji</p>
-                                    )}
                                     {course.lessons && course.lessons.length > 3 && (
-                                        <div className="mt-4 flex justify-center">
-                                            <button
-                                                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
-                                                onClick={() => setStep(5)}
+                                        <button
+                                            className="text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
+                                            onClick={() => setStep(5)}
+                                        >
+                                            Zobacz wszystkie
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    {course?.lessons && course.lessons.length > 0 ? (
+                                        course.lessons.slice(0, 3).map((lesson) => (
+                                            <div
+                                                key={lesson.id}
+                                                className="cursor-pointer p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                                onClick={() => handleLessonClick(lesson)}
                                             >
-                                                Zobacz wszystkie
-                                            </button>
-                                        </div>
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            {lesson.title}
+                                                        </p>
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            {lesson.start_time
+                                                                ? formatUtils.formatDate(lesson.start_time)
+                                                                : 'Termin nie ustalony'}
+                                                        </p>
+                                                    </div>
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5 text-blue-900"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M9 5l7 7-7 7"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 text-sm p-3 border border-gray-200 rounded-lg">
+                                            Brak dostępnych lekcji
+                                        </p>
                                     )}
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Enroll Button at the bottom (rendered only if user is not enrolled) */}
-                        {!isEnrolled && (
-                            <div className="mt-6 flex justify-center">
-                                <button
-                                    className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
-                                    onClick={handleEnroll}
-                                >
-                                    Zapisz się na kurs
-                                </button>
+                            {/* Studenci */}
+                            <div>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                        Uczestnicy ({course.students?.length || 0})
+                                    </h3>
+                                    {course.students && course.students.length > 3 && (
+                                        <button
+                                            className="text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
+                                            onClick={() => setStep(4)}
+                                        >
+                                            Zobacz wszystkich
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    {course.students && course.students.length > 0 ? (
+                                        course.students.slice(0, 3).map((student) => (
+                                            <div
+                                                key={student.id}
+                                                className="cursor-pointer flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                                                onClick={() => handleStudentClick(student)}
+                                            >
+                                                <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                                                    <LazyLoadImage
+                                                        src={student.avatar || '/images/default-avatar.png'}
+                                                        alt={student.username}
+                                                        effect="blur"
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            e.target.src = '/images/default-avatar.png';
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        {student.first_name} {student.last_name}
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        @{student.username}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 text-sm p-3 border border-gray-200 rounded-lg">
+                                            Brak zapisanych studentów
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        )}
+
+                            {/* Enroll Button */}
+                            {!isEnrolled && (
+                                <div className="mt-8 flex justify-center">
+                                    <button
+                                        className="inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800 transition-colors"
+                                        onClick={handleEnroll}
+                                    >
+                                        Zapisz się na kurs
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </motion.div>
                 )}
 
@@ -434,7 +513,7 @@ const CourseModalContent = ({ course, onClose, hasHistory, goBack }) => {
                 {/* Student Details (step 6) */}
                 {step === 6 && selectedStudent && renderStudentDetails(selectedStudent)}
             </div>
-        </>
+        </div>
     );
 };
 
