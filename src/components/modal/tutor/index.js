@@ -1,7 +1,7 @@
-import TutorModalContent from './TutorModalContent';
-import TutorProfile from './TutorProfile';
-import LessonSchedulingForm from './LessonSchedulingForm';
-import LessonConfirmation from './LessonConfirmation';
+import { TutorModalContent } from './TutorModalContent';
+import { TutorProfile } from './TutorProfile';
+import { LessonSchedulingForm } from './LessonSchedulingForm';
+import { LessonConfirmation } from './LessonConfirmation';
 
 export {
     TutorModalContent,

@@ -1,15 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-
-// Status mapping with original colors
-const statusMapping = {
-    scheduled: { text: 'Zaplanowana', color: 'bg-indigo-100 text-indigo-800' },
-    confirmed: { text: 'Potwierdzona', color: 'bg-emerald-100 text-emerald-800' },
-    in_progress: { text: 'W trakcie', color: 'bg-violet-100 text-violet-800' },
-    done: { text: 'Zakończona', color: 'bg-slate-100 text-slate-700' },
-    failed: { text: 'Nieudana', color: 'bg-rose-100 text-rose-800' },
-    cancelled: { text: 'Anulowana', color: 'bg-slate-200 text-slate-800' },
-};
+import { Icon } from '../modal/shared/Icon';
+import { StatusBadge } from '../modal/shared/StatusBadge';
 
 const LessonCard = ({ lesson, onInfoClick }) => {
     // Get user role from Redux store
@@ -39,107 +31,91 @@ const LessonCard = ({ lesson, onInfoClick }) => {
     // Count students (only show for tutors)
     const studentCount = lesson.students?.length || 0;
 
+    // Check if lesson is today
+    const isToday = () => {
+        const today = new Date();
+        return startTime.getDate() === today.getDate() &&
+            startTime.getMonth() === today.getMonth() &&
+            startTime.getFullYear() === today.getFullYear();
+    };
+
     return (
-        <div className="bg-gray-50 shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-100 transition-colors duration-200">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 transition-colors duration-200">
             {/* Status and date */}
-            <div className="px-6 pt-4 pb-2 flex justify-between items-center">
-                <span
-                    className={`text-sm font-medium px-3 py-1 rounded-full ${
-                        statusMapping[lesson.status]?.color || 'bg-slate-100 text-slate-700'
-                    }`}
-                >
-                    {statusMapping[lesson.status]?.text || 'Nieznany'}
+            <div className="px-4 pt-3 pb-2 flex justify-between items-center">
+                <StatusBadge status={lesson.status || 'scheduled'} size="sm" />
+                <span className="text-xs text-gray-500 font-medium">
+                    {isToday() ? 'Dzisiaj' : formattedDate}
                 </span>
-                <span className="text-sm text-gray-600 font-medium">{formattedDate}</span>
             </div>
 
             {/* Lesson content section */}
-            <div className="px-6 pb-4">
-                <h2 className="text-xl font-medium text-gray-900 mb-3">{lesson.title}</h2>
+            <div className="px-4 pb-3">
+                <h2 className="text-base font-medium text-gray-900 mb-2">{lesson.title}</h2>
 
-                {/* Subject and level with original colors */}
-                <div className="flex flex-wrap items-center gap-3 mb-4">
+                {/* Subject and level tags */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
                     {lesson.subject && (
-                        <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                        <span className="text-xs px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">
                             {lesson.subject}
                         </span>
                     )}
                     {lesson.level && (
-                        <span className="text-sm px-3 py-1 bg-amber-50 text-amber-700 rounded-full">
+                        <span className="text-xs px-2.5 py-1 bg-amber-50 text-amber-600 rounded-full">
                             {lesson.level}
                         </span>
                     )}
                 </div>
 
                 {/* Time info */}
-                <div className="flex items-center gap-3 text-sm text-gray-600 mb-1">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
-                    <span>
-                        {formattedStartTime} - {formattedEndTime}
-                    </span>
-                    <span className="text-gray-500">·</span>
-                    <span>{durationMinutes} min</span>
+                <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-1.5">
+                        <Icon name="clock" className="h-3.5 w-3.5 text-gray-400" />
+                        <span>
+                            {formattedStartTime} - {formattedEndTime}
+                        </span>
+                    </div>
+
+                    <span className="text-gray-300">|</span>
+
+                    <div className="flex items-center gap-1.5">
+                        <span>{durationMinutes} min</span>
+                    </div>
 
                     {/* Show student count if there are students */}
-                    {studentCount > 0 && (
+                    {isTutor && (
                         <>
-                            <span className="text-gray-500 ml-1">·</span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-gray-500 ml-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                                />
-                            </svg>
-                            <span>
-                                {studentCount}{' '}
-                                {studentCount === 1
-                                    ? 'uczeń'
-                                    : studentCount < 5
-                                        ? 'uczniów'
-                                        : 'uczniów'}
-                            </span>
+                            <span className="text-gray-300">|</span>
+                            <div className="flex items-center gap-1.5">
+                                <Icon name="users" className="h-3.5 w-3.5 text-gray-400" />
+                                <span>
+                                    {studentCount}{' '}
+                                    {studentCount === 1
+                                        ? 'uczeń'
+                                        : studentCount < 5
+                                            ? 'uczniów'
+                                            : 'uczniów'}
+                                </span>
+                            </div>
                         </>
                     )}
                 </div>
             </div>
 
             {/* Person info - conditional display for tutor/student */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
                 {isTutor ? (
                     // TUTOR VIEW - Show students
                     <div className="flex-1">
                         {studentCount === 0 ? (
                             // No students case
                             <div className="flex items-center">
-                                <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
+                                <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 flex items-center justify-center">
+                                    <Icon name="user" className="h-4 w-4 text-gray-400" />
                                 </div>
                                 <div>
                                     <div className="text-xs text-gray-500 mb-0.5">Uczniowie:</div>
-                                    <div className="text-sm font-medium text-gray-900">
+                                    <div className="text-xs text-gray-700">
                                         Brak zapisanych uczniów
                                     </div>
                                 </div>
@@ -147,14 +123,14 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                         ) : (
                             // Students display with better styling
                             <div>
-                                <div className="text-xs text-gray-500 mb-2">
+                                <div className="text-xs text-gray-500 mb-1.5">
                                     {studentCount === 1 ? "Uczeń:" : "Uczniowie:"}
                                 </div>
                                 <div className="flex flex-wrap items-center">
                                     {/* Show first 2 students */}
                                     {lesson.students.slice(0, 2).map((student, index) => (
-                                        <div key={student.id || index} className="flex items-center mr-4 mb-1">
-                                            <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                                        <div key={student.id || index} className="flex items-center mr-3 mb-1">
+                                            <div className="w-6 h-6 mr-1.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
                                                 <img
                                                     src={student.avatar || '/images/default-avatar.png'}
                                                     alt={student.username || "Uczeń"}
@@ -164,7 +140,7 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                                                     }}
                                                 />
                                             </div>
-                                            <span className="text-sm font-medium text-gray-900">
+                                            <span className="text-xs font-medium text-gray-700">
                                                 {student.first_name || student.username}
                                             </span>
                                         </div>
@@ -173,11 +149,11 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                                     {/* Show +X for additional students */}
                                     {studentCount > 2 && (
                                         <div className="flex items-center">
-                                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-medium text-xs mr-2 border border-blue-200">
+                                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 font-medium text-xs mr-1.5 border border-blue-200">
                                                 +{studentCount - 2}
                                             </div>
-                                            <span className="text-sm text-gray-700">
-                                                {studentCount > 3 ? "więcej uczniów" : "więcej"}
+                                            <span className="text-xs text-gray-600">
+                                                {studentCount > 3 ? "więcej" : ""}
                                             </span>
                                         </div>
                                     )}
@@ -188,7 +164,7 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                 ) : (
                     // STUDENT VIEW - Show tutor
                     <div className="flex items-center">
-                        <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                        <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
                             <img
                                 src={lesson.tutor?.avatar || '/images/default-avatar.png'}
                                 alt={lesson.tutor?.username || "Nauczyciel"}
@@ -200,22 +176,22 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                         </div>
                         <div>
                             <div className="text-xs text-gray-500 mb-0.5">Nauczyciel:</div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-xs font-medium text-gray-700">
                                 {lesson.tutor?.first_name && lesson.tutor?.last_name
                                     ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
                                     : lesson.tutor?.username || 'Nieznany'}
                             </div>
-                            <div className="text-sm text-gray-600">@{lesson.tutor?.username || 'nieznany'}</div>
+                            <div className="text-xs text-gray-500">@{lesson.tutor?.username || 'nieznany'}</div>
                         </div>
                     </div>
                 )}
 
-                {/* Action link */}
+                {/* Action button */}
                 <button
-                    className="btn text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors whitespace-nowrap ml-2"
+                    className="ml-2 px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
                     onClick={() => onInfoClick?.(lesson)}
                 >
-                    {'Szczegóły'}
+                    Szczegóły
                 </button>
             </div>
         </div>

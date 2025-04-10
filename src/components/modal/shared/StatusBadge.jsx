@@ -1,33 +1,38 @@
-// components/modal/shared/StatusBadge.jsx
 import React from 'react';
-import { statusUtils } from '../utils';
+import { Icon } from './Icon';
 
-/**
- * Reusable status badge component
- */
-const StatusBadge = ({ status, showText = true, size = 'md' }) => {
+const statusMapping = {
+    scheduled: { text: 'Zaplanowana', color: 'bg-blue-50 text-blue-600', icon: 'calendar' },
+    confirmed: { text: 'Potwierdzona', color: 'bg-green-50 text-green-600', icon: 'check-circle' },
+    in_progress: { text: 'W trakcie', color: 'bg-purple-50 text-purple-600', icon: 'play' },
+    done: { text: 'Zakończona', color: 'bg-gray-50 text-gray-600', icon: 'check' },
+    failed: { text: 'Nieudana', color: 'bg-red-50 text-red-600', icon: 'x-circle' },
+    cancelled: { text: 'Anulowana', color: 'bg-gray-100 text-gray-600', icon: 'x' },
+};
+
+export const StatusBadge = ({ status, showIcon = true, size = 'md' }) => {
+    const statusInfo = statusMapping[status] || { text: 'Nieznany', color: 'bg-gray-100 text-gray-600', icon: 'info' };
+
     const sizeClasses = {
-        sm: 'w-2 h-2',
-        md: 'w-3 h-3',
-        lg: 'w-4 h-4'
+        xs: 'text-xs py-0.5 px-2',
+        sm: 'text-xs py-1 px-2.5',
+        md: 'text-sm py-1 px-2.5',
+        lg: 'text-sm py-1.5 px-3'
     };
 
-    const textSizeClasses = {
-        sm: 'text-xs',
-        md: 'text-sm',
-        lg: 'text-base'
+    const iconSizes = {
+        xs: 'h-3 w-3',
+        sm: 'h-3.5 w-3.5',
+        md: 'h-4 w-4',
+        lg: 'h-4.5 w-4.5'
     };
 
     return (
-        <div className="flex items-center gap-2">
-            <span className={`${statusUtils.getStatusColor(status)} ${sizeClasses[size]} rounded-full`} />
-            {showText && (
-                <p className={`text-gray-900 font-medium ${textSizeClasses[size]}`}>
-                    {statusUtils.getStatusText(status)}
-                </p>
-            )}
-        </div>
+        <span className={`rounded-full font-medium inline-flex items-center gap-1.5 ${statusInfo.color} ${sizeClasses[size]}`}>
+      {showIcon && statusInfo.icon && (
+          <Icon name={statusInfo.icon} className={iconSizes[size]} />
+      )}
+            {statusInfo.text}
+    </span>
     );
 };
-
-export default StatusBadge;

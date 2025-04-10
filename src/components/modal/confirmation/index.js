@@ -1,3 +1,3 @@
-import ConfirmationModal from './ConfirmationModal';
+import { ConfirmationModal } from './ConfirmationModal';
 
 export { ConfirmationModal };

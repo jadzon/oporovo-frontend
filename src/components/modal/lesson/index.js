@@ -1,3 +1,3 @@
-import LessonModalContent from './LessonModalContent';
+import { LessonModalContent } from './LessonModalContent';
 
 export { LessonModalContent };
