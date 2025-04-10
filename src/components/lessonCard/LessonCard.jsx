@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 // Status mapping with original colors
 const statusMapping = {
@@ -11,13 +12,9 @@ const statusMapping = {
 };
 
 const LessonCard = ({ lesson, onInfoClick }) => {
-    // Get data from lesson props
-    const tutorAvatar = lesson.tutor?.avatar || '/images/default-avatar.png';
-    const tutorFullName =
-        lesson.tutor?.first_name && lesson.tutor?.last_name
-            ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
-            : lesson.tutor?.username || 'Nieznany';
-    const tutorUsername = lesson.tutor?.username || 'Nieznany';
+    // Get user role from Redux store
+    const { user } = useSelector((state) => state.auth);
+    const isTutor = user?.role === 'tutor';
 
     // Format start and end times
     const startTime = new Date(lesson.start_time);
@@ -39,7 +36,7 @@ const LessonCard = ({ lesson, onInfoClick }) => {
     const durationMs = endTime - startTime;
     const durationMinutes = Math.floor(durationMs / 60000);
 
-    // Count students
+    // Count students (only show for tutors)
     const studentCount = lesson.students?.length || 0;
 
     return (
@@ -95,6 +92,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                     </span>
                     <span className="text-gray-500">·</span>
                     <span>{durationMinutes} min</span>
+
+                    {/* Show student count if there are students */}
                     {studentCount > 0 && (
                         <>
                             <span className="text-gray-500 ml-1">·</span>
@@ -125,33 +124,98 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                 </div>
             </div>
 
-            {/* Tutor info */}
+            {/* Person info - conditional display for tutor/student */}
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center">
-                    <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
-                        <img
-                            src={tutorAvatar}
-                            alt={tutorUsername}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                                e.target.src = '/images/default-avatar.png';
-                            }}
-                        />
+                {isTutor ? (
+                    // TUTOR VIEW - Show students
+                    <div className="flex-1">
+                        {studentCount === 0 ? (
+                            // No students case
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div className="text-xs text-gray-500 mb-0.5">Uczniowie:</div>
+                                    <div className="text-sm font-medium text-gray-900">
+                                        Brak zapisanych uczniów
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            // Students display with better styling
+                            <div>
+                                <div className="text-xs text-gray-500 mb-2">
+                                    {studentCount === 1 ? "Uczeń:" : "Uczniowie:"}
+                                </div>
+                                <div className="flex flex-wrap items-center">
+                                    {/* Show first 2 students */}
+                                    {lesson.students.slice(0, 2).map((student, index) => (
+                                        <div key={student.id || index} className="flex items-center mr-4 mb-1">
+                                            <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                                                <img
+                                                    src={student.avatar || '/images/default-avatar.png'}
+                                                    alt={student.username || "Uczeń"}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.src = '/images/default-avatar.png';
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {student.first_name || student.username}
+                                            </span>
+                                        </div>
+                                    ))}
+
+                                    {/* Show +X for additional students */}
+                                    {studentCount > 2 && (
+                                        <div className="flex items-center">
+                                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-medium text-xs mr-2 border border-blue-200">
+                                                +{studentCount - 2}
+                                            </div>
+                                            <span className="text-sm text-gray-700">
+                                                {studentCount > 3 ? "więcej uczniów" : "więcej"}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    <div>
-                        <div className="text-sm font-medium text-gray-900">
-                            {tutorFullName}
+                ) : (
+                    // STUDENT VIEW - Show tutor
+                    <div className="flex items-center">
+                        <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                            <img
+                                src={lesson.tutor?.avatar || '/images/default-avatar.png'}
+                                alt={lesson.tutor?.username || "Nauczyciel"}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    e.target.src = '/images/default-avatar.png';
+                                }}
+                            />
                         </div>
-                        <div className="text-sm text-gray-600">@{tutorUsername}</div>
+                        <div>
+                            <div className="text-xs text-gray-500 mb-0.5">Nauczyciel:</div>
+                            <div className="text-sm font-medium text-gray-900">
+                                {lesson.tutor?.first_name && lesson.tutor?.last_name
+                                    ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
+                                    : lesson.tutor?.username || 'Nieznany'}
+                            </div>
+                            <div className="text-sm text-gray-600">@{lesson.tutor?.username || 'nieznany'}</div>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Action link */}
                 <button
-                    className="btn text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
+                    className="btn text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors whitespace-nowrap ml-2"
                     onClick={() => onInfoClick?.(lesson)}
                 >
-                    Szczegóły
+                    {'Szczegóły'}
                 </button>
             </div>
         </div>

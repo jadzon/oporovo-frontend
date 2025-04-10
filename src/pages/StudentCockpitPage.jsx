@@ -22,7 +22,7 @@ import {
 // Import the useModal hook from the new modal system
 import { useModal } from '../hooks/useModal';
 
-const CockpitPage = () => {
+const StudentCockpitPage = () => {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
     const { lessons, loading: lessonsLoading } = useSelector((state) => state.lessons);
@@ -555,4 +555,4 @@ const CockpitPage = () => {
     );
 };
 
-export default CockpitPage;
+export default StudentCockpitPage;

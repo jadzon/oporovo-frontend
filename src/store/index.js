@@ -4,6 +4,7 @@ import modalReducer from './slices/modalSlice';
 import lessonsReducer from './slices/lessonsSlice';
 import tutorsReducer from './slices/tutorsSlice';
 import coursesReducer from './slices/coursesSlice';
+import studentsReducer from './slices/studentsSlice';
 
 console.log("Setting up store with reducers:", {
     auth: authReducer,
@@ -11,6 +12,7 @@ console.log("Setting up store with reducers:", {
     lessons: lessonsReducer,
     tutors: tutorsReducer,
     courses: coursesReducer,
+    students: studentsReducer,
 });
 
 const store = configureStore({
@@ -20,6 +22,7 @@ const store = configureStore({
         lessons: lessonsReducer,
         tutors: tutorsReducer,
         courses: coursesReducer,
+        students: studentsReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
