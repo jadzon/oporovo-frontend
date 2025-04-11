@@ -12,7 +12,7 @@ import { fetchStudentsForTutor } from "../store/thunks/studentsThunks"
 import LessonCard from "../components/lessonCard/LessonCard"
 import CourseCard from "../components/courseCard/CourseCard"
 import { LessonCardSkeleton } from "../components/ui/Skeleton"
-import { useModal } from "../hooks/useModal"
+import { useModal } from '../components/modal';
 import StudentCard from "../components/studentCard/StudentCard.jsx"
 
 const TutorCockpitPage = () => {
@@ -68,8 +68,8 @@ const TutorCockpitPage = () => {
     )
 
     // Modal handlers
-    const handleLessonInfo = (lesson) => openLessonModal(lesson)
-    const handleCourseInfo = (course) => openCourseModal(course)
+    const handleLessonInfo = (lesson) => openLessonModal(lesson.id)
+    const handleCourseInfo = (course) => openCourseModal(course.id)
 
     // Action handlers
     const handleSetSchedule = () => alert("Ustaw harmonogram dyspozycyjności...")

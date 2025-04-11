@@ -1,7 +1,9 @@
-/**
- * Shared icon component for consistent styling across the modal system
- */
+// Icon.jsx
+// Shared icon component for consistent styling across the modal system
+import React from 'react';
+
 export const Icon = ({ name, className = "h-5 w-5" }) => {
+    // Icon map with SVG paths
     const icons = {
         check: (
             <svg
@@ -157,7 +159,12 @@ export const Icon = ({ name, className = "h-5 w-5" }) => {
             </svg>
         ),
         discord: (
-            <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={className}
+                viewBox="0 0 24 24"
+                fill="currentColor"
+            >
                 <path d="M19.54 0c1.356 0 2.46 1.104 2.46 2.472v21.528l-2.58-2.28-1.452-1.344-1.536-1.428.636 2.22h-13.608c-1.356 0-2.46-1.104-2.46-2.472v-16.224c0-1.368 1.104-2.472 2.46-2.472h16.08zm-4.632 15.672c2.652-.084 3.672-1.824 3.672-1.824 0-3.864-1.728-6.996-1.728-6.996-1.728-1.296-3.372-1.26-3.372-1.26l-.168.192c2.04.624 2.988 1.524 2.988 1.524-1.248-.684-2.472-1.02-3.612-1.152-.864-.096-1.692-.072-2.424.024l-.204.024c-.42.036-1.44.192-2.724.756-.444.204-.708.348-.708.348s.996-.948 3.156-1.572l-.12-.144s-1.644-.036-3.372 1.26c0 0-1.728 3.132-1.728 6.996 0 0 1.008 1.74 3.66 1.824 0 0 .444-.54.804-.996-1.524-.456-2.1-1.416-2.1-1.416l.336.204.048.036.047.027.014.006.047.027c.3.168.6.3.876.408.492.192 1.08.384 1.764.516.9.168 1.956.228 3.108.012.564-.096 1.14-.264 1.74-.516.42-.156.888-.384 1.38-.708 0 0-.6.984-2.172 1.428.36.456.792.972.792.972zm-5.58-5.604c-.684 0-1.224.6-1.224 1.332 0 .732.552 1.332 1.224 1.332.684 0 1.224-.6 1.224-1.332.012-.732-.54-1.332-1.224-1.332zm4.38 0c-.684 0-1.224.6-1.224 1.332 0 .732.552 1.332 1.224 1.332.684 0 1.224-.6 1.224-1.332 0-.732-.54-1.332-1.224-1.332z" />
             </svg>
         ),
@@ -220,9 +227,8 @@ export const Icon = ({ name, className = "h-5 w-5" }) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
             >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="6" x2="12" y2="12"></line>
-                <path d="M12 17h.01"></path>
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
         ),
         book: (
@@ -270,7 +276,7 @@ export const Icon = ({ name, className = "h-5 w-5" }) => {
                 <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
             </svg>
         ),
-        briefcase: (
+        message: (
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className={className}
@@ -281,59 +287,13 @@ export const Icon = ({ name, className = "h-5 w-5" }) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
             >
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
         ),
-        tag: (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={className}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            >
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-            </svg>
-        ),
-        tags: (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={className}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            >
-                <path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5z"></path>
-                <path d="M6 9.01V9"></path>
-                <path d="M17 5h7v7l-6.29 6.29c-.94.94-2.48.94-3.42 0l-3.58-3.58c-.94-.94-.94-2.48 0-3.42L17 5z"></path>
-            </svg>
-        ),
-        chalkboard: (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className={className}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            >
-                <path d="M3 3h18v18H3z"></path>
-                <path d="M7 21v-4"></path>
-                <path d="M17 21v-4"></path>
-                <path d="M3 7h18"></path>
-            </svg>
-        ),
-    }
+    };
 
-    return icons[name] || null
-}
+    // Return the icon if found, otherwise null
+    return icons[name] || null;
+};
+
+export default Icon;

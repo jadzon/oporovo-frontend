@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '../modal/shared/Icon';
+import { Icon } from '../modal/index.js';
 
 const StudentCard = ({ student, onInfoClick }) => {
     // Student data

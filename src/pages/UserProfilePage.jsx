@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useParams, useNavigate } from "react-router-dom"
@@ -26,7 +24,7 @@ import {
 } from "lucide-react"
 
 // Components
-import { Card } from "../components/modal/index.js"
+import { Card } from "../components/temp"
 
 const UserProfilePage = () => {
     const dispatch = useDispatch()

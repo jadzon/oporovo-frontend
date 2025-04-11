@@ -1,3 +1,6 @@
+/**
+ * Utility functions for formatting data in consistent ways
+ */
 
 /**
  * Format price to display with 2 decimal places and PLN
@@ -15,7 +18,11 @@ export const formatPrice = (price) => {
  */
 export const formatDate = (date) => {
     if (!date) return 'Nie określono';
-    return new Date(date).toLocaleDateString('pl-PL');
+    return new Date(date).toLocaleDateString('pl-PL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
 };
 
 /**
@@ -25,7 +32,13 @@ export const formatDate = (date) => {
  */
 export const formatDateTime = (date) => {
     if (!date) return 'Nie określono';
-    return new Date(date).toLocaleString('pl-PL');
+    return new Date(date).toLocaleString('pl-PL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 };
 
 /**

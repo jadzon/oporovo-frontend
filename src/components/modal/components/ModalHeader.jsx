@@ -1,11 +1,22 @@
+// Header component for the modal with title, back button, and close button
 import React from 'react';
+import { useModal } from '../core/useModal';
 import { Icon } from './Icon';
 
-export const ModalHeader = ({ title, onClose, hasHistory, goBack }) => {
+const ModalHeader = ({
+                         title,
+                         onClose,
+                         showBackButton = false
+                     }) => {
+    const { goBack } = useModal();
+
+    // Use provided onClose function or the one from useModal
+    const handleClose = onClose || useModal().closeModal;
+
     return (
         <div className="px-4 py-3 flex items-center justify-between bg-white sticky top-0 z-10 border-b border-gray-100 shadow-sm">
             <div className="flex items-center gap-2">
-                {hasHistory && (
+                {showBackButton && (
                     <button
                         onClick={goBack}
                         className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
@@ -18,7 +29,7 @@ export const ModalHeader = ({ title, onClose, hasHistory, goBack }) => {
             </div>
 
             <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
                 aria-label="Zamknij"
             >
@@ -27,3 +38,5 @@ export const ModalHeader = ({ title, onClose, hasHistory, goBack }) => {
         </div>
     );
 };
+
+export default ModalHeader;

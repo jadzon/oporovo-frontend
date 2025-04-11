@@ -2,6 +2,7 @@ import { useSelector } from "react-redux"
 import { Icon } from "../modal/index.js"
 import { StatusBadge } from "../modal/index.js"
 import ProfileHoverCard from "../profileHoverCard/ProfileHoverCard.jsx";
+import MiniUserCard from "../profile/MiniUserCard.jsx";
 
 const LessonCard = ({ lesson, onInfoClick }) => {
     // Get user role from Redux store
@@ -131,26 +132,7 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                                     placement="right"
                                     onSendMessage={handleSendMessage}
                                 >
-                                    <div className="flex items-center hover:bg-gray-100 rounded-lg p-1.5 cursor-pointer">
-                                        <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
-                                            <img
-                                                src={lesson.students[0].avatar || "/images/default-avatar.png"}
-                                                alt={lesson.students[0].username || "Uczeń"}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    e.target.src = "/images/default-avatar.png"
-                                                }}
-                                            />
-                                        </div>
-                                        <div>
-                                            <div className="text-xs font-medium text-gray-700">
-                                                {lesson.students[0].first_name || lesson.students[0].username}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                @{lesson.students[0].username || "uczeń"}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <MiniUserCard user={lesson.students[0]} />
                                 </ProfileHoverCard>
                             </div>
                         ) : (

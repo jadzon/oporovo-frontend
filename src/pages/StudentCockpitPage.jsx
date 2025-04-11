@@ -16,7 +16,7 @@ import CourseCard from "../components/courseCard/CourseCard"
 import { LessonCardSkeleton, TutorCardSkeleton } from "../components/ui/Skeleton"
 
 // Import the useModal hook from the new modal system
-import { useModal } from "../hooks/useModal"
+import { useModal } from '../components/modal';
 
 const StudentCockpitPage = () => {
     const dispatch = useDispatch()
@@ -62,9 +62,9 @@ const StudentCockpitPage = () => {
     )
 
     // Modal handlers using the new modal system
-    const handleLessonInfo = (lesson) => openLessonModal(lesson)
-    const handleTutorInfo = (tutor) => openTutorModal(tutor)
-    const handleCourseInfo = (course) => openCourseModal(course)
+    const handleLessonInfo = (lesson) => openLessonModal(lesson.id)
+    const handleTutorInfo = (tutor) => openTutorModal(tutor.id)
+    const handleCourseInfo = (course) => openCourseModal(course.id)
 
     const handleBookMore = () => alert("Zarezerwuj kolejną lekcję...")
     const handleSearchTutors = () => alert("Przekierowanie do wyszukiwania...")

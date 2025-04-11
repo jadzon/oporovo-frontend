@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from './Icon';
+import { Icon } from '../modal/index.js';
 
 export const Card = ({ title, icon, children, className = "" }) => {
     return (
