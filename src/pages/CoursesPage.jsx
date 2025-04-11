@@ -1,11 +1,10 @@
 // pages/CoursesPage.jsx
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaSearch, FaTimes } from 'react-icons/fa';
+import { Search, Sliders, X, BookOpen, Calendar, CheckCircle, Users } from 'lucide-react';
 import { courseService } from '../api/services/courseService';
 import InfoCourseCard from '../components/courseCard/InfoCourseCard.jsx';
 import { useModal } from '../hooks/useModal';
-import {FaSliders} from "react-icons/fa6";
 
 const CoursesPage = () => {
     // Local state for courses and loading flag
@@ -80,9 +79,9 @@ const CoursesPage = () => {
     const filtersActive = searchTerm || selectedSubject || priceRange[0] !== 100 || priceRange[1] !== 6000;
 
     return (
-        <div className="bg-gray-50 min-h-screen">
+        <div className="bg-[#FFFDF7] min-h-screen">
             {/* Hero section with big text */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-white border-b border-gray-100 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="py-8">
                         <motion.div
@@ -92,9 +91,9 @@ const CoursesPage = () => {
                             className="text-center lg:text-left"
                         >
                             <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
-                                Kursy przygotowujące do <span className="text-blue-900">matury</span>
+                                Kursy przygotowujące do <span className="text-black">matury</span>
                             </h1>
-                            <p className="mt-4 text-lg text-gray-700">
+                            <p className="mt-4 text-lg text-gray-600">
                                 Znajdź kurs, który pomoże Ci opanować wszystkie zagadnienia niezbędne do zdania matury.
                             </p>
                         </motion.div>
@@ -103,6 +102,56 @@ const CoursesPage = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Quick actions section */}
+                <section className="mb-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                            <div className="rounded-full bg-gray-50 p-4 mb-4">
+                                <BookOpen className="h-6 w-6 text-black" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Eksploruj kursy</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Odkryj bogaty wybór kursów przygotowujących do matury z różnych przedmiotów
+                            </p>
+                            <button
+                                className="mt-auto inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-full text-white bg-black hover:bg-gray-800 transition-colors"
+                            >
+                                Przeglądaj
+                            </button>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                            <div className="rounded-full bg-gray-50 p-4 mb-4">
+                                <Calendar className="h-6 w-6 text-black" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Harmonogram zajęć</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Dostosuj harmonogram zajęć do swoich potrzeb i możliwości czasowych
+                            </p>
+                            <button
+                                className="mt-auto inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-full text-white bg-black hover:bg-gray-800 transition-colors"
+                            >
+                                Planuj
+                            </button>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow">
+                            <div className="rounded-full bg-gray-50 p-4 mb-4">
+                                <CheckCircle className="h-6 w-6 text-black" />
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Oferta specjalna</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Sprawdź aktualnie trwające promocje i oferty specjalne na kursy
+                            </p>
+                            <button
+                                className="mt-auto inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-full text-white bg-black hover:bg-gray-800 transition-colors"
+                            >
+                                Sprawdź
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                     {/* LEFT SIDEBAR - FILTERS (Desktop) */}
                     <div className="hidden lg:block lg:col-span-1">
@@ -110,8 +159,9 @@ const CoursesPage = () => {
                             initial={{opacity: 0, x: -20}}
                             animate={{opacity: 1, x: 0}}
                             transition={{duration: 0.5}}
-                            className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden sticky top-24">
-                            <div className="px-6 py-4 border-b border-gray-200">
+                            className="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden sticky top-24">
+                            <div className="px-6 py-4 border-b border-gray-100 flex items-center">
+                                <Sliders className="h-5 w-5 text-black mr-2" />
                                 <h2 className="text-lg font-medium text-gray-900">Filtry wyszukiwania</h2>
                             </div>
                             <div className="p-6 space-y-5">
@@ -122,12 +172,12 @@ const CoursesPage = () => {
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <FaSearch className="h-4 w-4 text-gray-400" />
+                                            <Search className="h-4 w-4 text-gray-400" />
                                         </div>
                                         <input
                                             type="text"
                                             placeholder="Nazwa kursu..."
-                                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
@@ -140,7 +190,7 @@ const CoursesPage = () => {
                                         Przedmiot
                                     </label>
                                     <select
-                                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black sm:text-sm"
                                         value={selectedSubject}
                                         onChange={(e) => setSelectedSubject(e.target.value)}
                                     >
@@ -171,7 +221,7 @@ const CoursesPage = () => {
                                                 step="100"
                                                 value={priceRange[0]}
                                                 onChange={(e) => handlePriceChange(e, 0)}
-                                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
+                                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                                             />
                                         </div>
                                         <div>
@@ -186,7 +236,7 @@ const CoursesPage = () => {
                                                 step="100"
                                                 value={priceRange[1]}
                                                 onChange={(e) => handlePriceChange(e, 1)}
-                                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
+                                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                                             />
                                         </div>
                                     </div>
@@ -196,7 +246,7 @@ const CoursesPage = () => {
                                 <div className="pt-2">
                                     <button
                                         onClick={clearFilters}
-                                        className="w-full py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                        className="w-full py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         Wyczyść filtry
                                     </button>
@@ -210,12 +260,12 @@ const CoursesPage = () => {
                         <div className="flex gap-2">
                             <div className="relative flex-grow">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaSearch className="h-4 w-4 text-gray-400" />
+                                    <Search className="h-4 w-4 text-gray-400" />
                                 </div>
                                 <input
                                     type="text"
                                     placeholder="Szukaj kursu..."
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-black focus:border-black text-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -224,7 +274,7 @@ const CoursesPage = () => {
                                 className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg"
                                 onClick={() => setShowMobileFilters(true)}
                             >
-                                <FaSliders className="h-5 w-5" />
+                                <Sliders className="h-5 w-5" />
                             </button>
                         </div>
                     </div>
@@ -232,12 +282,12 @@ const CoursesPage = () => {
                     {/* Mobile filters modal */}
                     {showMobileFilters && (
                         <div className="fixed inset-0 z-50 lg:hidden">
-                            <div className="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                            <div className="absolute inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity"></div>
 
                             <div className="fixed inset-y-0 right-0 max-w-full flex">
                                 <div className="relative w-screen max-w-md">
                                     <div className="h-full flex flex-col bg-white shadow-xl overflow-y-auto">
-                                        <div className="px-4 py-5 border-b border-gray-200 sm:px-6 flex justify-between items-center">
+                                        <div className="px-4 py-5 border-b border-gray-100 sm:px-6 flex justify-between items-center">
                                             <h2 className="text-lg font-medium text-gray-900">Filtry</h2>
                                             <button
                                                 type="button"
@@ -245,7 +295,7 @@ const CoursesPage = () => {
                                                 onClick={() => setShowMobileFilters(false)}
                                             >
                                                 <span className="sr-only">Close panel</span>
-                                                <FaTimes className="h-5 w-5" />
+                                                <X className="h-5 w-5" />
                                             </button>
                                         </div>
                                         <div className="p-6 space-y-6">
@@ -255,7 +305,7 @@ const CoursesPage = () => {
                                                     Przedmiot
                                                 </label>
                                                 <select
-                                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-black focus:border-black text-sm"
                                                     value={selectedSubject}
                                                     onChange={(e) => setSelectedSubject(e.target.value)}
                                                 >
@@ -286,7 +336,7 @@ const CoursesPage = () => {
                                                             step="100"
                                                             value={priceRange[0]}
                                                             onChange={(e) => handlePriceChange(e, 0)}
-                                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
+                                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                                                         />
                                                     </div>
                                                     <div>
@@ -301,7 +351,7 @@ const CoursesPage = () => {
                                                             step="100"
                                                             value={priceRange[1]}
                                                             onChange={(e) => handlePriceChange(e, 1)}
-                                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-900"
+                                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                                                         />
                                                     </div>
                                                 </div>
@@ -314,13 +364,13 @@ const CoursesPage = () => {
                                                     clearFilters();
                                                     setShowMobileFilters(false);
                                                 }}
-                                                className="w-full py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                                                className="w-full py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
                                             >
                                                 Wyczyść filtry
                                             </button>
                                             <button
                                                 onClick={() => setShowMobileFilters(false)}
-                                                className="w-full py-2 px-4 shadow-sm text-sm font-medium rounded-md text-white bg-blue-900 hover:bg-blue-800"
+                                                className="w-full py-2 px-4 shadow-sm text-sm font-medium rounded-full text-white bg-black hover:bg-gray-800"
                                             >
                                                 Zastosuj filtry
                                             </button>
@@ -335,13 +385,13 @@ const CoursesPage = () => {
                     <div className="lg:col-span-3">
                         {/* Applied filters */}
                         {filtersActive && (
-                            <div className="mb-6 flex flex-wrap items-center gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div className="mb-6 flex flex-wrap items-center gap-2 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                                 <span className="text-sm text-gray-600 mr-2">Aktywne filtry:</span>
                                 {selectedSubject && (
-                                    <div className="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                    <div className="flex items-center bg-gray-50 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
                                         {selectedSubject}
-                                        <button onClick={() => setSelectedSubject('')} className="ml-2 text-blue-500 hover:text-blue-700">
-                                            <FaTimes className="h-3 w-3" />
+                                        <button onClick={() => setSelectedSubject('')} className="ml-2 text-gray-500 hover:text-gray-700">
+                                            <X className="h-3 w-3" />
                                         </button>
                                     </div>
                                 )}
@@ -349,13 +399,13 @@ const CoursesPage = () => {
                                     <div className="flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium">
                                         {priceRange[0]}-{priceRange[1]} zł
                                         <button onClick={() => setPriceRange([100, 6000])} className="ml-2 text-gray-500 hover:text-gray-700">
-                                            <FaTimes className="h-3 w-3" />
+                                            <X className="h-3 w-3" />
                                         </button>
                                     </div>
                                 )}
                                 <button
                                     onClick={clearFilters}
-                                    className="text-xs text-blue-900 hover:text-blue-700 underline ml-auto"
+                                    className="text-xs text-black hover:text-gray-800 underline ml-auto"
                                 >
                                     Wyczyść wszystkie
                                 </button>
@@ -366,8 +416,9 @@ const CoursesPage = () => {
                             initial={{opacity: 0, x: 20}}
                             animate={{opacity: 1, x: 0}}
                             transition={{duration: 0.5}}
-                            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200">
+                            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-100 flex items-center">
+                                <BookOpen className="h-5 w-5 text-black mr-2" />
                                 <h2 className="text-lg font-medium text-gray-900">Dostępne kursy</h2>
                             </div>
 
@@ -375,25 +426,14 @@ const CoursesPage = () => {
                                 {loading ? (
                                     <div className="space-y-6">
                                         {Array.from({ length: 3 }).map((_, index) => (
-                                            <div key={index} className="bg-gray-100 h-32 rounded-lg animate-pulse" />
+                                            <div key={index} className="bg-gray-100 h-44 rounded-xl animate-pulse" />
                                         ))}
                                     </div>
                                 ) : fetchError ? (
                                     <div className="text-center py-12">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
+                                        <X
                                             className="h-12 w-12 mx-auto text-red-500 mb-4"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                                            />
-                                        </svg>
+                                        />
                                         <p className="text-red-600 font-medium">{fetchError}</p>
                                     </div>
                                 ) : filteredCourses.length > 0 ? (
@@ -408,20 +448,9 @@ const CoursesPage = () => {
                                     </div>
                                 ) : (
                                     <div className="text-center py-12 space-y-4">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
+                                        <Search
                                             className="h-12 w-12 mx-auto text-gray-400 mb-4"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            />
-                                        </svg>
+                                        />
                                         <h3 className="text-lg font-medium text-gray-900">
                                             {filtersActive
                                                 ? 'Brak kursów dla wybranych kryteriów'

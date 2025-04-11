@@ -1,25 +1,16 @@
-import React from 'react';
-import { formatUtils } from '../utils';
-import { Card } from '../shared/Card';
-import { Icon } from '../shared/Icon';
+"use client"
+import { formatUtils } from "../utils"
+import { Card } from "../shared/Card"
+import { Icon } from "../shared/Icon"
 
-export const LessonConfirmation = ({
-                                       lessonData,
-                                       error,
-                                       onCancel,
-                                       onConfirm
-                                   }) => {
-    if (!lessonData) return null;
+export const LessonConfirmation = ({ lessonData, error, onCancel, onConfirm }) => {
+    if (!lessonData) return null
 
     return (
         <div className="max-w-2xl mx-auto space-y-6 p-4">
             <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    Potwierdź szczegóły lekcji
-                </h2>
-                <p className="text-sm text-gray-600">
-                    Sprawdź, czy wszystko się zgadza przed utworzeniem lekcji
-                </p>
+                <h2 className="text-xl font-semibold text-gray-800 mb-2">Potwierdź szczegóły lekcji</h2>
+                <p className="text-sm text-gray-600">Sprawdź, czy wszystko się zgadza przed utworzeniem lekcji</p>
             </div>
 
             {error && (
@@ -81,12 +72,16 @@ export const LessonConfirmation = ({
                         <>
                             <div className="py-2.5 grid grid-cols-3">
                                 <span className="text-sm text-gray-500">Stawka za godzinę</span>
-                                <span className="col-span-2 text-sm font-medium text-gray-800">{formatUtils.formatPrice(lessonData.hourly_rate)}</span>
+                                <span className="col-span-2 text-sm font-medium text-gray-800">
+                  {formatUtils.formatPrice(lessonData.hourly_rate)}
+                </span>
                             </div>
 
                             <div className="py-2.5 grid grid-cols-3">
                                 <span className="text-sm text-gray-500">Cena lekcji</span>
-                                <span className="col-span-2 text-sm font-medium text-blue-600">{formatUtils.formatPrice(lessonData.total_price)}</span>
+                                <span className="col-span-2 text-sm font-medium text-black">
+                  {formatUtils.formatPrice(lessonData.total_price)}
+                </span>
                             </div>
                         </>
                     )}
@@ -103,19 +98,19 @@ export const LessonConfirmation = ({
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
                 <button
                     onClick={onCancel}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-medium transition-colors text-sm"
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 font-medium transition-colors text-sm"
                 >
                     Wróć do edycji
                 </button>
 
                 <button
                     onClick={onConfirm}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors text-sm flex items-center justify-center gap-2"
+                    className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors text-sm flex items-center justify-center gap-2"
                 >
                     <Icon name="check" className="h-4 w-4" />
                     Utwórz lekcję
                 </button>
             </div>
         </div>
-    );
-};
+    )
+}

@@ -1,103 +1,100 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useModal } from '../../../hooks/useModal';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectIsTutor, selectIsStudent } from '../../../store/selectors/authSelectors.js';
-import { Icon } from '../shared/Icon';
-import { ModalHeader } from '../shared/ModalHeader';
-import { StatusBadge } from '../shared/StatusBadge';
-import { TimeDisplay } from '../shared/TimeDisplay';
-import { Card } from '../shared/Card';
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import { useModal } from "../../../hooks/useModal"
+import { useSelector, useDispatch } from "react-redux"
+import { selectIsTutor, selectIsStudent } from "../../../store/selectors/authSelectors.js"
+import { Icon } from "../shared/Icon"
+import { ModalHeader } from "../shared/ModalHeader"
+import { StatusBadge } from "../shared/StatusBadge"
+import { TimeDisplay } from "../shared/TimeDisplay"
+import { Card } from "../shared/Card"
 
 export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
-    const { openTutorModal } = useModal();
-    const tutor = lesson?.tutor || {};
-    const [isActionsOpen, setIsActionsOpen] = useState(false);
-    const actionsRef = useRef(null);
-    const dispatch = useDispatch();
+    const { openTutorModal } = useModal()
+    const tutor = lesson?.tutor || {}
+    const [isActionsOpen, setIsActionsOpen] = useState(false)
+    const actionsRef = useRef(null)
+    const dispatch = useDispatch()
 
-    const isTutor = useSelector(selectIsTutor);
-    const isStudent = useSelector(selectIsStudent);
+    const isTutor = useSelector(selectIsTutor)
+    const isStudent = useSelector(selectIsStudent)
 
     // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (actionsRef.current && !actionsRef.current.contains(event.target)) {
-                setIsActionsOpen(false);
+                setIsActionsOpen(false)
             }
-        };
+        }
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside)
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
 
     // Format date and time
     const formatDate = (dateString) => {
-        if (!dateString) return 'Brak danych';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('pl-PL', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
-    };
+        if (!dateString) return "Brak danych"
+        const date = new Date(dateString)
+        return date.toLocaleDateString("pl-PL", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        })
+    }
 
     const formatTime = (dateString) => {
-        if (!dateString) return 'Brak danych';
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('pl-PL', {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    };
+        if (!dateString) return "Brak danych"
+        const date = new Date(dateString)
+        return date.toLocaleTimeString("pl-PL", {
+            hour: "2-digit",
+            minute: "2-digit",
+        })
+    }
 
     const calculateDuration = () => {
-        if (!lesson?.start_time || !lesson?.end_time) return null;
-        const start = new Date(lesson.start_time);
-        const end = new Date(lesson.end_time);
-        const durationMs = end - start;
-        return Math.floor(durationMs / 60000);
-    };
+        if (!lesson?.start_time || !lesson?.end_time) return null
+        const start = new Date(lesson.start_time)
+        const end = new Date(lesson.end_time)
+        const durationMs = end - start
+        return Math.floor(durationMs / 60000)
+    }
 
-    const duration = calculateDuration();
+    const duration = calculateDuration()
 
     const handleTutorClick = () => {
         if (tutor && Object.keys(tutor).length > 0) {
-            openTutorModal(tutor);
+            openTutorModal(tutor)
         }
-    };
+    }
 
     // Action handlers
     const handleCancelLesson = () => {
-        console.log('Anulowanie lekcji:', lesson.id);
-        setIsActionsOpen(false);
-    };
+        console.log("Anulowanie lekcji:", lesson.id)
+        setIsActionsOpen(false)
+    }
 
     const handlePostponeLesson = () => {
-        console.log('Przekładanie lekcji:', lesson.id);
-        setIsActionsOpen(false);
-    };
+        console.log("Przekładanie lekcji:", lesson.id)
+        setIsActionsOpen(false)
+    }
 
     const handleConfirmLesson = () => {
-        console.log('Potwierdzanie lekcji:', lesson.id);
-        setIsActionsOpen(false);
-    };
+        console.log("Potwierdzanie lekcji:", lesson.id)
+        setIsActionsOpen(false)
+    }
 
-    const canEditLesson = ['scheduled', 'confirmed'].includes(lesson?.status);
+    const canEditLesson = ["scheduled", "confirmed"].includes(lesson?.status)
 
     // Determine if lesson is upcoming or past
-    const isUpcoming = lesson?.start_time && new Date(lesson.start_time) > new Date();
+    const isUpcoming = lesson?.start_time && new Date(lesson.start_time) > new Date()
 
     return (
         <div className="flex flex-col h-full bg-white">
             {/* Modern minimal header */}
-            <ModalHeader
-                title="Szczegóły lekcji"
-                onClose={onClose}
-                hasHistory={hasHistory}
-                goBack={goBack}
-            />
+            <ModalHeader title="Szczegóły lekcji" onClose={onClose} hasHistory={hasHistory} goBack={goBack} />
 
             {/* Content area with scrolling */}
             <div className="flex-1 overflow-y-auto bg-gray-50">
@@ -106,14 +103,12 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <StatusBadge status={lesson?.status || 'scheduled'} size="sm" />
+                                <StatusBadge status={lesson?.status || "scheduled"} size="sm" />
 
-                                <span className="text-xs text-gray-500">
-                  {formatDate(lesson?.start_time)}
-                </span>
+                                <span className="text-xs text-gray-500">{formatDate(lesson?.start_time)}</span>
                             </div>
 
-                            <h1 className="text-xl font-semibold text-gray-900 mb-2">{lesson?.title || 'Lekcja'}</h1>
+                            <h1 className="text-xl font-semibold text-gray-900 mb-2">{lesson?.title || "Lekcja"}</h1>
 
                             <div className="flex flex-wrap items-center gap-2 mb-3">
                                 {lesson?.subject && (
@@ -133,10 +128,11 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                         <div className="flex items-center gap-3">
                             {/* Discord button */}
                             {lesson?.discord_link && (
-                                <a href={lesson.discord_link}
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg shadow-sm transition-colors"
+                                <a
+                                    href={lesson.discord_link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5865F2] hover:bg-[#4752c4] text-white text-xs font-medium rounded-full shadow-sm transition-colors"
                                 >
                                     <Icon name="discord" className="h-4 w-4" />
                                     <span>Discord</span>
@@ -156,12 +152,12 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
 
                                     {/* Popup menu - styled like Twitter/Facebook dropdown */}
                                     {isActionsOpen && (
-                                        <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                        <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-md bg-white border border-gray-100 z-20">
                                             <div className="py-1" role="menu" aria-orientation="vertical">
-                                                {isTutor && lesson?.status === 'scheduled' && (
+                                                {isTutor && lesson?.status === "scheduled" && (
                                                     <button
                                                         onClick={handleConfirmLesson}
-                                                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                                                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
                                                         role="menuitem"
                                                     >
                                                         <Icon name="check-circle" className="h-5 w-5 text-green-500" />
@@ -171,16 +167,16 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
 
                                                 <button
                                                     onClick={handlePostponeLesson}
-                                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
                                                     role="menuitem"
                                                 >
-                                                    <Icon name="calendar" className="h-5 w-5 text-blue-500" />
+                                                    <Icon name="calendar" className="h-5 w-5 text-black" />
                                                     <span>Przełóż lekcję</span>
                                                 </button>
 
                                                 <button
                                                     onClick={handleCancelLesson}
-                                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                                                    className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
                                                     role="menuitem"
                                                 >
                                                     <Icon name="x-circle" className="h-5 w-5 text-red-500" />
@@ -203,13 +199,26 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
 
                         <div className="flex items-center gap-2">
                             <Icon name="clock" className="h-4 w-4 text-gray-400" />
-                            <span>{formatTime(lesson?.start_time)} - {formatTime(lesson?.end_time)}</span>
+                            <span>
+                {formatTime(lesson?.start_time)} - {formatTime(lesson?.end_time)}
+              </span>
                         </div>
 
                         {duration && (
                             <div className="flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-gray-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
                                 </svg>
                                 <span>{duration} min</span>
                             </div>
@@ -233,11 +242,11 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                 >
                                     <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                                         <img
-                                            src={tutor.avatar || '/images/default-avatar.png'}
-                                            alt={`${tutor.first_name || ''} ${tutor.last_name || ''}`}
+                                            src={tutor.avatar || "/images/default-avatar.png"}
+                                            alt={`${tutor.first_name || ""} ${tutor.last_name || ""}`}
                                             className="w-full h-full object-cover"
                                             onError={(e) => {
-                                                e.target.src = '/images/default-avatar.png';
+                                                e.target.src = "/images/default-avatar.png"
                                             }}
                                         />
                                     </div>
@@ -245,12 +254,8 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                         <h4 className="text-sm font-medium text-gray-900">
                                             {tutor.first_name} {tutor.last_name}
                                         </h4>
-                                        {tutor.username && (
-                                            <p className="text-xs text-gray-500">@{tutor.username}</p>
-                                        )}
-                                        <span className="text-xs text-blue-600 mt-1 block">
-                      Zobacz profil
-                    </span>
+                                        {tutor.username && <p className="text-xs text-gray-500">@{tutor.username}</p>}
+                                        <span className="text-xs text-blue-600 mt-1 block">Zobacz profil</span>
                                     </div>
                                 </div>
                             </Card>
@@ -258,9 +263,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                             {/* Lesson description - Cleaner card */}
                             {lesson?.description && (
                                 <Card title="Opis lekcji" icon="book">
-                                    <p className="text-gray-600 text-sm whitespace-pre-line">
-                                        {lesson.description}
-                                    </p>
+                                    <p className="text-gray-600 text-sm whitespace-pre-line">{lesson.description}</p>
                                 </Card>
                             )}
 
@@ -269,7 +272,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                 <Card title="Uczniowie" icon="users">
                                     <div className="flex justify-between items-center mb-3">
                     <span className="text-xs text-gray-500 font-medium">
-                      {lesson.students.length} {lesson.students.length === 1 ? 'osoba' : 'osób'}
+                      {lesson.students.length} {lesson.students.length === 1 ? "osoba" : "osób"}
                     </span>
                                     </div>
 
@@ -282,11 +285,11 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                                 <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                                                     {student.avatar ? (
                                                         <img
-                                                            src={student.avatar}
-                                                            alt={`${student.first_name || ''} ${student.last_name || ''}`}
+                                                            src={student.avatar || "/placeholder.svg"}
+                                                            alt={`${student.first_name || ""} ${student.last_name || ""}`}
                                                             className="w-full h-full object-cover"
                                                             onError={(e) => {
-                                                                e.target.src = '/images/default-avatar.png';
+                                                                e.target.src = "/images/default-avatar.png"
                                                             }}
                                                         />
                                                     ) : (
@@ -300,9 +303,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                                     <p className="text-sm font-medium text-gray-900">
                                                         {student.first_name} {student.last_name}
                                                     </p>
-                                                    {student.username && (
-                                                        <p className="text-xs text-gray-500">@{student.username}</p>
-                                                    )}
+                                                    {student.username && <p className="text-xs text-gray-500">@{student.username}</p>}
                                                 </div>
                                             </div>
                                         ))}
@@ -313,7 +314,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                             {/* Discord alert - Now looks like a Twitter/Facebook notification */}
                             {!lesson?.discord_link && isUpcoming && (
                                 <div className="bg-white rounded-lg shadow-sm p-4 flex items-start gap-3">
-                                    <div className="rounded-full bg-blue-100 p-2 flex-shrink-0">
+                                    <div className="rounded-full bg-gray-100 p-2 flex-shrink-0">
                                         <Icon name="info" className="h-5 w-5 text-blue-600" />
                                     </div>
                                     <div>
@@ -332,28 +333,22 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-gray-500">Status</span>
-                                        <StatusBadge status={lesson?.status || 'scheduled'} size="xs" />
+                                        <StatusBadge status={lesson?.status || "scheduled"} size="xs" />
                                     </div>
 
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-gray-500">Data</span>
-                                        <span className="text-xs font-medium text-gray-700">
-                      {formatDate(lesson?.start_time)}
-                    </span>
+                                        <span className="text-xs font-medium text-gray-700">{formatDate(lesson?.start_time)}</span>
                                     </div>
 
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-gray-500">Rozpoczęcie</span>
-                                        <span className="text-xs font-medium text-gray-700">
-                      {formatTime(lesson?.start_time)}
-                    </span>
+                                        <span className="text-xs font-medium text-gray-700">{formatTime(lesson?.start_time)}</span>
                                     </div>
 
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-gray-500">Zakończenie</span>
-                                        <span className="text-xs font-medium text-gray-700">
-                      {formatTime(lesson?.end_time)}
-                    </span>
+                                        <span className="text-xs font-medium text-gray-700">{formatTime(lesson?.end_time)}</span>
                                     </div>
 
                                     {duration && (
@@ -375,10 +370,10 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                             {/* Action buttons - stacked vertically */}
                             {canEditLesson && (
                                 <Card className="space-y-2">
-                                    {isTutor && lesson?.status === 'scheduled' && (
+                                    {isTutor && lesson?.status === "scheduled" && (
                                         <button
                                             onClick={handleConfirmLesson}
-                                            className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2"
+                                            className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-full shadow-sm transition-colors flex justify-center items-center gap-2"
                                         >
                                             <Icon name="check" className="h-4 w-4" />
                                             <span>Potwierdź lekcję</span>
@@ -387,7 +382,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
 
                                     <button
                                         onClick={handlePostponeLesson}
-                                        className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2"
+                                        className="w-full px-4 py-2 bg-black hover:bg-gray-800 text-white text-sm font-medium rounded-full shadow-sm transition-colors flex justify-center items-center gap-2"
                                     >
                                         <Icon name="calendar" className="h-4 w-4" />
                                         <span>Przełóż lekcję</span>
@@ -395,7 +390,7 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
 
                                     <button
                                         onClick={handleCancelLesson}
-                                        className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg shadow-sm transition-colors flex justify-center items-center gap-2"
+                                        className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-full shadow-sm transition-colors flex justify-center items-center gap-2"
                                     >
                                         <Icon name="x" className="h-4 w-4" />
                                         <span>Anuluj lekcję</span>
@@ -407,5 +402,5 @@ export const LessonModalContent = ({ lesson, onClose, hasHistory, goBack }) => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}

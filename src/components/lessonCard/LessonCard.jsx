@@ -1,52 +1,52 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Icon } from '../modal/shared/Icon';
-import { StatusBadge } from '../modal/shared/StatusBadge';
+import { useSelector } from "react-redux"
+import { Icon } from "../modal/index.js"
+import { StatusBadge } from "../modal/index.js"
+import ProfileHoverCard from "../profileHoverCard/ProfileHoverCard.jsx";
 
 const LessonCard = ({ lesson, onInfoClick }) => {
     // Get user role from Redux store
-    const { user } = useSelector((state) => state.auth);
-    const isTutor = user?.role === 'tutor';
+    const { user } = useSelector((state) => state.auth)
+    const isTutor = user?.role === "tutor"
 
     // Format start and end times
-    const startTime = new Date(lesson.start_time);
-    const endTime = new Date(lesson.end_time);
-    const formattedDate = startTime.toLocaleDateString('pl-PL', {
-        day: 'numeric',
-        month: 'short',
-    });
-    const formattedStartTime = startTime.toLocaleTimeString('pl-PL', {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-    const formattedEndTime = endTime.toLocaleTimeString('pl-PL', {
-        hour: '2-digit',
-        minute: '2-digit',
-    });
+    const startTime = new Date(lesson.start_time)
+    const endTime = new Date(lesson.end_time)
+    const formattedDate = startTime.toLocaleDateString("pl-PL", {
+        day: "numeric",
+        month: "short",
+    })
+    const formattedStartTime = startTime.toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+    })
+    const formattedEndTime = endTime.toLocaleTimeString("pl-PL", {
+        hour: "2-digit",
+        minute: "2-digit",
+    })
 
     // Calculate duration in minutes
-    const durationMs = endTime - startTime;
-    const durationMinutes = Math.floor(durationMs / 60000);
+    const durationMs = endTime - startTime
+    const durationMinutes = Math.floor(durationMs / 60000)
 
     // Count students (only show for tutors)
-    const studentCount = lesson.students?.length || 0;
+    const studentCount = lesson.students?.length || 0
 
     // Check if lesson is today
     const isToday = () => {
-        const today = new Date();
-        return startTime.getDate() === today.getDate() &&
+        const today = new Date()
+        return (
+            startTime.getDate() === today.getDate() &&
             startTime.getMonth() === today.getMonth() &&
-            startTime.getFullYear() === today.getFullYear();
-    };
+            startTime.getFullYear() === today.getFullYear()
+        )
+    }
 
     return (
-        <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 transition-colors duration-200">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-xl overflow-hidden hover:bg-gray-50 transition-colors duration-200">
             {/* Status and date */}
             <div className="px-4 pt-3 pb-2 flex justify-between items-center">
-                <StatusBadge status={lesson.status || 'scheduled'} size="sm" />
-                <span className="text-xs text-gray-500 font-medium">
-                    {isToday() ? 'Dzisiaj' : formattedDate}
-                </span>
+                <StatusBadge status={lesson.status || "scheduled"} size="sm" />
+                <span className="text-xs text-gray-500 font-medium">{isToday() ? "Dzisiaj" : formattedDate}</span>
             </div>
 
             {/* Lesson content section */}
@@ -56,14 +56,10 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                 {/* Subject and level tags */}
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                     {lesson.subject && (
-                        <span className="text-xs px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">
-                            {lesson.subject}
-                        </span>
+                        <span className="text-xs px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full">{lesson.subject}</span>
                     )}
                     {lesson.level && (
-                        <span className="text-xs px-2.5 py-1 bg-amber-50 text-amber-600 rounded-full">
-                            {lesson.level}
-                        </span>
+                        <span className="text-xs px-2.5 py-1 bg-amber-50 text-amber-600 rounded-full">{lesson.level}</span>
                     )}
                 </div>
 
@@ -72,8 +68,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                     <div className="flex items-center gap-1.5">
                         <Icon name="clock" className="h-3.5 w-3.5 text-gray-400" />
                         <span>
-                            {formattedStartTime} - {formattedEndTime}
-                        </span>
+              {formattedStartTime} - {formattedEndTime}
+            </span>
                     </div>
 
                     <span className="text-gray-300">|</span>
@@ -89,13 +85,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                             <div className="flex items-center gap-1.5">
                                 <Icon name="users" className="h-3.5 w-3.5 text-gray-400" />
                                 <span>
-                                    {studentCount}{' '}
-                                    {studentCount === 1
-                                        ? 'uczeń'
-                                        : studentCount < 5
-                                            ? 'uczniów'
-                                            : 'uczniów'}
-                                </span>
+                  {studentCount} {studentCount === 1 ? "uczeń" : studentCount < 5 ? "uczniów" : "uczniów"}
+                </span>
                             </div>
                         </>
                     )}
@@ -115,46 +106,40 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                                 </div>
                                 <div>
                                     <div className="text-xs text-gray-500 mb-0.5">Uczniowie:</div>
-                                    <div className="text-xs text-gray-700">
-                                        Brak zapisanych uczniów
-                                    </div>
+                                    <div className="text-xs text-gray-700">Brak zapisanych uczniów</div>
                                 </div>
                             </div>
                         ) : (
                             // Students display with better styling
                             <div>
-                                <div className="text-xs text-gray-500 mb-1.5">
-                                    {studentCount === 1 ? "Uczeń:" : "Uczniowie:"}
-                                </div>
+                                <div className="text-xs text-gray-500 mb-1.5">{studentCount === 1 ? "Uczeń:" : "Uczniowie:"}</div>
                                 <div className="flex flex-wrap items-center">
                                     {/* Show first 2 students */}
                                     {lesson.students.slice(0, 2).map((student, index) => (
                                         <div key={student.id || index} className="flex items-center mr-3 mb-1">
                                             <div className="w-6 h-6 mr-1.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
                                                 <img
-                                                    src={student.avatar || '/images/default-avatar.png'}
+                                                    src={student.avatar || "/images/default-avatar.png"}
                                                     alt={student.username || "Uczeń"}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
-                                                        e.target.src = '/images/default-avatar.png';
+                                                        e.target.src = "/images/default-avatar.png"
                                                     }}
                                                 />
                                             </div>
                                             <span className="text-xs font-medium text-gray-700">
-                                                {student.first_name || student.username}
-                                            </span>
+                        {student.first_name || student.username}
+                      </span>
                                         </div>
                                     ))}
 
                                     {/* Show +X for additional students */}
                                     {studentCount > 2 && (
                                         <div className="flex items-center">
-                                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600 font-medium text-xs mr-1.5 border border-blue-200">
+                                            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-black font-medium text-xs mr-1.5 border border-gray-200">
                                                 +{studentCount - 2}
                                             </div>
-                                            <span className="text-xs text-gray-600">
-                                                {studentCount > 3 ? "więcej" : ""}
-                                            </span>
+                                            <span className="text-xs text-gray-600">{studentCount > 3 ? "więcej" : ""}</span>
                                         </div>
                                     )}
                                 </div>
@@ -163,39 +148,49 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                     </div>
                 ) : (
                     // STUDENT VIEW - Show tutor
+                    <ProfileHoverCard
+                        userId={lesson.tutor.id}
+                        userData={lesson.tutor}
+                        placement="right"
+                        onScheduleLesson={()=>(console.log("schedule"))}
+                        onSendMessage={()=>(console.log("send message"))}
+                    >
                     <div className="flex items-center">
                         <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
                             <img
-                                src={lesson.tutor?.avatar || '/images/default-avatar.png'}
+                                src={lesson.tutor?.avatar || "/images/default-avatar.png"}
                                 alt={lesson.tutor?.username || "Nauczyciel"}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                    e.target.src = '/images/default-avatar.png';
+                                    e.target.src = "/images/default-avatar.png"
                                 }}
                             />
                         </div>
+
                         <div>
                             <div className="text-xs text-gray-500 mb-0.5">Nauczyciel:</div>
                             <div className="text-xs font-medium text-gray-700">
                                 {lesson.tutor?.first_name && lesson.tutor?.last_name
                                     ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
-                                    : lesson.tutor?.username || 'Nieznany'}
+                                    : lesson.tutor?.username || "Nieznany"}
                             </div>
-                            <div className="text-xs text-gray-500">@{lesson.tutor?.username || 'nieznany'}</div>
+                            <div className="text-xs text-gray-500">@{lesson.tutor?.username || "nieznany"}</div>
                         </div>
                     </div>
+                    </ProfileHoverCard>
                 )}
+
 
                 {/* Action button */}
                 <button
-                    className="ml-2 px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
+                    className="btn ml-2 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50 rounded-full transition-colors hover:underline"
                     onClick={() => onInfoClick?.(lesson)}
                 >
                     Szczegóły
                 </button>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default LessonCard;
+export default LessonCard

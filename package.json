@@ -16,6 +16,7 @@
     "and": "^0.0.3",
     "axios": "^1.8.4",
     "framer-motion": "^12.6.3",
+    "lucide-react": "^0.487.0",
     "react": "^19.0.0",
     "react-day-picker": "^9.6.4",
     "react-dom": "^19.0.0",

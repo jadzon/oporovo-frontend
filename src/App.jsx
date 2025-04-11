@@ -14,6 +14,7 @@ import StudentCockpit from './pages/StudentCockpitPage';
 import TutorsPage from "./pages/TutorsPage";
 import HelpPage from "./pages/HelpPage";
 import CoursesPage from "./pages/CoursesPage";
+import UserProfilePage from './pages/UserProfilePage';
 import { LayoutGroup } from "framer-motion";
 
 // Protected route component
@@ -61,6 +62,26 @@ function App() {
                     <Route path={ROUTES.HELP} element={<HelpPage />} />
                     <Route path={ROUTES.COURSES} element={<CoursesPage />} />
 
+                    {/* User profile routes */}
+                    <Route
+                        path="/user/:userId"
+                        element={
+                            <ProtectedRoute>
+                                <UserProfilePage />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Legacy profile route - will redirect to user's own profile */}
+                    <Route
+                        path={ROUTES.PROFILE}
+                        element={
+                            <ProtectedRoute>
+                                {isAuthenticated ? <UserProfilePage /> : <Navigate to="/" />}
+                            </ProtectedRoute>
+                        }
+                    />
+
                     {/* Fallback route */}
                     <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
                 </Route>
@@ -68,5 +89,4 @@ function App() {
         </BrowserRouter>
     );
 }
-
-export default App;
+export default App

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '../shared/Icon';
+import {formatUtils} from "../utils/index.js";
 
 export const ConfirmationModal = ({
                                       onClose,

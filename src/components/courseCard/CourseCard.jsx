@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { motion } from 'framer-motion';
+import { BookOpen, Clock, User } from 'lucide-react';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const CourseCard = ({ course, onInfoClick }) => {
@@ -14,12 +15,36 @@ const CourseCard = ({ course, onInfoClick }) => {
             : course.tutor?.username || 'Nieznany';
     const tutorUsername = course.tutor?.username || 'nieznany';
 
+    // Status badge component - mimicking the StatusBadge from LessonCard
+    const StatusBadge = ({ status }) => {
+        const getStatusStyles = () => {
+            switch (status?.toLowerCase()) {
+                case 'active':
+                    return 'bg-emerald-50 text-emerald-600';
+                case 'soon':
+                    return 'bg-amber-50 text-amber-600';
+                case 'completed':
+                    return 'bg-gray-100 text-gray-600';
+                default:
+                    return 'bg-gray-50 text-gray-600';
+            }
+        };
+
+        return (
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${getStatusStyles()}`}>
+                {status === 'active' ? 'Aktywny' :
+                    status === 'soon' ? 'Wkrótce' :
+                        status === 'completed' ? 'Zakończony' : 'Dostępny'}
+            </span>
+        );
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 transition-colors duration-200"
+            className="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden hover:bg-gray-50 transition-colors duration-200"
         >
             {/* Course Banner */}
             {course.banner ? (
@@ -32,93 +57,67 @@ const CourseCard = ({ course, onInfoClick }) => {
                     />
                 </div>
             ) : (
-                <div className="w-full h-36 bg-gray-100 flex items-center justify-center border-b border-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
+                <div className="w-full h-36 bg-gray-100 flex items-center justify-center border-b border-gray-100">
+                    <BookOpen className="h-12 w-12 text-gray-300" />
                 </div>
             )}
 
             {/* Status and Type */}
-            <div className="px-6 pt-4 pb-2 flex justify-between items-center">
-                <span className="text-sm font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-900">
-                    {course.status || 'Dostępny'}
-                </span>
+            <div className="px-4 pt-3 pb-2 flex justify-between items-center">
+                <StatusBadge status={course.status || 'available'} />
                 {course.type && (
-                    <span className="text-sm text-gray-600 font-medium">
+                    <span className="text-xs text-gray-500 font-medium">
                         {course.type}
                     </span>
                 )}
             </div>
 
             {/* Course Details */}
-            <div className="px-6 pb-4">
-                <h2 className="text-xl font-medium text-gray-900 mb-3">{course.name}</h2>
+            <div className="px-4 pb-3">
+                <h2 className="text-base font-medium text-gray-900 mb-2">{course.name}</h2>
 
                 {/* Subject and level tags */}
-                <div className="flex flex-wrap items-center gap-3 mb-4">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
                     {course.subject && (
-                        <span className="text-sm px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                        <span className="text-xs px-2.5 py-1 bg-gray-50 text-gray-600 rounded-full">
                             {course.subject}
                         </span>
                     )}
                     {course.level && (
-                        <span className="text-sm px-3 py-1 bg-amber-50 text-amber-700 rounded-full">
+                        <span className="text-xs px-2.5 py-1 bg-amber-50 text-amber-600 rounded-full">
                             {course.level}
                         </span>
                     )}
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                <p className="text-xs text-gray-600 mb-3 line-clamp-2">
                     {course.description || 'Brak opisu kursu.'}
                 </p>
 
                 {/* Additional Info */}
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                        />
-                    </svg>
-                    <span>{course.lessons_count || 0} lekcji</span>
+                <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-1.5">
+                        <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+                        <span>{course.lessons_count || 0} lekcji</span>
+                    </div>
 
                     {course.duration && (
                         <>
-                            <span className="text-gray-500">·</span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-gray-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                            </svg>
-                            <span>{course.duration}</span>
+                            <span className="text-gray-300">|</span>
+                            <div className="flex items-center gap-1.5">
+                                <Clock className="h-3.5 w-3.5 text-gray-400" />
+                                <span>{course.duration}</span>
+                            </div>
                         </>
                     )}
                 </div>
             </div>
 
             {/* Tutor info */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex items-center">
-                    <div className="w-10 h-10 mr-3 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200 shadow-sm">
+                    <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-100">
                         <LazyLoadImage
                             src={tutorAvatar}
                             alt={tutorUsername}
@@ -131,16 +130,17 @@ const CourseCard = ({ course, onInfoClick }) => {
                         />
                     </div>
                     <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-xs text-gray-500 mb-0.5">Nauczyciel:</div>
+                        <div className="text-xs font-medium text-gray-700">
                             {tutorFullName}
                         </div>
-                        <div className="text-sm text-gray-600">@{tutorUsername}</div>
+                        <div className="text-xs text-gray-500">@{tutorUsername}</div>
                     </div>
                 </div>
 
-                {/* Action link */}
+                {/* Action button */}
                 <button
-                    className="btn text-sm font-medium text-blue-900 hover:text-blue-700 hover:underline transition-colors"
+                    className="btn ml-2 px-3 py-1.5 text-xs font-medium text-black hover:bg-gray-50 rounded-full transition-colors hover:underline"
                     onClick={() => onInfoClick?.(course)}
                 >
                     Szczegóły
