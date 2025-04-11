@@ -25,8 +25,10 @@ import {
 
 // Components
 import { Card } from "../components/temp"
+import {useModal} from "../components/modal/index.js";
 
 const UserProfilePage = () => {
+    const {openScheduleModal} = useModal();
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { userId } = useParams() // Get the userId from URL params
@@ -575,7 +577,11 @@ const UserProfilePage = () => {
                     </div>
                     <div className="mt-4 sm:mt-0 flex space-x-3">
                         {isTutor && !isOwnProfile && (
-                            <button className="px-4 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors flex items-center gap-2">
+                            <button className="px-4 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                            onClick={(e)=>{
+                                e.stopPropagation()
+                                openScheduleModal(profileData.id)
+                            }}>
                                 <Calendar className="h-4 w-4" />
                                 Zarezerwuj lekcję
                             </button>

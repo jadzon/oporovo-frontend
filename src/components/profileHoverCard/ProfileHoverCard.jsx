@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
 import { User, Calendar, BookOpen, GraduationCap, MessageSquare, ChevronRight } from "lucide-react"
+import {useModal} from "../modal/index.js";
 
 const ProfileHoverCard = ({
                               userId,
@@ -12,6 +13,7 @@ const ProfileHoverCard = ({
                               delayShow = 300,
                               delayHide = 200
                           }) => {
+    const { openScheduleModal} = useModal();
     const [isVisible, setIsVisible] = useState(false)
     const [userData, setUserData] = useState(initialUserData || null)
     const [loading, setLoading] = useState(false)
@@ -269,7 +271,7 @@ const ProfileHoverCard = ({
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation()
-                                                    onScheduleLesson(userData)
+                                                    openScheduleModal(userData.id)
                                                     setIsVisible(false)
                                                 }}
                                                 className="flex-1 py-1.5 px-2 bg-black hover:bg-gray-800 text-white text-xs font-medium rounded-full transition-colors flex items-center justify-center"

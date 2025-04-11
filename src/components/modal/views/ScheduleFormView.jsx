@@ -346,7 +346,8 @@ const ScheduleFormView = ({ tutorId }) => {
             // Show success message and close modal
             showLessonCreatedConfirmation({
                 ...createdLesson,
-                lessonObject: createdLesson
+                lessonObject: createdLesson,
+                showViewDetailsButton: true
             });
 
             // Optionally, navigate to the lesson details
@@ -526,13 +527,18 @@ const ScheduleFormView = ({ tutorId }) => {
 
         return (
             <>
-                <ModalHeader title={`Zaplanuj lekcję z ${tutor.first_name}`} />
+                {/*<ModalHeader title={`Zaplanuj lekcję z ${tutor.first_name}`} />*/}
 
                 <div className="flex-1 overflow-y-auto bg-gray-50">
+                    <div></div>
+                    <div className="text-center my-6">
+                        <p className="text-sm text-gray-600">{`Zaplanuj lekcję z ${tutor.first_name}`}</p>
+                    </div>
                     <div className="p-4">
                         {error && (
-                            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2 mb-4">
-                                <Icon name="x-circle" className="h-5 w-5 flex-shrink-0" />
+                            <div
+                                className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2 mb-4">
+                                <Icon name="x-circle" className="h-5 w-5 flex-shrink-0"/>
                                 <p className="text-sm">{error}</p>
                             </div>
                         )}
@@ -570,32 +576,32 @@ const ScheduleFormView = ({ tutorId }) => {
 
                                         {/* Custom CSS for properly styled calendar days */}
                                         <style jsx>{`
-                      /* Available day styling */
-                      .rdp-day.rdp-day_available:not(.rdp-day_selected)::before {
-                        content: "";
-                        position: absolute;
-                        top: 3px;
-                        left: 3px;
-                        right: 3px;
-                        bottom: 3px;
-                        background-color: #f5f5f5;
-                        border-radius: 6px;
-                        z-index: -1;
-                      }
+                                            /* Available day styling */
+                                            .rdp-day.rdp-day_available:not(.rdp-day_selected)::before {
+                                                content: "";
+                                                position: absolute;
+                                                top: 3px;
+                                                left: 3px;
+                                                right: 3px;
+                                                bottom: 3px;
+                                                background-color: #f5f5f5;
+                                                border-radius: 6px;
+                                                z-index: -1;
+                                            }
 
-                      /* Selected day styling */
-                      .rdp-day.rdp-day_selected {
-                        background-color: #000000;
-                        color: white;
-                        border-radius: 6px;
-                      }
+                                            /* Selected day styling */
+                                            .rdp-day.rdp-day_selected {
+                                                background-color: #000000;
+                                                color: white;
+                                                border-radius: 6px;
+                                            }
 
-                      /* Today styling */
-                      .rdp-day.rdp-day_today:not(.rdp-day_selected) {
-                        border: 2px solid #666666;
-                        border-radius: 6px;
-                      }
-                    `}</style>
+                                            /* Today styling */
+                                            .rdp-day.rdp-day_today:not(.rdp-day_selected) {
+                                                border: 2px solid #666666;
+                                                border-radius: 6px;
+                                            }
+                                        `}</style>
 
                                         <DayPicker
                                             mode="single"
@@ -605,7 +611,7 @@ const ScheduleFormView = ({ tutorId }) => {
                                             locale={pl}
                                             disabled={[
                                                 // Disable dates before today
-                                                { before: new Date() },
+                                                {before: new Date()},
                                                 // Disable dates without availability
                                                 (date) => {
                                                     // Skip this check for dates already disabled (before today)
@@ -643,12 +649,14 @@ const ScheduleFormView = ({ tutorId }) => {
                                                 <div className="mt-4 space-y-2">
                                                     <div className="flex justify-between items-center text-sm">
                                                         <span className="text-gray-600">Zaplanowana lekcja:</span>
-                                                        <span className="font-medium text-gray-800">{lessonDetails.duration} minut</span>
+                                                        <span
+                                                            className="font-medium text-gray-800">{lessonDetails.duration} minut</span>
                                                     </div>
                                                     {tutor?.price && (
                                                         <div className="flex justify-between items-center text-sm">
                                                             <span className="text-gray-600">Cena lekcji:</span>
-                                                            <span className="font-medium text-black">{formatUtils.formatPrice(lessonDetails.total_price)}</span>
+                                                            <span
+                                                                className="font-medium text-black">{formatUtils.formatPrice(lessonDetails.total_price)}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -662,7 +670,8 @@ const ScheduleFormView = ({ tutorId }) => {
                                     <ModalSection title="Szczegóły lekcji" icon="edit" variant="card">
                                         <div className="space-y-4">
                                             <div>
-                                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                                                <label htmlFor="title"
+                                                       className="block text-sm font-medium text-gray-700 mb-1">
                                                     Tytuł lekcji*
                                                 </label>
                                                 <input
@@ -678,7 +687,8 @@ const ScheduleFormView = ({ tutorId }) => {
 
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    <label htmlFor="subject"
+                                                           className="block text-sm font-medium text-gray-700 mb-1">
                                                         Przedmiot*
                                                     </label>
                                                     <select
@@ -698,7 +708,8 @@ const ScheduleFormView = ({ tutorId }) => {
                                                 </div>
 
                                                 <div>
-                                                    <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
+                                                    <label htmlFor="level"
+                                                           className="block text-sm font-medium text-gray-700 mb-1">
                                                         Poziom*
                                                     </label>
                                                     <select
@@ -719,7 +730,8 @@ const ScheduleFormView = ({ tutorId }) => {
                                             </div>
 
                                             <div>
-                                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                                                <label htmlFor="description"
+                                                       className="block text-sm font-medium text-gray-700 mb-1">
                                                     Opis lekcji
                                                 </label>
                                                 <textarea
@@ -769,10 +781,10 @@ const ScheduleFormView = ({ tutorId }) => {
 
         return (
             <>
-                <ModalHeader
-                    title="Potwierdź szczegóły lekcji"
-                    showBackButton={true}
-                />
+                {/*<ModalHeader*/}
+                {/*    title="Potwierdź szczegóły lekcji"*/}
+                {/*    showBackButton={true}*/}
+                {/*/>*/}
 
                 <div className="flex-1 overflow-y-auto bg-gray-50">
                     <div className="p-4">
@@ -793,6 +805,12 @@ const ScheduleFormView = ({ tutorId }) => {
                                     <span className="text-sm text-gray-500">Tytuł</span>
                                     <span className="col-span-2 text-sm font-medium text-gray-800">{lessonDetails.title}</span>
                                 </div>
+                                {lessonDetails.description && (
+                                    <div className="py-2.5 grid grid-cols-3">
+                                        <span className="text-sm text-gray-500">Opis</span>
+                                        <span className="col-span-2 text-sm text-gray-700">{lessonDetails.description}</span>
+                                    </div>
+                                )}
 
                                 <div className="py-2.5 grid grid-cols-3">
                                     <span className="text-sm text-gray-500">Nauczyciel</span>
@@ -837,12 +855,7 @@ const ScheduleFormView = ({ tutorId }) => {
 
                                 {lessonDetails.hourly_rate > 0 && (
                                     <>
-                                        <div className="py-2.5 grid grid-cols-3">
-                                            <span className="text-sm text-gray-500">Stawka za godzinę</span>
-                                            <span className="col-span-2 text-sm font-medium text-gray-800">
-                        {formatUtils.formatPrice(lessonDetails.hourly_rate)}
-                      </span>
-                                        </div>
+
 
                                         <div className="py-2.5 grid grid-cols-3">
                                             <span className="text-sm text-gray-500">Cena lekcji</span>
@@ -851,13 +864,6 @@ const ScheduleFormView = ({ tutorId }) => {
                       </span>
                                         </div>
                                     </>
-                                )}
-
-                                {lessonDetails.description && (
-                                    <div className="py-2.5 grid grid-cols-3">
-                                        <span className="text-sm text-gray-500">Opis</span>
-                                        <span className="col-span-2 text-sm text-gray-700">{lessonDetails.description}</span>
-                                    </div>
                                 )}
                             </div>
                         </ModalSection>

@@ -4,6 +4,7 @@ import { lessonService } from '../../../api/services/lessonService';
 import { tutorService } from '../../../api/services/tutorService';
 import { courseService } from '../../../api/services/courseService';
 import { tutorAvailabilityService } from '../../../api/services/tutorAvailabilityService';
+import {userService} from "../../../api/services/userService.js";
 
 /**
  * Centralized data fetching service for modals
@@ -68,7 +69,7 @@ export const modalDataService = {
             console.log('Fetching tutor with ID:', tutorId);
 
             // Try to get directly by ID if available
-            const response = await tutorService.searchTutors({ id: tutorId });
+            const response = await userService.getUserById(tutorId);
             console.log('Tutor search response:', response);
 
             // Handle different possible response structures

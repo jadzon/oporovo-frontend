@@ -161,7 +161,7 @@ const LessonDetailsView = ({ lessonId }) => {
 
     return (
         <div className="flex flex-col h-full">
-            <ModalHeader title="Szczegóły lekcji" />
+            {/*<ModalHeader title="Szczegóły lekcji" />*/}
 
             {/* Lesson header with status and title */}
             <div className="bg-white px-4 py-4 border-b border-gray-100">
@@ -206,13 +206,13 @@ const LessonDetailsView = ({ lessonId }) => {
                         {/* Actions dropdown - only show if can edit */}
                         {canEditLesson && (
                             <div className="relative">
-                                <button
-                                    onClick={handleActionMenuClick}
-                                    className="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-                                    aria-label="Opcje lekcji"
-                                >
-                                    <Icon name="more" className="h-5 w-5" />
-                                </button>
+                                {/*<button*/}
+                                {/*    onClick={handleActionMenuClick}*/}
+                                {/*    className="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"*/}
+                                {/*    aria-label="Opcje lekcji"*/}
+                                {/*>*/}
+                                {/*    <Icon name="more" className="h-5 w-5" />*/}
+                                {/*</button>*/}
 
                                 {/* Popup menu */}
                                 {isActionsOpen && (
@@ -349,7 +349,7 @@ const LessonDetailsView = ({ lessonId }) => {
                             : null
                     }
                     secondaryAction={{
-                        label: "Zaplanuj podobną lekcję",
+                        label: "Zaplanuj kolejną lekcję",
                         icon: "calendar",
                         onClick: () => lesson.tutor && handleScheduleLesson(lesson.tutor)
                     }}

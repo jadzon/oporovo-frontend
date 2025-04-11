@@ -74,6 +74,13 @@ export const useModal = () => {
         });
     }, [dispatch]);
 
+    // Hide the confirmation view
+    const hideConfirmation = useCallback(() => {
+        dispatch({
+            type: 'HIDE_CONFIRMATION'
+        });
+    }, [dispatch]);
+
     // Show a lesson created confirmation and return to main view
     const showLessonCreatedConfirmation = useCallback((lessonData) => {
         dispatch({
@@ -105,6 +112,7 @@ export const useModal = () => {
         changeView,
         goBack,
         showConfirmation,
+        hideConfirmation,
         showLessonCreatedConfirmation
     };
 };

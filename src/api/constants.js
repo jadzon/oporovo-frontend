@@ -9,8 +9,8 @@ export const ENDPOINTS = {
         REFRESH: `${API_URL}/token/refresh-token`,
     },
     USER: {
-        PROFILE: (id) => `${API_URL}/user/${id}`,  // New endpoint for user profiles
-        UPDATE: (id) => `${API_URL}/user/${id}`,   // For future update functionality
+        PROFILE: (id) => `${API_URL}/user/${id}`,
+        UPDATE: (id) => `${API_URL}/user/${id}`,
     },
     LESSONS: {
         BASE: `${API_URL}/lessons`,
@@ -37,6 +37,6 @@ export const ROUTES = {
     TUTORS: '/tutors',
     HELP: '/help',
     COURSES: '/courses',
-    USER_PROFILE: '/user/:userId',  // Dynamic user profile route
-    PROFILE: '/profile',            // Keep this for backward compatibility
+    USER_PROFILE: '/user/:userId',
+    PROFILE: '/profile',
 };
