@@ -30,6 +30,18 @@ const LessonCard = ({ lesson, onInfoClick }) => {
 
     // Count students (only show for tutors)
     const studentCount = lesson.students?.length || 0
+    const hasSingleStudent = studentCount === 1
+
+    // Handlers for profile card actions
+    const handleScheduleLesson = (person) => {
+        console.log("Schedule lesson with:", person)
+        // Tu możesz dodać logikę planowania lekcji
+    }
+
+    const handleSendMessage = (person) => {
+        console.log("Send message to:", person)
+        // Tu możesz dodać logikę wysyłania wiadomości
+    }
 
     // Check if lesson is today
     const isToday = () => {
@@ -68,8 +80,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                     <div className="flex items-center gap-1.5">
                         <Icon name="clock" className="h-3.5 w-3.5 text-gray-400" />
                         <span>
-              {formattedStartTime} - {formattedEndTime}
-            </span>
+                            {formattedStartTime} - {formattedEndTime}
+                        </span>
                     </div>
 
                     <span className="text-gray-300">|</span>
@@ -85,8 +97,8 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                             <div className="flex items-center gap-1.5">
                                 <Icon name="users" className="h-3.5 w-3.5 text-gray-400" />
                                 <span>
-                  {studentCount} {studentCount === 1 ? "uczeń" : studentCount < 5 ? "uczniów" : "uczniów"}
-                </span>
+                                    {studentCount} {studentCount === 1 ? "uczeń" : studentCount < 5 ? "uczniów" : "uczniów"}
+                                </span>
                             </div>
                         </>
                     )}
@@ -109,28 +121,68 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                                     <div className="text-xs text-gray-700">Brak zapisanych uczniów</div>
                                 </div>
                             </div>
-                        ) : (
-                            // Students display with better styling
+                        ) : hasSingleStudent ? (
+                            // Single student case - use hover card
                             <div>
-                                <div className="text-xs text-gray-500 mb-1.5">{studentCount === 1 ? "Uczeń:" : "Uczniowie:"}</div>
+                                <div className="text-xs text-gray-500 mb-1.5">Uczeń:</div>
+                                <ProfileHoverCard
+                                    userId={lesson.students[0].id}
+                                    userData={lesson.students[0]}
+                                    placement="right"
+                                    onSendMessage={handleSendMessage}
+                                >
+                                    <div className="flex items-center hover:bg-gray-100 rounded-lg p-1.5 cursor-pointer">
+                                        <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+                                            <img
+                                                src={lesson.students[0].avatar || "/images/default-avatar.png"}
+                                                alt={lesson.students[0].username || "Uczeń"}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = "/images/default-avatar.png"
+                                                }}
+                                            />
+                                        </div>
+                                        <div>
+                                            <div className="text-xs font-medium text-gray-700">
+                                                {lesson.students[0].first_name || lesson.students[0].username}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                @{lesson.students[0].username || "uczeń"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ProfileHoverCard>
+                            </div>
+                        ) : (
+                            // Multiple students display with better styling
+                            <div>
+                                <div className="text-xs text-gray-500 mb-1.5">Uczniowie:</div>
                                 <div className="flex flex-wrap items-center">
                                     {/* Show first 2 students */}
                                     {lesson.students.slice(0, 2).map((student, index) => (
-                                        <div key={student.id || index} className="flex items-center mr-3 mb-1">
-                                            <div className="w-6 h-6 mr-1.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
-                                                <img
-                                                    src={student.avatar || "/images/default-avatar.png"}
-                                                    alt={student.username || "Uczeń"}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        e.target.src = "/images/default-avatar.png"
-                                                    }}
-                                                />
+                                        <ProfileHoverCard
+                                            key={student.id || index}
+                                            userId={student.id}
+                                            userData={student}
+                                            placement="top"
+                                            onSendMessage={handleSendMessage}
+                                        >
+                                            <div className="flex items-center mr-3 mb-1 hover:bg-gray-100 rounded-lg p-1 cursor-pointer">
+                                                <div className="w-6 h-6 mr-1.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+                                                    <img
+                                                        src={student.avatar || "/images/default-avatar.png"}
+                                                        alt={student.username || "Uczeń"}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => {
+                                                            e.target.src = "/images/default-avatar.png"
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-medium text-gray-700">
+                                                    {student.first_name || student.username}
+                                                </span>
                                             </div>
-                                            <span className="text-xs font-medium text-gray-700">
-                        {student.first_name || student.username}
-                      </span>
-                                        </div>
+                                        </ProfileHoverCard>
                                     ))}
 
                                     {/* Show +X for additional students */}
@@ -148,38 +200,38 @@ const LessonCard = ({ lesson, onInfoClick }) => {
                     </div>
                 ) : (
                     // STUDENT VIEW - Show tutor
-                    <ProfileHoverCard
-                        userId={lesson.tutor.id}
-                        userData={lesson.tutor}
-                        placement="right"
-                        onScheduleLesson={()=>(console.log("schedule"))}
-                        onSendMessage={()=>(console.log("send message"))}
-                    >
-                    <div className="flex items-center">
-                        <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
-                            <img
-                                src={lesson.tutor?.avatar || "/images/default-avatar.png"}
-                                alt={lesson.tutor?.username || "Nauczyciel"}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                    e.target.src = "/images/default-avatar.png"
-                                }}
-                            />
-                        </div>
-
-                        <div>
-                            <div className="text-xs text-gray-500 mb-0.5">Nauczyciel:</div>
-                            <div className="text-xs font-medium text-gray-700">
-                                {lesson.tutor?.first_name && lesson.tutor?.last_name
-                                    ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
-                                    : lesson.tutor?.username || "Nieznany"}
+                    <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1.5">Prowadzący:</div>
+                        <ProfileHoverCard
+                            userId={lesson.tutor?.id}
+                            userData={lesson.tutor}
+                            placement="right"
+                            onScheduleLesson={handleScheduleLesson}
+                            onSendMessage={handleSendMessage}
+                        >
+                            <div className="flex items-center hover:bg-gray-100 rounded-lg p-1.5 cursor-pointer">
+                                <div className="w-8 h-8 mr-2 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+                                    <img
+                                        src={lesson.tutor?.avatar || "/images/default-avatar.png"}
+                                        alt={lesson.tutor?.username || "Nauczyciel"}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.src = "/images/default-avatar.png"
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <div className="text-xs font-medium text-gray-700">
+                                        {lesson.tutor?.first_name && lesson.tutor?.last_name
+                                            ? `${lesson.tutor.first_name} ${lesson.tutor.last_name}`
+                                            : lesson.tutor?.username || "Nieznany"}
+                                    </div>
+                                    <div className="text-xs text-gray-500">@{lesson.tutor?.username || "nauczyciel"}</div>
+                                </div>
                             </div>
-                            <div className="text-xs text-gray-500">@{lesson.tutor?.username || "nieznany"}</div>
-                        </div>
+                        </ProfileHoverCard>
                     </div>
-                    </ProfileHoverCard>
                 )}
-
 
                 {/* Action button */}
                 <button
