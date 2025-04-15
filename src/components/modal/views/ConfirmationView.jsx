@@ -1,5 +1,4 @@
-// ConfirmationView.jsx
-// Simple confirmation view with spinning animation
+// ConfirmationView.jsx with simplified loading animation
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '../core/useModal';
@@ -43,60 +42,27 @@ const ConfirmationView = ({ data }) => {
         closeModal();
     };
 
-    // Render sophisticated loading animation
+    // Render simple but cool loading animation
     const renderLoading = () => (
         <div className="flex flex-col items-center justify-center h-full w-full">
-            <div className="relative">
-                {/* Outer spinning ring */}
-                <motion.div
-                    className="w-24 h-24 border-[3px] border-gray-100 rounded-full"
-                    style={{
-                        borderLeftColor: "#000",
-                        borderRightColor: "#000"
-                    }}
-                    animate={{
-                        rotate: 360,
-                    }}
-                    transition={{
-                        duration: 2,
-                        ease: "linear",
-                        repeat: Infinity
-                    }}
-                />
+            {/* Simple but cool spinner */}
+            <motion.div
+                className="w-14 h-14 rounded-full"
+                style={{
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    borderLeftColor: '#000',
+                }}
+                animate={{ rotate: 360 }}
+                transition={{
+                    duration: 0.8,
+                    ease: "linear",
+                    repeat: Infinity
+                }}
+            />
 
-                {/* Inner spinning ring (opposite direction) */}
-                <motion.div
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-[2px] border-gray-200 rounded-full"
-                    style={{
-                        borderTopColor: "#000",
-                        borderBottomColor: "#000"
-                    }}
-                    animate={{
-                        rotate: -360,
-                    }}
-                    transition={{
-                        duration: 1.5,
-                        ease: "linear",
-                        repeat: Infinity
-                    }}
-                />
-
-                {/* Center dot pulse */}
-                <motion.div
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-black rounded-full"
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [1, 0.8, 1]
-                    }}
-                    transition={{
-                        duration: 2,
-                        ease: "easeInOut",
-                        repeat: Infinity
-                    }}
-                />
-            </div>
-
-            <p className="mt-8 text-gray-500 text-sm">Przetwarzanie...</p>
+            <p className="mt-6 text-gray-500 text-sm">Przetwarzanie...</p>
         </div>
     );
 

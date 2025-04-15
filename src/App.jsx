@@ -16,6 +16,7 @@ import HelpPage from "./pages/HelpPage";
 import CoursesPage from "./pages/CoursesPage";
 import UserProfilePage from './pages/UserProfilePage';
 import { LayoutGroup } from "framer-motion";
+import SettingsPage from "./pages/SettingsPage.jsx";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -61,6 +62,7 @@ function App() {
                     <Route path={ROUTES.TUTORS} element={<TutorsPage />} />
                     <Route path={ROUTES.HELP} element={<HelpPage />} />
                     <Route path={ROUTES.COURSES} element={<CoursesPage />} />
+                    <Route path={"/settings"} element={<SettingsPage />} />
 
                     {/* User profile routes */}
                     <Route
