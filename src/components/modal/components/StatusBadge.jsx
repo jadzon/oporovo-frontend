@@ -1,6 +1,6 @@
 // Component for displaying lesson status with consistent styling
 import React from 'react';
-import { Icon } from './Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 
 export const StatusBadge = ({ status, showIcon = true, size = "md" }) => {
     // Map status to text, icon, and colors

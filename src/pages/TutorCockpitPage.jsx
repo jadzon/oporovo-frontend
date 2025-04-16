@@ -9,7 +9,7 @@ import { fetchUserCourses } from "../store/thunks/courseThunks"
 import { fetchStudentsForTutor } from "../store/thunks/studentsThunks"
 
 // Components
-import LessonCard from "../components/lessonCard/LessonCard"
+import LessonCard from "../components/LessonCard/LessonCard"
 import CourseCard from "../components/courseCard/CourseCard"
 import { LessonCardSkeleton } from "../components/ui/Skeleton"
 import { useModal } from '../components/modal';

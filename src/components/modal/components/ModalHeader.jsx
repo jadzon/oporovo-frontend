@@ -1,7 +1,7 @@
 // Header component for the modal with title, back button, and close button
 import React from 'react';
 import { useModal } from '../core/useModal';
-import { Icon } from './Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 
 const ModalHeader = ({
                          title,

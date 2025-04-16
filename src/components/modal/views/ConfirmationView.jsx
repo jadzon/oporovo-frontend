@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '../core/useModal';
 import ModalHeader from '../components/ModalHeader';
-import { Icon } from '../components/Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 
 const ConfirmationView = ({ data }) => {
     const { closeModal, hideConfirmation } = useModal();

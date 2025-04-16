@@ -10,7 +10,7 @@ import ProfileCard from '../components/ProfileCard';
 import LoadingState from '../components/LoadingState';
 import { StatusBadge } from '../components/StatusBadge';
 import { TimeDisplay } from '../components/TimeDisplay';
-import { Icon } from '../components/Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 
 const LessonDetailsView = ({ lessonId }) => {
     const { openScheduleModal, closeModal } = useModal();

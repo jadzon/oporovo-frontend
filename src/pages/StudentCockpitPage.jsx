@@ -8,7 +8,7 @@ import { fetchUserTutors } from "../store/thunks/tutorsThunks"
 import { fetchUserCourses } from "../store/thunks/courseThunks"
 
 // Cards
-import LessonCard from "../components/lessonCard/LessonCard"
+import LessonCard from "../components/LessonCard/LessonCard"
 import TutorCard from "../components/tutorCard/TutorCard"
 import CourseCard from "../components/courseCard/CourseCard"
 
@@ -17,6 +17,7 @@ import { LessonCardSkeleton, TutorCardSkeleton } from "../components/ui/Skeleton
 
 // Import the useModal hook from the new modal system
 import { useModal } from '../components/modal';
+import LessonCardTemp from "../components/LessonCard/LessonCardTemp.jsx";
 
 const StudentCockpitPage = () => {
     const dispatch = useDispatch()
@@ -87,7 +88,7 @@ const StudentCockpitPage = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="md:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Quick actions section */}
                 <section className="mb-10">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -342,7 +343,7 @@ const StudentCockpitPage = () => {
                                                 ) : upcomingLessons.length > 0 ? (
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {upcomingLessons.map((les) => (
-                                                            <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
+                                                            <LessonCardTemp key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                         ))}
                                                     </div>
                                                 ) : (
@@ -370,7 +371,7 @@ const StudentCockpitPage = () => {
                                                 ) : pastLessons.length > 0 ? (
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {pastLessons.map((les) => (
-                                                            <LessonCard key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
+                                                            <LessonCardTemp key={les.id} lesson={les} onInfoClick={handleLessonInfo} />
                                                         ))}
                                                     </div>
                                                 ) : (

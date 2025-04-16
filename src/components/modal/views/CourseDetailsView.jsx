@@ -8,7 +8,7 @@ import ModalSection from '../components/ModalSection';
 import ModalActions from '../components/ModalActions';
 import ProfileCard from '../components/ProfileCard';
 import LoadingState from '../components/LoadingState';
-import { Icon } from '../components/Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 import { formatUtils } from '../../../utils';
 
 const CourseDetailsView = ({ courseId }) => {

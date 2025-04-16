@@ -7,7 +7,7 @@ import CourseDetailsView from '../views/CourseDetailsView';
 import ScheduleFormView from '../views/ScheduleFormView';
 import ConfirmationView from '../views/ConfirmationView';
 import LoadingState from '../components/LoadingState';
-import { Icon } from '../components/Icon';
+import { Icon } from '../../../utils/Icon.jsx';
 
 /**
  * Main modal component that renders different content based on modal type
